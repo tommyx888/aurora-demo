@@ -4,6 +4,7 @@ import {
   FileText, Sparkles, Loader2, Copy, Download, RotateCcw, Check
 } from 'lucide-react';
 import { generateDoc, isAILive } from '../lib/aiHelpers';
+import { useLanguage } from '../hooks/useLanguage';
 import { LeadCTA } from './Requests';
 import { cn } from '../lib/utils';
 import type { AIDocTemplate } from '../types';
@@ -111,6 +112,8 @@ const TEMPLATES: TemplateConfig[] = [
 ];
 
 export function AIOffice({ onLeadCapture }: AIOfficeProps) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateConfig>(TEMPLATES[0]);
   const [variables, setVariables] = useState<Record<string, string>>({});
   const [generated, setGenerated] = useState<string | null>(null);
@@ -165,9 +168,9 @@ export function AIOffice({ onLeadCapture }: AIOfficeProps) {
     <div className="page-enter space-y-6">
       <div>
         <p className="text-sm text-tertiary uppercase tracking-wider mb-1">AI Office</p>
-        <h1 className="font-display text-3xl">AI Generator dokumentov</h1>
+        <h1 className="font-display text-3xl">{isEn ? 'AI Document Generator' : 'AI Generator dokumentov'}</h1>
         <p className="text-secondary text-sm mt-1">
-          Zmluvy, inzeraty, exit interviews a viac · {isAILive ? 'Live AI mode 🔥' : 'Demo mode'}
+          {isEn ? 'Contracts, job ads, exit interviews and more' : 'Zmluvy, inzeraty, exit interviews a viac'} · {isAILive ? 'Live AI mode 🔥' : 'Demo mode'}
         </p>
       </div>
 
@@ -248,12 +251,12 @@ export function AIOffice({ onLeadCapture }: AIOfficeProps) {
               {isGenerating ? (
                 <>
                   <Loader2 size={14} className="animate-spin" />
-                  Generujem...
+                  {isEn ? 'Generating...' : 'Generujem...'}
                 </>
               ) : (
                 <>
                   <Sparkles size={14} />
-                  Generovat AI
+                  {isEn ? 'Generate with AI' : 'Generovat AI'}
                 </>
               )}
             </button>
@@ -268,29 +271,29 @@ export function AIOffice({ onLeadCapture }: AIOfficeProps) {
         {/* RIGHT: Preview */}
         <div className="card flex flex-col" style={{ minHeight: 500 }}>
           <div className="flex items-center justify-between mb-3">
-            <p className="text-xs uppercase tracking-wider text-tertiary">Vystup</p>
+            <p className="text-xs uppercase tracking-wider text-tertiary">{isEn ? 'Output' : 'Vystup'}</p>
             {generated && (
               <div className="flex gap-1">
                 <button
                   onClick={handleCopy}
                   className="btn-ghost text-xs"
-                  title="Kopirovat"
+                  title={isEn ? 'Copy' : 'Kopirovat'}
                 >
                   {copied ? (
                     <>
                       <Check size={12} style={{ color: 'var(--success)' }} />
-                      Skopirovane
+                      {isEn ? 'Copied' : 'Skopirovane'}
                     </>
                   ) : (
                     <>
                       <Copy size={12} />
-                      Kopirovat
+                      {isEn ? 'Copy' : 'Kopirovat'}
                     </>
                   )}
                 </button>
                 <button onClick={handleDownload} className="btn-ghost text-xs">
                   <Download size={12} />
-                  Stiahnut
+                  {isEn ? 'Download' : 'Stiahnut'}
                 </button>
               </div>
             )}
@@ -306,7 +309,7 @@ export function AIOffice({ onLeadCapture }: AIOfficeProps) {
                 className="flex-1 flex flex-col items-center justify-center text-center"
               >
                 <FileText size={40} className="text-tertiary opacity-30 mb-3" />
-                <p className="text-sm text-tertiary">Vyplň údaje a klikni "Generovat AI"</p>
+                <p className="text-sm text-tertiary">{isEn ? 'Fill fields and click "Generate with AI"' : 'Vyplň údaje a klikni "Generovat AI"'}</p>
               </motion.div>
             )}
 
@@ -319,8 +322,8 @@ export function AIOffice({ onLeadCapture }: AIOfficeProps) {
                 className="flex-1 flex flex-col items-center justify-center text-center"
               >
                 <Loader2 size={40} className="accent-text animate-spin mb-3" />
-                <p className="font-medium text-sm">AI pise dokument...</p>
-                <p className="text-xs text-tertiary mt-1">Pouziva slovenske formaty a legislativu</p>
+                <p className="font-medium text-sm">{isEn ? 'AI is writing your document...' : 'AI pise dokument...'}</p>
+                <p className="text-xs text-tertiary mt-1">{isEn ? 'Using localized formatting and legal style' : 'Pouziva slovenske formaty a legislativu'}</p>
               </motion.div>
             )}
 
@@ -341,7 +344,7 @@ export function AIOffice({ onLeadCapture }: AIOfficeProps) {
         </div>
       </div>
 
-      <LeadCTA module="AI Office Generator" onLeadCapture={onLeadCapture} />
+      <LeadCTA module={isEn ? 'AI Office Generator' : 'AI Office Generator'} onLeadCapture={onLeadCapture} />
     </div>
   );
 }

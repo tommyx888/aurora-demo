@@ -1,6 +1,7 @@
 ﻿import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Sparkles, X, ArrowRight, ArrowLeft, Wand2, Bot } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface TourStep {
   title: string;
@@ -9,7 +10,7 @@ interface TourStep {
   tip?: string;
 }
 
-const STEPS: TourStep[] = [
+const STEPS_SK: TourStep[] = [
   {
     title: 'Vitaj v demo!',
     emoji: '👋',
@@ -53,6 +54,15 @@ const STEPS: TourStep[] = [
     tip: 'Dolu mas tip lištu, hore search bar, vsetko sa da kliknut.',
   },
 ];
+const STEPS_EN: TourStep[] = [
+  { title: 'Welcome to the demo!', emoji: '👋', body: 'I will show you the strongest features of this HR system in 30 seconds. If you do not want the tour, click X.', tip: 'Demo contains pre-filled data from "Aurora" (15 employees). Everything is interactive.' },
+  { title: '4 Hero modules', emoji: '🔥', body: 'In the left sidebar you can find our 4 key modules: AI onboarding, Skill Heatmap, Admin Dashboard, and Recruiting kanban.', tip: 'Features with "AI" badge are your differentiation points.' },
+  { title: 'Branding Studio', emoji: '🪄', body: 'Bottom-right palette icon → upload your logo. AI extracts colors and switches the whole demo to your brand in 1 second.', tip: 'Try this with a real customer logo for instant wow effect.' },
+  { title: 'AI Chatbot Eva', emoji: '🤖', body: 'Open the bot and ask about benefits, colleagues, or events. Without API key it runs in demo mode, with API key in live mode.', tip: 'Add VITE_ANTHROPIC_API_KEY to .env.local for live mode.' },
+  { title: 'View switching', emoji: '🔄', body: 'Switch between Employee and Admin views in sidebar. Some features are HR-only, others are employee-focused.', tip: 'Great for sales demos: show manager vs employee perspective.' },
+  { title: '3 Themes', emoji: '🎨', body: 'Choose one of 3 visual themes or use custom branding.', tip: 'Theme switcher is bottom-right palette icon.' },
+  { title: 'Done!', emoji: '🚀', body: 'You are ready. Explore freely and click around.', tip: 'Konami code (↑↑↓↓←→←→BA) triggers confetti. 🎉' },
+];
 
 const TOUR_KEY = 'de-demo-tour-completed';
 
@@ -62,8 +72,11 @@ interface OnboardingTourProps {
 }
 
 export function OnboardingTour({ forceShow = false, onClose }: OnboardingTourProps) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [step, setStep] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const steps = isEn ? STEPS_EN : STEPS_SK;
 
   useEffect(() => {
     if (forceShow) {
@@ -86,7 +99,7 @@ export function OnboardingTour({ forceShow = false, onClose }: OnboardingTourPro
   };
 
   const handleNext = () => {
-    if (step < STEPS.length - 1) {
+    if (step < steps.length - 1) {
       setStep((s) => s + 1);
     } else {
       handleClose();
@@ -97,8 +110,8 @@ export function OnboardingTour({ forceShow = false, onClose }: OnboardingTourPro
     if (step > 0) setStep((s) => s - 1);
   };
 
-  const current = STEPS[step];
-  const progress = ((step + 1) / STEPS.length) * 100;
+  const current = steps[step];
+  const progress = ((step + 1) / steps.length) * 100;
 
   return (
     <AnimatePresence>
@@ -130,7 +143,7 @@ export function OnboardingTour({ forceShow = false, onClose }: OnboardingTourPro
             <button
               onClick={handleClose}
               className="absolute top-3 right-3 w-8 h-8 rounded-full bg-tertiary hover:bg-medium flex items-center justify-center transition-colors z-10"
-              title="Preskocit tour"
+              title={isEn ? 'Skip tour' : 'Preskocit tour'}
             >
               <X size={14} />
             </button>
@@ -154,7 +167,7 @@ export function OnboardingTour({ forceShow = false, onClose }: OnboardingTourPro
                   </motion.div>
 
                   <p className="text-[11px] uppercase tracking-wider text-tertiary text-center mb-2">
-                    Krok {step + 1} z {STEPS.length}
+                    {isEn ? 'Step' : 'Krok'} {step + 1} {isEn ? 'of' : 'z'} {steps.length}
                   </p>
 
                   <h2 className="font-display text-3xl text-center mb-4">{current.title}</h2>
@@ -168,7 +181,7 @@ export function OnboardingTour({ forceShow = false, onClose }: OnboardingTourPro
                       <div className="flex items-start gap-2">
                         <Sparkles size={14} className="accent-text mt-0.5 flex-shrink-0" />
                         <p className="text-xs leading-relaxed">
-                          <strong className="text-primary">Tip:</strong>{' '}
+                          <strong className="text-primary">{isEn ? 'Tip:' : 'Tip:'}</strong>{' '}
                           <span className="text-secondary">{current.tip}</span>
                         </p>
                       </div>
@@ -179,7 +192,7 @@ export function OnboardingTour({ forceShow = false, onClose }: OnboardingTourPro
 
               {/* Step dots */}
               <div className="flex items-center justify-center gap-1 my-6">
-                {STEPS.map((_, i) => (
+                {steps.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => setStep(i)}
@@ -198,22 +211,22 @@ export function OnboardingTour({ forceShow = false, onClose }: OnboardingTourPro
                   className="btn-ghost text-sm disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   <ArrowLeft size={14} />
-                  Spat
+                  {isEn ? 'Back' : 'Spat'}
                 </button>
 
                 <button onClick={handleClose} className="btn-ghost text-xs text-tertiary">
-                  Preskocit
+                  {isEn ? 'Skip' : 'Preskocit'}
                 </button>
 
                 <button onClick={handleNext} className="btn-primary text-sm">
-                  {step === STEPS.length - 1 ? (
+                  {step === steps.length - 1 ? (
                     <>
-                      Pochopene
+                      {isEn ? 'Got it' : 'Pochopene'}
                       <Sparkles size={14} />
                     </>
                   ) : (
                     <>
-                      Dalej
+                      {isEn ? 'Next' : 'Dalej'}
                       <ArrowRight size={14} />
                     </>
                   )}

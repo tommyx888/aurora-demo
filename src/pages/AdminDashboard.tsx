@@ -12,6 +12,7 @@ import { employees, departments } from '../data/employees';
 import { candidates, openPositions } from '../data/candidates';
 import { requests } from '../data/content';
 import { cn } from '../lib/utils';
+import { useLanguage } from '../hooks/useLanguage';
 
 type Period = 'week' | 'month' | 'quarter';
 
@@ -87,6 +88,8 @@ const turnoverByDept = [
 ];
 
 export function AdminDashboard() {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [period, setPeriod] = useState<Period>('month');
   const data = CHART_DATA[period];
 
@@ -104,18 +107,18 @@ export function AdminDashboard() {
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-sm text-tertiary uppercase tracking-wider mb-1">HR Dashboard</p>
-          <h1 className="font-display text-3xl">Dobrý deň, Janka 👋</h1>
+          <h1 className="font-display text-3xl">{isEn ? 'Good day, Janka 👋' : 'Dobrý deň, Janka 👋'}</h1>
           <p className="text-secondary text-sm mt-1">
-            Tu je tvoj prehľad firmy · {new Date().toLocaleDateString('sk-SK', { weekday: 'long', day: 'numeric', month: 'long' })}
+            {isEn ? 'Here is your company overview' : 'Tu je tvoj prehľad firmy'} · {new Date().toLocaleDateString(isEn ? 'en-US' : 'sk-SK', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
         </div>
 
         {/* Period switcher */}
         <div className="flex items-center gap-1 p-1 bg-tertiary rounded-lg">
           {([
-            { id: 'week' as const, label: 'Týždeň' },
-            { id: 'month' as const, label: 'Mesiac' },
-            { id: 'quarter' as const, label: 'Kvartál' },
+            { id: 'week' as const, label: isEn ? 'Week' : 'Týždeň' },
+            { id: 'month' as const, label: isEn ? 'Month' : 'Mesiac' },
+            { id: 'quarter' as const, label: isEn ? 'Quarter' : 'Kvartál' },
           ]).map((p) => (
             <button
               key={p.id}
@@ -145,12 +148,14 @@ export function AdminDashboard() {
       >
         <Zap size={18} style={{ color: 'var(--warning)' }} className="mt-0.5 flex-shrink-0" />
         <div className="flex-1">
-          <p className="font-medium text-sm mb-1">AI detekoval anomáliu v Sales tíme</p>
+          <p className="font-medium text-sm mb-1">{isEn ? 'AI detected an anomaly in Sales team' : 'AI detekoval anomáliu v Sales tíme'}</p>
           <p className="text-sm text-secondary">
-            Pulse score v Sales klesol z 4.6 na 3.8 za posledné 3 týždne. Odporúčam 1:1 s Jakubom (Sales Manager) tento týždeň.
+            {isEn
+              ? 'Pulse score in Sales dropped from 4.6 to 3.8 in the last 3 weeks. Recommended: a 1:1 with Jakub (Sales Manager) this week.'
+              : 'Pulse score v Sales klesol z 4.6 na 3.8 za posledné 3 týždne. Odporúčam 1:1 s Jakubom (Sales Manager) tento týždeň.'}
           </p>
         </div>
-        <button className="btn-ghost text-xs">Zobraziť detail →</button>
+        <button className="btn-ghost text-xs">{isEn ? 'View details →' : 'Zobraziť detail →'}</button>
       </motion.div>
 
       {/* Key metrics */}
@@ -159,15 +164,15 @@ export function AdminDashboard() {
           icon={Users}
           label="Headcount"
           value={employees.length.toString()}
-          change="+1 tento mesiac"
+          change={isEn ? '+1 this month' : '+1 tento mesiac'}
           trend="up"
           color="#3b82f6"
         />
         <KpiCard
           icon={UserPlus}
-          label="Otvorené pozície"
+          label={isEn ? 'Open positions' : 'Otvorené pozície'}
           value={openPositions.length.toString()}
-          change={`${activeRecruits} aktívnych kandidátov`}
+          change={isEn ? `${activeRecruits} active candidates` : `${activeRecruits} aktívnych kandidátov`}
           trend="neutral"
           color="#10b981"
         />
@@ -175,15 +180,17 @@ export function AdminDashboard() {
           icon={Heart}
           label="eNPS"
           value={`+${enpsCurrent}`}
-          change={enpsDelta >= 0 ? `+${enpsDelta} vs predchadzajuce obdobie` : `${enpsDelta} vs predchadzajuce obdobie`}
+          change={enpsDelta >= 0
+            ? (isEn ? `+${enpsDelta} vs previous period` : `+${enpsDelta} vs predchadzajuce obdobie`)
+            : (isEn ? `${enpsDelta} vs previous period` : `${enpsDelta} vs predchadzajuce obdobie`)}
           trend={enpsDelta >= 0 ? 'up' : 'down'}
           color="#ec4899"
         />
         <KpiCard
           icon={AlertCircle}
-          label="Pending žiadanky"
+          label={isEn ? 'Pending requests' : 'Pending žiadanky'}
           value={pendingRequests.toString()}
-          change="Vyžadujú akciu"
+          change={isEn ? 'Require action' : 'Vyžadujú akciu'}
           trend="down"
           color="#f59e0b"
         />
@@ -196,7 +203,11 @@ export function AdminDashboard() {
           <div className="flex justify-between items-start mb-4">
             <div>
               <h2 className="font-medium">Headcount Growth</h2>
-              <p className="text-xs text-tertiary mt-0.5">{data.label} · +36% rast</p>
+              <p className="text-xs text-tertiary mt-0.5">
+                {(isEn
+                  ? (period === 'week' ? 'This week' : period === 'month' ? 'Last 6 months' : 'Last 6 quarters')
+                  : data.label)} · {isEn ? '+36% growth' : '+36% rast'}
+              </p>
             </div>
             <span className="badge badge-success">
               <TrendingUp size={12} />
@@ -235,7 +246,7 @@ export function AdminDashboard() {
 
         {/* Department breakdown */}
         <div className="card">
-          <h2 className="font-medium mb-4">Oddelenia</h2>
+          <h2 className="font-medium mb-4">{isEn ? 'Departments' : 'Oddelenia'}</h2>
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
               <Pie
@@ -341,7 +352,7 @@ export function AdminDashboard() {
           <div className="flex justify-between items-start mb-4">
             <div>
               <h2 className="font-medium">Turnover by Dept</h2>
-              <p className="text-xs text-tertiary mt-0.5">Tento rok · 13% YTD</p>
+              <p className="text-xs text-tertiary mt-0.5">{isEn ? 'This year · 13% YTD' : 'Tento rok · 13% YTD'}</p>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={180}>
@@ -368,7 +379,7 @@ export function AdminDashboard() {
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Activity feed */}
         <div className="card">
-          <h2 className="font-medium mb-4">Posledná aktivita</h2>
+          <h2 className="font-medium mb-4">{isEn ? 'Recent activity' : 'Posledná aktivita'}</h2>
           <div className="space-y-3">
             {[
               { who: 'Peter Novák', what: 'požiadal o dovolenku 15.-22.7.', when: 'pred 2h', emoji: '🏖️' },
@@ -404,16 +415,18 @@ export function AdminDashboard() {
             <h2 className="font-medium">Cost insights</h2>
           </div>
           <div className="space-y-4">
-            <CostRow label="Mesačné mzdy (gross)" value="78 450 €" trend="+5.2% vs Q1" />
+            <CostRow label={isEn ? 'Monthly payroll (gross)' : 'Mesačné mzdy (gross)'} value="78 450 €" trend="+5.2% vs Q1" />
             <CostRow label="Recruiting cost / hire" value="2 100 €" trend="-15% vs benchmark" positive />
             <CostRow label="Wellness benefits" value="3 200 €" trend="Multisport + BetterHelp" />
-            <CostRow label="Training spend YTD" value="14 500 €" trend="58% utilizácie" />
-            <CostRow label="Office (per FTE/mesiac)" value="290 €" trend="Stabilne" />
+            <CostRow label="Training spend YTD" value="14 500 €" trend={isEn ? '58% utilization' : '58% utilizácie'} />
+            <CostRow label={isEn ? 'Office (per FTE/month)' : 'Office (per FTE/mesiac)'} value="290 €" trend={isEn ? 'Stable' : 'Stabilne'} />
           </div>
 
           <div className="mt-4 pt-4 border-t border-subtle">
             <p className="text-xs text-tertiary">
-              💡 <strong className="text-primary">AI insight:</strong> Recruiting cost je o 15% nižšie ako trh — váš referral program funguje. Zvýšte bonus z 500€ na 750€ pre A-grade pozície.
+              {isEn
+                ? '💡 AI insight: Recruiting cost is 15% below market - your referral program works. Consider increasing bonus from €500 to €750 for A-grade roles.'
+                : '💡 AI insight: Recruiting cost je o 15% nižšie ako trh — váš referral program funguje. Zvýšte bonus z 500€ na 750€ pre A-grade pozície.'}
             </p>
           </div>
         </div>

@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import type { Page } from '../types';
 import { DemoDisclaimerBanner } from '../components/DemoDisclaimer';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface LandingPageProps {
   onStart: (page: Page) => void;
@@ -18,7 +19,7 @@ const features = [
   { icon: Brain, label: 'Skill Heatmap', color: '#ec4899' },
   { icon: BarChart3, label: 'Live Dashboard', color: '#3b82f6' },
   { icon: BriefcaseBusiness, label: 'Recruiting', color: '#10b981' },
-  { icon: FileText, label: 'Žiadanky', color: '#f59e0b' },
+  { icon: FileText, label: 'Requests', color: '#f59e0b' },
   { icon: GitBranch, label: 'Org Chart', color: '#06b6d4' },
   { icon: MessageSquare, label: 'Pulse Surveys', color: '#f97316' },
   { icon: Newspaper, label: 'Newsletter', color: '#8b5cf6' },
@@ -27,17 +28,16 @@ const features = [
 ];
 
 export function LandingPage({ onStart, onOpenBranding, onOpenDemoInfo }: LandingPageProps) {
+  const { t } = useLanguage();
+
   return (
     <div className="min-h-screen bg-primary relative overflow-hidden">
-      {/* Disclaimer banner — demo + na mieru */}
       <div className="relative z-20">
         <DemoDisclaimerBanner onLearnMore={onOpenDemoInfo} />
       </div>
 
-      {/* Mesh gradient background */}
       <div className="absolute inset-0 mesh-bg opacity-60 pointer-events-none" />
 
-      {/* Grid pattern overlay */}
       <div
         className="absolute inset-0 opacity-30 pointer-events-none"
         style={{
@@ -91,17 +91,16 @@ export function LandingPage({ onStart, onOpenBranding, onOpenDemoInfo }: Landing
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 accent-bg"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 accent-bg"></span>
             </span>
-            Live demo · žiadna registrácia · 60 sekúnd setup
+            {t('landing.badge')}
           </motion.div>
 
           <h1 className="font-display text-6xl md:text-7xl leading-[1.05] mb-6">
-            HR systém,<br />
-            ktorý vaši ľudia <em className="gradient-text">naozaj použijú</em>.
+            {t('landing.title1')}<br />
+            {t('landing.title2')} <em className="gradient-text">{t('landing.titleEm')}</em>.
           </h1>
 
           <p className="text-lg text-secondary leading-relaxed max-w-2xl mx-auto mb-10">
-            Onboarding s AI, skill maticou, recruiting kanban a 6 ďalších modulov v jednom.
-            Postavené pre slovenské firmy, ktoré chcú nahradiť nudné HR systémy z roku 2003.
+            {t('landing.subtitle')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -112,33 +111,33 @@ export function LandingPage({ onStart, onOpenBranding, onOpenDemoInfo }: Landing
               className="btn-primary text-base px-8 py-4"
             >
               <Sparkles size={18} />
-              Vyskúšať demo
+              {t('landing.ctaPrimary')}
               <ArrowRight size={18} />
             </motion.button>
             <button
               onClick={onOpenBranding}
               className="btn-secondary text-base px-8 py-4"
             >
-              ✨ Skús s tvojím logom
+              {t('landing.ctaSecondary')}
             </button>
           </div>
 
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-8 text-sm text-tertiary">
             <span className="flex items-center gap-1.5">
               <CheckCircle2 size={14} className="accent-text" />
-              Bez registrácie
+              {t('landing.feature1')}
             </span>
             <span className="flex items-center gap-1.5">
               <CheckCircle2 size={14} className="accent-text" />
-              Pred-vyplnené dáta
+              {t('landing.feature2')}
             </span>
             <span className="flex items-center gap-1.5">
               <CheckCircle2 size={14} className="accent-text" />
-              3 vizuálne štýly
+              {t('landing.feature3')}
             </span>
             <span className="flex items-center gap-1.5">
               <CheckCircle2 size={14} className="accent-text" />
-              Reset jedným klikom
+              {t('landing.feature4')}
             </span>
           </div>
         </motion.div>
@@ -184,27 +183,27 @@ export function LandingPage({ onStart, onOpenBranding, onOpenDemoInfo }: Landing
             <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center mb-3">
               <Zap size={18} className="accent-text" />
             </div>
-            <h3 className="font-medium text-base mb-2">Šitý na Slovensko</h3>
+            <h3 className="font-medium text-base mb-2">{t('landing.why1Title')}</h3>
             <p className="text-sm text-secondary leading-relaxed">
-              Slovenský pracovný zákon, dovolenky, štátne sviatky, Multisport. Žiadne preklady z angličtiny.
+              {t('landing.why1Body')}
             </p>
           </div>
           <div className="card">
             <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center mb-3">
               <Brain size={18} className="accent-text" />
             </div>
-            <h3 className="font-medium text-base mb-2">AI od prvého dňa</h3>
+            <h3 className="font-medium text-base mb-2">{t('landing.why2Title')}</h3>
             <p className="text-sm text-secondary leading-relaxed">
-              Onboarding buddy "Eva", AI insights pre skill gaps, automaticky generované narodeninové priania.
+              {t('landing.why2Body')}
             </p>
           </div>
           <div className="card">
             <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center mb-3">
               <Users size={18} className="accent-text" />
             </div>
-            <h3 className="font-medium text-base mb-2">Aj na 10 ľudí</h3>
+            <h3 className="font-medium text-base mb-2">{t('landing.why3Title')}</h3>
             <p className="text-sm text-secondary leading-relaxed">
-              Nie je to drahý SAP klon. Funguje pre 10-osobový startup aj pre 250-osobovú strednú firmu.
+              {t('landing.why3Body')}
             </p>
           </div>
         </motion.div>
@@ -216,7 +215,7 @@ export function LandingPage({ onStart, onOpenBranding, onOpenDemoInfo }: Landing
           transition={{ delay: 1 }}
           className="text-center text-xs text-tertiary"
         >
-          Postavené s ❤️ v Bratislave · Digital Evolution s.r.o. · 2026
+          {t('landing.footer')}
         </motion.div>
       </div>
     </div>

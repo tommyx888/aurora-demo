@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Newspaper, Plus, Heart, MessageCircle, Share2, Sparkles } from 'lucide-react';
 import { news as initialNews } from '../data/content';
+import { useLanguage } from '../hooks/useLanguage';
 import { LeadCTA } from './Requests';
 import { formatDate, cn } from '../lib/utils';
 
@@ -10,6 +11,8 @@ interface NewsletterProps {
 }
 
 export function Newsletter({ onLeadCapture }: NewsletterProps) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [news, setNews] = useState(initialNews);
   const [filter, setFilter] = useState<string>('all');
 
@@ -40,19 +43,21 @@ export function Newsletter({ onLeadCapture }: NewsletterProps) {
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-sm text-tertiary uppercase tracking-wider mb-1">Communication</p>
-          <h1 className="font-display text-3xl">Firemné správy</h1>
+          <h1 className="font-display text-3xl">{isEn ? 'Company News' : 'Firemné správy'}</h1>
           <p className="text-secondary text-sm mt-1">
-            {news.length} článkov · Tip: Reaguj emojkami, kolegovia to vidia 👀
+            {isEn
+              ? `${news.length} posts · Tip: react with emojis, teammates can see it 👀`
+              : `${news.length} článkov · Tip: Reaguj emojkami, kolegovia to vidia 👀`}
           </p>
         </div>
         <div className="flex gap-2">
           <button className="btn-secondary text-sm">
             <Sparkles size={14} />
-            AI: Napísať za mňa
+            {isEn ? 'AI: Write for me' : 'AI: Napísať za mňa'}
           </button>
           <button className="btn-primary text-sm">
             <Plus size={14} />
-            Nový článok
+            {isEn ? 'New post' : 'Nový článok'}
           </button>
         </div>
       </div>
@@ -65,7 +70,7 @@ export function Newsletter({ onLeadCapture }: NewsletterProps) {
             onClick={() => setFilter(cat)}
             className={cn('badge', filter === cat && 'badge-accent')}
           >
-            {cat === 'all' ? 'Všetky' : cat}
+            {cat === 'all' ? (isEn ? 'All' : 'Všetky') : cat}
           </button>
         ))}
       </div>
@@ -120,7 +125,7 @@ export function Newsletter({ onLeadCapture }: NewsletterProps) {
                 <button
                   onClick={() => addReaction(item.id, '🚀')}
                   className="px-2 py-1 rounded-full hover:bg-tertiary transition-colors"
-                  title="Pridať reakciu"
+                  title={isEn ? 'Add reaction' : 'Pridať reakciu'}
                 >
                   <Plus size={12} className="text-tertiary" />
                 </button>
@@ -130,7 +135,7 @@ export function Newsletter({ onLeadCapture }: NewsletterProps) {
         ))}
       </div>
 
-      <LeadCTA module="Firemný Newsletter" onLeadCapture={onLeadCapture} />
+      <LeadCTA module={isEn ? 'Company Newsletter' : 'Firemný Newsletter'} onLeadCapture={onLeadCapture} />
     </div>
   );
 }

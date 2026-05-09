@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Bot, X, Send, Sparkles, Stethoscope, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { sendChatMessage, isAILive } from '../lib/ai';
 import { runAIDiagnostics } from '../lib/aiDiagnostics';
+import { useLanguage } from '../hooks/useLanguage';
 import type { ChatMessage } from '../types';
 
 interface AIChatbotProps {
@@ -11,13 +12,42 @@ interface AIChatbotProps {
 }
 
 export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
+  const { lang, t } = useLanguage();
+  const copy = {
+    welcomeLive:
+      lang === 'en'
+        ? "Hi! 👋 I'm Eva, your AI buddy in Aurora. I'm live (Live Mode 🔥), ask me anything - benefits, colleagues, events, or just chat!"
+        : 'Ahoj! 👋 Som Eva, tvoja AI buddy v Aurora. Som naživo (Live Mode 🔥), opýtaj sa ma na čokoľvek - benefity, kolegov, eventy, alebo si len pokecaj!',
+    welcomeDemo:
+      lang === 'en'
+        ? "Hi! 👋 I'm Eva, your AI buddy. I'm in Demo mode, but I can still answer questions about benefits, colleagues, events... Try it! (For full AI: add VITE_ANTHROPIC_API_KEY)"
+        : 'Ahoj! 👋 Som Eva, tvoja AI buddy. Som v Demo móde, ale stále viem odpovedať na otázky o benefitoch, kolegoch, eventoch... Skús! (Pre plné AI: pridaj VITE_ANTHROPIC_API_KEY)',
+    error: lang === 'en' ? 'Oops, something went wrong 😅 Try again?' : 'Ups, niečo sa pokazilo 😅 Skús znova?',
+    quickPrompts:
+      lang === 'en'
+        ? ['What are the benefits?', 'When is Friday Beers?', 'Who has a birthday?', "What's new in the company?"]
+        : ['Aké sú benefity?', 'Kedy je Friday Beers?', 'Kto má narodeniny?', 'Čo je nové vo firme?'],
+    placeholder: lang === 'en' ? 'Type a message...' : 'Napíš správu...',
+    footerDemo: lang === 'en' ? 'fake responses · add API key for Live mode' : 'fake responses · pridaj API key pre Live mode',
+    typingApiCall: lang === 'en' ? 'Testing API call...' : 'Skúšam API call...',
+    diagnosticsTitle: lang === 'en' ? 'AI Diagnostics' : 'AI Diagnostika',
+    testLabel: lang === 'en' ? 'Test' : 'Test',
+    apiOk: lang === 'en' ? '✅ API works' : '✅ API funguje',
+    apiBad: lang === 'en' ? '❌ API issue' : '❌ API problem',
+    runAgain: lang === 'en' ? 'Run again' : 'Spustiť znova',
+    badKey: lang === 'en' ? '➜ API key is invalid or expired' : '➜ API key je nesprávny alebo expired',
+    rateLimit: lang === 'en' ? '➜ You hit the rate limit' : '➜ Prekročil si rate limit',
+    badModel: lang === 'en' ? '➜ Model ID or parameters are invalid' : '➜ Model ID je zlý alebo rýchle parametre',
+    network: lang === 'en' ? '➜ Probably CORS / network issue' : '➜ Pravdepodobne CORS / network problem',
+  };
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',
       role: 'assistant',
       content: isAILive
-        ? 'Ahoj! 👋 Som Eva, tvoja AI buddy v Aurora. Som naživo (Live Mode 🔥), opýtaj sa ma na čokoľvek - benefity, kolegov, eventy, alebo si len pokecaj!'
-        : 'Ahoj! 👋 Som Eva, tvoja AI buddy. Som v Demo móde, ale stále viem odpovedať na otázky o benefitoch, kolegoch, eventoch... Skús! (Pre plné AI: pridaj VITE_ANTHROPIC_API_KEY)',
+        ? copy.welcomeLive
+        : copy.welcomeDemo,
       timestamp: Date.now(),
     },
   ]);
@@ -75,7 +105,7 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
         {
           id: `error-${Date.now()}`,
           role: 'assistant',
-          content: 'Ups, niečo sa pokazilo 😅 Skús znova?',
+          content: copy.error,
           timestamp: Date.now(),
         },
       ]);
@@ -99,12 +129,7 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
     setDiagRunning(false);
   };
 
-  const quickPrompts = [
-    'Aké sú benefity?',
-    'Kedy je Friday Beers?',
-    'Kto má narodeniny?',
-    'Čo je nové vo firme?',
-  ];
+  const quickPrompts = copy.quickPrompts;
 
   return (
     <>
@@ -113,10 +138,10 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
         onClick={() => onClose()}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 left-6 w-14 h-14 rounded-full accent-bg shadow-xl-themed flex items-center justify-center text-white z-40 ai-ring"
-        title="Chat s Evou"
+        className="fixed bottom-4 left-4 md:bottom-6 md:left-6 w-12 h-12 md:w-14 md:h-14 rounded-full accent-bg shadow-xl-themed flex items-center justify-center text-white z-40 ai-ring"
+        title={t('chatbot.title')}
       >
-        {isOpen ? <X size={22} /> : <Bot size={22} />}
+        {isOpen ? <X size={20} /> : <Bot size={20} />}
         {!isOpen && (
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white text-[9px] flex items-center justify-center text-white font-bold">
             1
@@ -132,7 +157,7 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 left-6 w-96 max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-8rem)] card shadow-xl-themed z-40 flex flex-col p-0 overflow-hidden"
+            className="fixed bottom-20 left-3 right-3 md:left-6 md:right-auto md:bottom-24 md:w-96 h-[calc(100vh-7rem)] md:h-[600px] max-h-[calc(100vh-7rem)] md:max-h-[calc(100vh-8rem)] card shadow-xl-themed z-40 flex flex-col p-0 overflow-hidden"
           >
             {/* Header */}
             <div className="p-4 border-b border-subtle flex items-center gap-3">
@@ -148,7 +173,7 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
                   </span>
                 </p>
               </div>
-              <button onClick={runDiag} className="btn-ghost" title="Diagnostika API">
+              <button onClick={runDiag} className="btn-ghost" title={t('chatbot.diagnostics')}>
                 <Stethoscope size={14} />
               </button>
               <button onClick={onClose} className="btn-ghost">
@@ -232,7 +257,7 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                  placeholder="Napíš správu..."
+                  placeholder={copy.placeholder}
                   className="input-field text-sm flex-1 py-2"
                   disabled={isTyping}
                 />
@@ -245,7 +270,7 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
                 </button>
               </div>
               <p className="text-[10px] text-tertiary mt-2 text-center">
-                Powered by {isAILive ? 'Claude API 🚀' : 'fake responses · pridaj API key pre Live mode'}
+                Powered by {isAILive ? 'Claude API 🚀' : copy.footerDemo}
               </p>
             </div>
 
@@ -261,7 +286,7 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <Stethoscope size={16} className="accent-text" />
-                      <p className="font-medium">AI Diagnostika</p>
+                      <p className="font-medium">{copy.diagnosticsTitle}</p>
                     </div>
                     <button onClick={() => setDiagOpen(false)} className="btn-ghost">
                       <X size={16} />
@@ -271,14 +296,14 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
                   {diagRunning && (
                     <div className="flex flex-col items-center justify-center py-12 gap-2">
                       <Loader2 size={32} className="animate-spin accent-text" />
-                      <p className="text-sm text-tertiary">Skúšam API call...</p>
+                      <p className="text-sm text-tertiary">{copy.typingApiCall}</p>
                     </div>
                   )}
 
                   {diagResult && !diagRunning && (
                     <div className="space-y-2">
                       <p className="text-[10px] text-tertiary uppercase tracking-wider">
-                        Test {new Date(diagResult.timestamp).toLocaleTimeString('sk-SK')}
+                        {copy.testLabel} {new Date(diagResult.timestamp).toLocaleTimeString(lang === 'en' ? 'en-US' : 'sk-SK')}
                       </p>
                       {diagResult.checks.map((c, i) => (
                         <div key={i} className="card p-3 text-xs">
@@ -299,7 +324,7 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
                       {diagResult.apiTest && (
                         <div className="mt-4 pt-4 border-t border-subtle">
                           <p className="text-[10px] text-tertiary uppercase tracking-wider mb-2">
-                            {diagResult.apiTest.success ? '✅ API funguje' : '❌ API problem'}
+                            {diagResult.apiTest.success ? copy.apiOk : copy.apiBad}
                           </p>
                           {diagResult.apiTest.success && diagResult.apiTest.response && (
                             <div className="card bg-tertiary p-3 text-xs italic">
@@ -313,16 +338,16 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
                               </p>
                               <div className="mt-3 pt-3 border-t border-subtle space-y-1 text-tertiary">
                                 {diagResult.apiTest.errorStatus === 401 && (
-                                  <p>➜ API key je nesprávny alebo expired</p>
+                                  <p>{copy.badKey}</p>
                                 )}
                                 {diagResult.apiTest.errorStatus === 429 && (
-                                  <p>➜ Prekročil si rate limit</p>
+                                  <p>{copy.rateLimit}</p>
                                 )}
                                 {diagResult.apiTest.errorStatus === 400 && (
-                                  <p>➜ Model ID je zlý alebo rýchle parametre</p>
+                                  <p>{copy.badModel}</p>
                                 )}
                                 {!diagResult.apiTest.errorStatus && (
-                                  <p>➜ Pravdepodobne CORS / network problem</p>
+                                  <p>{copy.network}</p>
                                 )}
                               </div>
                             </div>
@@ -334,7 +359,7 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
                         onClick={runDiag}
                         className="btn-secondary text-xs w-full mt-4"
                       >
-                        Spustiť znova
+                        {copy.runAgain}
                       </button>
                     </div>
                   )}

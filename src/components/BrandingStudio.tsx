@@ -7,6 +7,7 @@ import {
 import { extractColors, generatePalette, applyPalette } from '../lib/colorExtract';
 import { useBranding } from '../hooks/useBranding';
 import { useTheme } from '../hooks/useTheme';
+import { useLanguage } from '../hooks/useLanguage';
 import type { Theme } from '../types';
 
 interface BrandingStudioProps {
@@ -15,6 +16,8 @@ interface BrandingStudioProps {
 }
 
 export function BrandingStudio({ isOpen, onClose }: BrandingStudioProps) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const { branding, updateBranding, reset } = useBranding();
   const { setTheme } = useTheme();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -26,12 +29,12 @@ export function BrandingStudio({ isOpen, onClose }: BrandingStudioProps) {
 
   const handleFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      setError('Prosím nahraj obrázok (PNG, JPG, SVG, WEBP)');
+      setError(isEn ? 'Please upload an image (PNG, JPG, SVG, WEBP)' : 'Prosím nahraj obrázok (PNG, JPG, SVG, WEBP)');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setError('Súbor je príliš veľký (max 5 MB)');
+      setError(isEn ? 'File is too large (max 5 MB)' : 'Súbor je príliš veľký (max 5 MB)');
       return;
     }
 
@@ -73,7 +76,7 @@ export function BrandingStudio({ isOpen, onClose }: BrandingStudioProps) {
 
       setStep('preview');
     } catch (err: any) {
-      setError(err?.message || 'Niečo sa pokazilo. Skús znova.');
+      setError(err?.message || (isEn ? 'Something went wrong. Please try again.' : 'Niečo sa pokazilo. Skús znova.'));
     } finally {
       setIsProcessing(false);
     }
@@ -135,7 +138,7 @@ export function BrandingStudio({ isOpen, onClose }: BrandingStudioProps) {
                   <div>
                     <h2 className="font-display text-2xl">Branding Studio</h2>
                     <p className="text-sm text-tertiary">
-                      Nahraj svoje logo a uvidíš demo v <em>tvojich</em> farbách
+                      {isEn ? 'Upload your logo and see the demo in your brand colors' : 'Nahraj svoje logo a uvidíš demo v tvojich farbách'}
                     </p>
                   </div>
                 </div>
@@ -153,7 +156,7 @@ export function BrandingStudio({ isOpen, onClose }: BrandingStudioProps) {
                     type="text"
                     value={companyNameInput}
                     onChange={(e) => setCompanyNameInput(e.target.value)}
-                    placeholder="Názov tvojej firmy (napr. Tatra Banka)"
+                    placeholder={isEn ? 'Your company name (e.g. Acme Inc.)' : 'Názov tvojej firmy (napr. Tatra Banka)'}
                     className="input-field text-sm"
                   />
 
@@ -178,8 +181,8 @@ export function BrandingStudio({ isOpen, onClose }: BrandingStudioProps) {
                       <div className="flex flex-col items-center gap-3">
                         <Loader2 size={32} className="animate-spin accent-text" />
                         <div>
-                          <p className="font-medium text-sm">Analyzujem tvoje logo...</p>
-                          <p className="text-xs text-tertiary mt-1">Extrahujem dominantné farby</p>
+                          <p className="font-medium text-sm">{isEn ? 'Analyzing your logo...' : 'Analyzujem tvoje logo...'}</p>
+                          <p className="text-xs text-tertiary mt-1">{isEn ? 'Extracting dominant colors' : 'Extrahujem dominantné farby'}</p>
                         </div>
                       </div>
                     ) : (
@@ -188,9 +191,9 @@ export function BrandingStudio({ isOpen, onClose }: BrandingStudioProps) {
                           <Upload size={24} className="accent-text" />
                         </div>
                         <div>
-                          <p className="font-medium">Drag & drop logo sem</p>
+                          <p className="font-medium">{isEn ? 'Drag & drop logo here' : 'Drag & drop logo sem'}</p>
                           <p className="text-xs text-tertiary mt-1">
-                            alebo <span className="accent-text">klikni a vyber súbor</span>
+                            {isEn ? 'or ' : 'alebo '}<span className="accent-text">{isEn ? 'click and choose file' : 'klikni a vyber súbor'}</span>
                           </p>
                           <p className="text-[10px] text-tertiary mt-3">
                             PNG, JPG, SVG, WEBP · max 5 MB
@@ -215,13 +218,13 @@ export function BrandingStudio({ isOpen, onClose }: BrandingStudioProps) {
                   <div className="card bg-tertiary text-xs text-secondary leading-relaxed">
                     <p className="font-medium mb-1.5 flex items-center gap-1.5 text-primary">
                       <Sparkles size={12} className="accent-text" />
-                      Ako to funguje
+                      {isEn ? 'How it works' : 'Ako to funguje'}
                     </p>
                     <ol className="space-y-1 list-decimal list-inside text-tertiary">
-                      <li>Nahraj logo svojej firmy</li>
-                      <li>AI extrahuje 5 dominantných farieb</li>
-                      <li>Generuje paletu (primárna, sekundárna, akcenty)</li>
-                      <li>Aplikuje na celé demo za 1 sekundu</li>
+                      <li>{isEn ? 'Upload your company logo' : 'Nahraj logo svojej firmy'}</li>
+                      <li>{isEn ? 'AI extracts 5 dominant colors' : 'AI extrahuje 5 dominantných farieb'}</li>
+                      <li>{isEn ? 'Generates palette (primary, secondary, accents)' : 'Generuje paletu (primárna, sekundárna, akcenty)'}</li>
+                      <li>{isEn ? 'Applies it to whole demo in 1 second' : 'Aplikuje na celé demo za 1 sekundu'}</li>
                     </ol>
                   </div>
                 </div>
@@ -248,7 +251,7 @@ export function BrandingStudio({ isOpen, onClose }: BrandingStudioProps) {
                       />
                       <p className="text-xs text-tertiary mt-1.5 flex items-center gap-1">
                         <Check size={11} className="accent-text" />
-                        Demo prepnuté na tvoj branding
+                        {isEn ? 'Demo switched to your branding' : 'Demo prepnuté na tvoj branding'}
                       </p>
                     </div>
                   </div>
@@ -256,7 +259,7 @@ export function BrandingStudio({ isOpen, onClose }: BrandingStudioProps) {
                   {/* Extracted palette */}
                   <div>
                     <p className="text-xs uppercase tracking-wider text-tertiary mb-2">
-                      Extrahovaná paleta
+                      {isEn ? 'Extracted palette' : 'Extrahovaná paleta'}
                     </p>
                     <div className="grid grid-cols-6 gap-2">
                       {branding.rawColors.map((color, i) => (
@@ -282,22 +285,22 @@ export function BrandingStudio({ isOpen, onClose }: BrandingStudioProps) {
                   {/* Active swatches */}
                   <div>
                     <p className="text-xs uppercase tracking-wider text-tertiary mb-2">
-                      Aplikované farby
+                      {isEn ? 'Applied colors' : 'Aplikované farby'}
                     </p>
                     <div className="grid grid-cols-2 gap-3">
-                      <SwatchCard label="Primárna" color={branding.primary} />
-                      <SwatchCard label="Sekundárna" color={branding.secondary} />
+                      <SwatchCard label={isEn ? 'Primary' : 'Primárna'} color={branding.primary} />
+                      <SwatchCard label={isEn ? 'Secondary' : 'Sekundárna'} color={branding.secondary} />
                     </div>
                   </div>
 
                   {/* Live preview */}
                   <div className="card bg-tertiary p-3">
-                    <p className="text-xs uppercase tracking-wider text-tertiary mb-2">Náhľad</p>
+                    <p className="text-xs uppercase tracking-wider text-tertiary mb-2">{isEn ? 'Preview' : 'Náhľad'}</p>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <button className="btn-primary text-xs">Primary tlačidlo</button>
+                      <button className="btn-primary text-xs">{isEn ? 'Primary button' : 'Primary tlačidlo'}</button>
                       <button className="btn-secondary text-xs">Secondary</button>
-                      <span className="badge badge-accent">Tvoj badge</span>
-                      <span className="text-xs accent-text font-medium">Akcent text →</span>
+                      <span className="badge badge-accent">{isEn ? 'Your badge' : 'Tvoj badge'}</span>
+                      <span className="text-xs accent-text font-medium">{isEn ? 'Accent text →' : 'Akcent text →'}</span>
                     </div>
                   </div>
 
@@ -308,21 +311,21 @@ export function BrandingStudio({ isOpen, onClose }: BrandingStudioProps) {
                       className="btn-secondary text-sm flex-1"
                     >
                       <RotateCcw size={14} />
-                      Reset
+                      {isEn ? 'Reset' : 'Reset'}
                     </button>
                     <button
                       onClick={() => setStep('upload')}
                       className="btn-secondary text-sm flex-1"
                     >
                       <ImageIcon size={14} />
-                      Iné logo
+                      {isEn ? 'Another logo' : 'Iné logo'}
                     </button>
                     <button
                       onClick={onClose}
                       className="btn-primary text-sm flex-1"
                     >
                       <Check size={14} />
-                      Hotovo
+                      {isEn ? 'Done' : 'Hotovo'}
                     </button>
                   </div>
                 </div>

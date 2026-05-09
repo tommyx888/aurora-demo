@@ -5,6 +5,7 @@ import {
   Plane, Laptop, GraduationCap, MapPin, MoreHorizontal
 } from 'lucide-react';
 import { requests as initialRequests } from '../data/content';
+import { useLanguage } from '../hooks/useLanguage';
 import { formatDate, cn } from '../lib/utils';
 import type { Request } from '../types';
 
@@ -29,6 +30,8 @@ const typeLabels = {
 };
 
 export function Requests({ onLeadCapture }: RequestsProps) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [requests, setRequests] = useState<Request[]>(initialRequests);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
 
@@ -43,15 +46,15 @@ export function Requests({ onLeadCapture }: RequestsProps) {
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-sm text-tertiary uppercase tracking-wider mb-1">Workflow</p>
-          <h1 className="font-display text-3xl">Žiadanky & Schvaľovanie</h1>
+          <h1 className="font-display text-3xl">{isEn ? 'Requests & Approvals' : 'Žiadanky & Schvaľovanie'}</h1>
           <p className="text-secondary text-sm mt-1">
-            Centrálne miesto pre dovolenky, equipment, školenia a viac
+            {isEn ? 'Central place for vacation, equipment, training and more' : 'Centrálne miesto pre dovolenky, equipment, školenia a viac'}
           </p>
         </div>
         <div className="flex gap-2">
           <button className="btn-primary text-sm">
             <Plus size={14} />
-            Nová žiadanka
+            {isEn ? 'New request' : 'Nová žiadanka'}
           </button>
         </div>
       </div>
@@ -60,9 +63,9 @@ export function Requests({ onLeadCapture }: RequestsProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: 'Pending', value: requests.filter((r) => r.status === 'pending').length, icon: Clock, color: '#f59e0b' },
-          { label: 'Schválené', value: requests.filter((r) => r.status === 'approved').length, icon: CheckCircle2, color: '#10b981' },
-          { label: 'Zamietnuté', value: requests.filter((r) => r.status === 'rejected').length, icon: XCircle, color: '#ef4444' },
-          { label: 'Celkom', value: requests.length, icon: FileText, color: '#3b82f6' },
+          { label: isEn ? 'Approved' : 'Schválené', value: requests.filter((r) => r.status === 'approved').length, icon: CheckCircle2, color: '#10b981' },
+          { label: isEn ? 'Rejected' : 'Zamietnuté', value: requests.filter((r) => r.status === 'rejected').length, icon: XCircle, color: '#ef4444' },
+          { label: isEn ? 'Total' : 'Celkom', value: requests.length, icon: FileText, color: '#3b82f6' },
         ].map((s, i) => (
           <motion.div
             key={s.label}
@@ -87,10 +90,10 @@ export function Requests({ onLeadCapture }: RequestsProps) {
       {/* Filter */}
       <div className="flex items-center gap-2">
         {[
-          { key: 'all', label: 'Všetky' },
-          { key: 'pending', label: 'Čakajú' },
-          { key: 'approved', label: 'Schválené' },
-          { key: 'rejected', label: 'Zamietnuté' },
+          { key: 'all', label: isEn ? 'All' : 'Všetky' },
+          { key: 'pending', label: isEn ? 'Pending' : 'Čakajú' },
+          { key: 'approved', label: isEn ? 'Approved' : 'Schválené' },
+          { key: 'rejected', label: isEn ? 'Rejected' : 'Zamietnuté' },
         ].map((f) => (
           <button
             key={f.key}
@@ -120,7 +123,11 @@ export function Requests({ onLeadCapture }: RequestsProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
                     <Icon size={14} className="text-tertiary" />
-                    <span className="text-xs text-tertiary uppercase tracking-wider">{typeLabels[req.type]}</span>
+                    <span className="text-xs text-tertiary uppercase tracking-wider">
+                      {isEn
+                        ? ({ leave: 'Vacation', equipment: 'Equipment', training: 'Training', travel: 'Travel', other: 'Other' } as any)[req.type]
+                        : typeLabels[req.type]}
+                    </span>
                     {req.amount && <span className="text-xs text-tertiary">· {req.amount} €</span>}
                   </div>
                   <p className="font-medium text-sm">{req.title}</p>
@@ -141,14 +148,14 @@ export function Requests({ onLeadCapture }: RequestsProps) {
                         className="px-3 py-1.5 rounded text-xs font-medium text-white"
                         style={{ background: 'var(--success)' }}
                       >
-                        Schváliť
+                        {isEn ? 'Approve' : 'Schváliť'}
                       </button>
                       <button
                         onClick={() => updateStatus(req.id, 'rejected')}
                         className="px-3 py-1.5 rounded text-xs font-medium"
                         style={{ background: 'color-mix(in srgb, var(--danger) 15%, transparent)', color: 'var(--danger)' }}
                       >
-                        Zamietnuť
+                        {isEn ? 'Reject' : 'Zamietnuť'}
                       </button>
                     </div>
                   ) : (
@@ -156,7 +163,9 @@ export function Requests({ onLeadCapture }: RequestsProps) {
                       'badge',
                       req.status === 'approved' ? 'badge-success' : 'badge-danger'
                     )}>
-                      {req.status === 'approved' ? '✓ Schválené' : '✗ Zamietnuté'}
+                      {req.status === 'approved'
+                        ? (isEn ? '✓ Approved' : '✓ Schválené')
+                        : (isEn ? '✗ Rejected' : '✗ Zamietnuté')}
                     </span>
                   )}
                 </div>
@@ -167,12 +176,14 @@ export function Requests({ onLeadCapture }: RequestsProps) {
       </div>
 
       {/* Lead capture CTA */}
-      <LeadCTA module="Žiadanky & Schvaľovanie" onLeadCapture={onLeadCapture} />
+      <LeadCTA module={isEn ? 'Requests & Approvals' : 'Žiadanky & Schvaľovanie'} onLeadCapture={onLeadCapture} />
     </div>
   );
 }
 
 export function LeadCTA({ module, onLeadCapture }: { module: string; onLeadCapture: (m: string) => void }) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -185,15 +196,15 @@ export function LeadCTA({ module, onLeadCapture }: { module: string; onLeadCaptu
             <Sparkles size={20} />
           </div>
           <div>
-            <p className="font-medium">Páči sa ti modul "{module}"?</p>
-            <p className="text-sm text-secondary">Postavíme ti to na mieru pre tvoju firmu.</p>
+            <p className="font-medium">{isEn ? `Do you like "${module}" module?` : `Páči sa ti modul "${module}"?`}</p>
+            <p className="text-sm text-secondary">{isEn ? 'We will tailor it to your company.' : 'Postavíme ti to na mieru pre tvoju firmu.'}</p>
           </div>
         </div>
         <button
           onClick={() => onLeadCapture(module)}
           className="btn-primary"
         >
-          Chcem to v mojej firme →
+          {isEn ? 'I want this in my company →' : 'Chcem to v mojej firme →'}
         </button>
       </div>
     </motion.div>

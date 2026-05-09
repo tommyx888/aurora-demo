@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, Cake, Users, MapPin, Sparkles, Plus } from 'lucide-react';
 import { events } from '../data/content';
 import { employees } from '../data/employees';
+import { useLanguage } from '../hooks/useLanguage';
 import { LeadCTA } from './Requests';
 import { formatDate, daysUntil, getAge, cn } from '../lib/utils';
 
@@ -19,6 +20,8 @@ const typeConfig = {
 };
 
 export function Events({ onLeadCapture }: EventsProps) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const upcomingBirthdays = employees
@@ -59,14 +62,14 @@ export function Events({ onLeadCapture }: EventsProps) {
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-sm text-tertiary uppercase tracking-wider mb-1">Calendar</p>
-          <h1 className="font-display text-3xl">Eventy & Narodeniny</h1>
+          <h1 className="font-display text-3xl">{isEn ? 'Events & Birthdays' : 'Eventy & Narodeniny'}</h1>
           <p className="text-secondary text-sm mt-1">
-            Firemné akcie, štátne sviatky, narodeniny tímu na jednom mieste
+            {isEn ? 'Company events, public holidays and team birthdays in one place' : 'Firemné akcie, štátne sviatky, narodeniny tímu na jednom mieste'}
           </p>
         </div>
         <button className="btn-primary text-sm">
           <Plus size={14} />
-          Nový event
+          {isEn ? 'New event' : 'Nový event'}
         </button>
       </div>
 
@@ -78,7 +81,7 @@ export function Events({ onLeadCapture }: EventsProps) {
               <ChevronLeft size={18} />
             </button>
             <h2 className="font-display text-xl capitalize">
-              {currentMonth.toLocaleDateString('sk-SK', { month: 'long', year: 'numeric' })}
+              {currentMonth.toLocaleDateString(isEn ? 'en-US' : 'sk-SK', { month: 'long', year: 'numeric' })}
             </h2>
             <button onClick={() => navigate(1)} className="btn-ghost">
               <ChevronRight size={18} />
@@ -86,7 +89,7 @@ export function Events({ onLeadCapture }: EventsProps) {
           </div>
 
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'].map((d) => (
+            {(isEn ? ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'] : ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne']).map((d) => (
               <div key={d} className="text-center text-xs font-medium text-tertiary py-2">{d}</div>
             ))}
           </div>
@@ -145,7 +148,7 @@ export function Events({ onLeadCapture }: EventsProps) {
         <div className="card">
           <div className="flex items-center gap-2 mb-4">
             <Cake size={16} className="text-tertiary" />
-            <h2 className="font-medium">Najbližšie narodeniny</h2>
+            <h2 className="font-medium">{isEn ? 'Upcoming birthdays' : 'Najbližšie narodeniny'}</h2>
           </div>
 
           <div className="space-y-3">
@@ -161,8 +164,8 @@ export function Events({ onLeadCapture }: EventsProps) {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{emp.name}</p>
                   <p className="text-xs text-tertiary">
-                    {emp.daysUntil === 0 ? '🎉 Dnes!' : `Za ${emp.daysUntil} dní`} ·
-                    {' '}{getAge(emp.birthday) + (emp.daysUntil > 0 ? 1 : 0)} rokov
+                    {emp.daysUntil === 0 ? (isEn ? '🎉 Today!' : '🎉 Dnes!') : (isEn ? `In ${emp.daysUntil} days` : `Za ${emp.daysUntil} dní`)} ·
+                    {' '}{getAge(emp.birthday) + (emp.daysUntil > 0 ? 1 : 0)} {isEn ? 'years' : 'rokov'}
                   </p>
                 </div>
                 <button className="text-xs accent-text font-medium">
@@ -175,7 +178,9 @@ export function Events({ onLeadCapture }: EventsProps) {
 
           <div className="mt-4 pt-4 border-t border-subtle">
             <p className="text-xs text-tertiary leading-relaxed">
-              💡 <strong className="text-primary">AI tip:</strong> Stlač "AI" pre vygenerované personalizované prianie za 5 sekúnd.
+              {isEn
+                ? '💡 AI tip: Press "AI" to generate a personalized birthday wish in 5 seconds.'
+                : '💡 AI tip: Stlač "AI" pre vygenerované personalizované prianie za 5 sekúnd.'}
             </p>
           </div>
         </div>
@@ -183,7 +188,7 @@ export function Events({ onLeadCapture }: EventsProps) {
 
       {/* Upcoming events list */}
       <div className="card">
-        <h2 className="font-medium mb-4">Nadchádzajúce udalosti</h2>
+        <h2 className="font-medium mb-4">{isEn ? 'Upcoming events' : 'Nadchádzajúce udalosti'}</h2>
         <div className="grid md:grid-cols-2 gap-3">
           {upcomingEvents.map((ev, i) => (
             <motion.div
@@ -208,7 +213,7 @@ export function Events({ onLeadCapture }: EventsProps) {
               </div>
               <div className="text-right">
                 <p className="text-xs font-medium">
-                  {ev.days === 0 ? 'Dnes' : `+${ev.days}d`}
+                  {ev.days === 0 ? (isEn ? 'Today' : 'Dnes') : `+${ev.days}d`}
                 </p>
                 <p className="text-[10px] text-tertiary">{formatDate(ev.date)}</p>
               </div>

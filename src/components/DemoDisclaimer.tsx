@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
 import { Info, X, Sparkles, Wrench, Users, MessageCircle, ArrowRight } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface DemoDisclaimerModalProps {
   isOpen: boolean;
@@ -13,6 +13,8 @@ interface DemoDisclaimerModalProps {
  * Volaju ho landing banner aj sidebar badge.
  */
 export function DemoDisclaimerModal({ isOpen, onClose, onContact }: DemoDisclaimerModalProps) {
+  const { t } = useLanguage();
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -37,9 +39,9 @@ export function DemoDisclaimerModal({ isOpen, onClose, onContact }: DemoDisclaim
                   <Info size={20} />
                 </div>
                 <div>
-                  <h2 className="font-display text-2xl mb-1">Toto je vzorová simulácia</h2>
+                  <h2 className="font-display text-2xl mb-1">{t('demoModal.title')}</h2>
                   <p className="text-sm text-secondary">
-                    Demo so simulovanou firmou Aurora a 15 fiktívnymi zamestnancami
+                    {t('demoModal.subtitle')}
                   </p>
                 </div>
               </div>
@@ -51,42 +53,39 @@ export function DemoDisclaimerModal({ isOpen, onClose, onContact }: DemoDisclaim
             {/* Body */}
             <div className="p-6 space-y-5">
               <p className="text-sm leading-relaxed">
-                Pri demonštrácii vidíte len <strong>časť možností</strong>, ktoré HR systém ponúka.
-                Plne integrované riešenia sú výrazne <strong>komplexnejšie a šité na mieru</strong> každej firme.
+                {t('demoModal.body')}
               </p>
 
               <div className="grid sm:grid-cols-3 gap-3">
                 <FeatureBox
                   icon={Wrench}
-                  title="Šité na mieru"
-                  body="Žiadny biznis nie je rovnaký. Procesy, schvaľovacie workflow, role a integrácie navrhujeme presne pre vás."
+                  title={t('demoModal.feat1Title')}
+                  body={t('demoModal.feat1Body')}
                 />
                 <FeatureBox
                   icon={Users}
-                  title="Plná integrácia"
-                  body="Prepojenie s vaším účtovným systémom, payroll, Slack, Microsoft 365, Active Directory či ATS."
+                  title={t('demoModal.feat2Title')}
+                  body={t('demoModal.feat2Body')}
                 />
                 <FeatureBox
                   icon={Sparkles}
-                  title="Vlastné moduly"
-                  body="Compliance, GDPR, Slovak labor law, špecifické HR processes — všetko podľa vašich požiadaviek."
+                  title={t('demoModal.feat3Title')}
+                  body={t('demoModal.feat3Body')}
                 />
               </div>
 
               <div className="card bg-tertiary p-4 border-l-4 accent-border">
                 <p className="text-sm leading-relaxed">
-                  💬 <strong>Chápeme, že každá organizácia má iné požiadavky a špecifikácie.</strong>
-                  {' '}Tie radi vypočujeme a navrhneme riešenie, ktoré zapadne do vašich existujúcich procesov —
-                  nie naopak.
+                  💬 {t('demoModal.highlight')}
                 </p>
               </div>
 
               <div>
-                <p className="text-xs uppercase tracking-wider text-tertiary mb-2">Čo ďalej?</p>
+                <p className="text-xs uppercase tracking-wider text-tertiary mb-2">{t('demoModal.nextStepsTitle')}</p>
                 <div className="space-y-2 text-sm">
-                  <Step n="1" text="Krátky 15-min discovery call kde si povieme vaše potreby" />
-                  <Step n="2" text="Pripravíme detailný návrh riešenia + cenovú ponuku" />
-                  <Step n="3" text="Pilot s vaším tímom, iterácia, postupný rollout" />
+                  <Step n="1" text={t('demoModal.step1')} />
+                  <Step n="2" text={t('demoModal.step2')} />
+                  <Step n="3" text={t('demoModal.step3')} />
                 </div>
               </div>
             </div>
@@ -105,12 +104,12 @@ export function DemoDisclaimerModal({ isOpen, onClose, onContact }: DemoDisclaim
               </p>
               <div className="flex gap-2">
                 <button onClick={onClose} className="btn-secondary text-sm">
-                  Pokračovať v demo
+                  {t('demoModal.continueDemo')}
                 </button>
                 {onContact && (
                   <button onClick={onContact} className="btn-primary text-sm">
                     <MessageCircle size={14} />
-                    Pozhovárajme sa
+                    {t('common.contactUs')}
                     <ArrowRight size={14} />
                   </button>
                 )}
@@ -150,6 +149,8 @@ function Step({ n, text }: { n: string; text: string }) {
 // LANDING BANNER (top of landing page)
 // ============================================
 export function DemoDisclaimerBanner({ onLearnMore }: { onLearnMore: () => void }) {
+  const { t } = useLanguage();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -161,15 +162,15 @@ export function DemoDisclaimerBanner({ onLearnMore }: { onLearnMore: () => void 
         <div className="flex items-center gap-2 text-sm">
           <span className="text-base">✨</span>
           <span className="text-secondary">
-            <strong className="text-primary">Live demo</strong> · Vzorová simulácia s ukážkovými dátami.
-            Plne integrované riešenia <strong>šijeme presne na mieru</strong> vašej firmy.
+            <strong className="text-primary">{t('landing.disclaimer1')}</strong> · {t('landing.disclaimer2')}{' '}
+            <strong>{t('landing.disclaimerEm')}</strong> {t('landing.disclaimer3')}
           </span>
         </div>
         <button
           onClick={onLearnMore}
           className="text-xs font-medium accent-text hover:underline whitespace-nowrap flex items-center gap-1"
         >
-          Zistiť viac
+          {t('common.learnMore')}
           <ArrowRight size={11} />
         </button>
       </div>
@@ -181,11 +182,13 @@ export function DemoDisclaimerBanner({ onLearnMore }: { onLearnMore: () => void 
 // SIDEBAR BADGE (under logo)
 // ============================================
 export function DemoDisclaimerBadge({ onClick }: { onClick: () => void }) {
+  const { t } = useLanguage();
+
   return (
     <button
       onClick={onClick}
       className="w-full text-left px-3 py-2 mt-1 rounded-lg hover:bg-tertiary transition-colors group"
-      title="Klikni pre detaily"
+      title={t('nav.switchView')}
     >
       <div className="flex items-center gap-2">
         <div
@@ -195,9 +198,9 @@ export function DemoDisclaimerBadge({ onClick }: { onClick: () => void }) {
           <Info size={11} className="accent-text" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] uppercase tracking-wider text-tertiary leading-none">Demo</p>
+          <p className="text-[10px] uppercase tracking-wider text-tertiary leading-none">{t('sidebar.demoLabel')}</p>
           <p className="text-[10px] text-secondary leading-tight mt-0.5">
-            Plné riešenia šijeme na mieru
+            {t('sidebar.demoTagline')}
           </p>
         </div>
       </div>

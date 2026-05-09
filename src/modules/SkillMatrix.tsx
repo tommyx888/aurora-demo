@@ -6,6 +6,7 @@ import {
   Users, Target, Euro, BookOpen, Zap, GraduationCap, Trash2, RotateCcw
 } from 'lucide-react';
 import { employees as initialEmployees } from '../data/employees';
+import { useLanguage } from '../hooks/useLanguage';
 import { cn, fireConfetti } from '../lib/utils';
 import type { Employee, Training, TrainingType } from '../types';
 
@@ -35,6 +36,8 @@ const heatColor = (level: number) => {
 // MAIN COMPONENT
 // ============================================
 export function SkillMatrix() {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   // Employees with overrides applied
   const [employees, setEmployees] = useState<Employee[]>(() => {
     try {
@@ -109,7 +112,9 @@ export function SkillMatrix() {
       })
     );
     setEditCell(null);
-    showToast(level === 0 ? `Skill ${skill} odstránený` : `${skill} aktualizované na úroveň ${level}`);
+    showToast(level === 0
+      ? (isEn ? `Skill ${skill} removed` : `Skill ${skill} odstránený`)
+      : (isEn ? `${skill} updated to level ${level}` : `${skill} aktualizované na úroveň ${level}`));
   };
 
   const addTraining = (training: Omit<Training, 'id' | 'createdAt'>) => {
@@ -121,19 +126,21 @@ export function SkillMatrix() {
     setTrainings((prev) => [newTraining, ...prev]);
     setTrainingModal({ open: false });
     fireConfetti();
-    showToast(`✓ Školenie "${training.skillName}" naplánované pre ${training.participantIds.length} ${training.participantIds.length === 1 ? 'osobu' : 'ľudí'}`);
+    showToast(isEn
+      ? `✓ Training "${training.skillName}" planned for ${training.participantIds.length} participant(s)`
+      : `✓ Školenie "${training.skillName}" naplánované pre ${training.participantIds.length} ${training.participantIds.length === 1 ? 'osobu' : 'ľudí'}`);
   };
 
   const removeTraining = (id: string) => {
     setTrainings((prev) => prev.filter((t) => t.id !== id));
-    showToast('Školenie zrušené');
+    showToast(isEn ? 'Training canceled' : 'Školenie zrušené');
   };
 
   const resetAllChanges = () => {
-    if (!window.confirm('Naozaj chceš resetovať všetky zmeny v skill matici?')) return;
+    if (!window.confirm(isEn ? 'Do you really want to reset all skill matrix changes?' : 'Naozaj chceš resetovať všetky zmeny v skill matici?')) return;
     setEmployees(initialEmployees);
     localStorage.removeItem(SKILLS_KEY);
-    showToast('Zmeny resetnuté na pôvodný stav');
+    showToast(isEn ? 'Changes reset to original state' : 'Zmeny resetnuté na pôvodný stav');
   };
 
   const showToast = (msg: string) => {
@@ -172,13 +179,15 @@ export function SkillMatrix() {
           <p className="text-sm text-tertiary uppercase tracking-wider mb-1">Admin · Talent</p>
           <h1 className="font-display text-3xl">Skill Heatmap</h1>
           <p className="text-secondary text-sm mt-1">
-            Vizualizácia kompetencií tímu · {employees.length} zamestnancov · {allSkills.length} skillov ·
-            {' '}<strong className="accent-text">Klik na bunku pre úpravu</strong>
+            {isEn
+              ? `Team competency visualization · ${employees.length} employees · ${allSkills.length} skills · `
+              : `Vizualizácia kompetencií tímu · ${employees.length} zamestnancov · ${allSkills.length} skillov · `}
+            <strong className="accent-text">{isEn ? 'Click a cell to edit' : 'Klik na bunku pre úpravu'}</strong>
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1 p-1 bg-tertiary rounded-lg">
+        <div className="flex items-center gap-2 flex-wrap w-full lg:w-auto">
+          <div className="flex items-center gap-1 p-1 bg-tertiary rounded-lg overflow-x-auto max-w-full">
             <Filter size={14} className="text-tertiary mx-2" />
             {departments.map((dept) => (
               <button
@@ -189,16 +198,16 @@ export function SkillMatrix() {
                   filterDept === dept ? 'bg-secondary shadow-sm-themed text-primary' : 'text-secondary hover:text-primary'
                 )}
               >
-                {dept === 'all' ? 'Všetky' : dept}
+                {dept === 'all' ? (isEn ? 'All' : 'Všetky') : dept}
               </button>
             ))}
           </div>
           <button
             onClick={() => setTrainingModal({ open: true })}
-            className="btn-primary text-sm"
+            className="btn-primary text-sm flex-1 sm:flex-none"
           >
             <GraduationCap size={14} />
-            Naplánovať školenie
+            {isEn ? 'Plan training' : 'Naplánovať školenie'}
           </button>
           {hasEdits && (
             <button onClick={resetAllChanges} className="btn-secondary text-sm" title="Reset">
@@ -226,7 +235,9 @@ export function SkillMatrix() {
             </div>
           </div>
           <p className="text-sm text-secondary leading-relaxed">
-            <strong>Vue.js</strong> má len 1 osobu (Martin, level 2). Ak Martin odíde, máte zero coverage.
+            {isEn
+              ? <><strong>Vue.js</strong> has only 1 person (Martin, level 2). If he leaves, coverage drops to zero.</>
+              : <><strong>Vue.js</strong> má len 1 osobu (Martin, level 2). Ak Martin odíde, máte zero coverage.</>}
           </p>
           <button
             onClick={() => setTrainingModal({
@@ -235,7 +246,7 @@ export function SkillMatrix() {
             })}
             className="text-xs accent-text font-medium mt-3 hover:underline flex items-center gap-1"
           >
-            <Plus size={11} /> Naplánovať tréning →
+            <Plus size={11} /> {isEn ? 'Plan training →' : 'Naplánovať tréning →'}
           </button>
         </div>
 
@@ -251,13 +262,15 @@ export function SkillMatrix() {
             </div>
           </div>
           <p className="text-sm text-secondary leading-relaxed">
-            <strong>3 Senior + 2 Mid</strong> developeri majú React level 4-5. Vaša competitive advantage.
+            {isEn
+              ? <><strong>3 Senior + 2 Mid</strong> developers have React level 4-5. This is your competitive advantage.</>
+              : <><strong>3 Senior + 2 Mid</strong> developeri majú React level 4-5. Vaša competitive advantage.</>}
           </p>
           <button
-            onClick={() => showToast('💡 Marketing: pridáme do brand story na webe a LinkedIn-e')}
+            onClick={() => showToast(isEn ? '💡 Marketing: added to website and LinkedIn brand story' : '💡 Marketing: pridáme do brand story na webe a LinkedIn-e')}
             className="text-xs accent-text font-medium mt-3 hover:underline"
           >
-            Pridať do brand story →
+            {isEn ? 'Add to brand story →' : 'Pridať do brand story →'}
           </button>
         </div>
 
@@ -273,10 +286,12 @@ export function SkillMatrix() {
             </div>
           </div>
           <p className="text-sm text-secondary leading-relaxed">
-            "Senior React" má nižšiu prioritu než Vue/Backend. Zvážte presunutie zdrojov.
+            {isEn
+              ? '"Senior React" now has lower priority than Vue/Backend. Consider reallocating sourcing.'
+              : '"Senior React" má nižšiu prioritu než Vue/Backend. Zvážte presunutie zdrojov.'}
           </p>
           <button
-            onClick={() => showToast('✓ Recruiting priority preusporiadané (mock)')}
+            onClick={() => showToast(isEn ? '✓ Recruiting priorities reordered (mock)' : '✓ Recruiting priority preusporiadané (mock)')}
             className="text-xs accent-text font-medium mt-3 hover:underline"
           >
             Re-prioritize roles →
@@ -288,13 +303,15 @@ export function SkillMatrix() {
       <div className="card overflow-hidden">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <div>
-            <h2 className="font-medium">Heatmap matica</h2>
+            <h2 className="font-medium">{isEn ? 'Heatmap matrix' : 'Heatmap matica'}</h2>
             <p className="text-xs text-tertiary mt-0.5">
-              💡 <strong>Klik na bunku</strong> → zmena úrovne · Hover na header pre filter
+              {isEn
+                ? <>💡 <strong>Click a cell</strong> → change level · Hover header to filter</>
+                : <>💡 <strong>Klik na bunku</strong> → zmena úrovne · Hover na header pre filter</>}
             </p>
           </div>
           <div className="flex items-center gap-1 text-xs">
-            <span className="text-tertiary mr-2">Úroveň:</span>
+            <span className="text-tertiary mr-2">{isEn ? 'Level:' : 'Úroveň:'}</span>
             {[1, 2, 3, 4, 5].map((lvl) => (
               <div key={lvl} className="flex items-center gap-1">
                 <div className={cn('w-4 h-4 rounded', heatColor(lvl))} />
@@ -304,12 +321,12 @@ export function SkillMatrix() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
           <table className="w-full">
             <thead>
               <tr>
                 <th className="text-left text-xs font-medium text-tertiary p-2 sticky left-0 bg-secondary z-10">
-                  Zamestnanec
+                  {isEn ? 'Employee' : 'Zamestnanec'}
                 </th>
                 {allSkills.map((skill) => (
                   <th
@@ -373,7 +390,7 @@ export function SkillMatrix() {
                             // @ts-ignore
                             '--tw-ring-color': 'var(--accent-primary)',
                           }}
-                          title={`${emp.name} · ${skill}: ${lvl > 0 ? `Level ${lvl}` : 'Žiadne'} · klik pre úpravu`}
+                          title={`${emp.name} · ${skill}: ${lvl > 0 ? `Level ${lvl}` : (isEn ? 'None' : 'Žiadne')} · ${isEn ? 'click to edit' : 'klik pre úpravu'}`}
                         >
                           {lvl > 0 ? lvl : ''}
                         </motion.button>
@@ -388,12 +405,12 @@ export function SkillMatrix() {
       </div>
 
       {/* Bottom: 2 columns */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Top covered skills */}
         <div className="card">
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 size={16} className="text-tertiary" />
-            <h2 className="font-medium">Top 5 najpokrytejších skillov</h2>
+            <h2 className="font-medium">{isEn ? 'Top 5 best-covered skills' : 'Top 5 najpokrytejších skillov'}</h2>
           </div>
           <div className="space-y-3">
             {allSkills
@@ -407,7 +424,7 @@ export function SkillMatrix() {
                 <div key={skill}>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="font-medium">{skill}</span>
-                    <span className="text-tertiary">{count} ľudí</span>
+                    <span className="text-tertiary">{isEn ? `${count} people` : `${count} ľudí`}</span>
                   </div>
                   <div className="h-2 bg-tertiary rounded-full overflow-hidden">
                     <motion.div
@@ -426,14 +443,14 @@ export function SkillMatrix() {
         <div className="card">
           <div className="flex items-center gap-2 mb-4">
             <Sparkles size={16} className="text-tertiary" />
-            <h2 className="font-medium">AI: Odporúčania pre rast</h2>
+            <h2 className="font-medium">{isEn ? 'AI: Growth recommendations' : 'AI: Odporúčania pre rast'}</h2>
           </div>
           <div className="space-y-3">
             {[
-              { person: 'Filip Dudáš', empId: 'emp-14', skill: 'React', suggestion: 'React workshop s Tomášom Polákom (mentor matching)', priority: 'high', type: 'mentor' as TrainingType, days: 30, budget: 0, level: 3 },
-              { person: 'Barbora Sedláková', empId: 'emp-11', skill: 'UI Design', suggestion: 'Figma Advanced course - má talent na UX', priority: 'medium', type: 'online-course' as TrainingType, days: 14, budget: 280, level: 4 },
-              { person: 'Andrea Mikušová', empId: 'emp-15', skill: 'Video Editing', suggestion: 'Video editing certifikát - zvýši seniority', priority: 'medium', type: 'external-course' as TrainingType, days: 21, budget: 450, level: 4 },
-              { person: 'Adam Hornák', empId: 'emp-12', skill: 'Kubernetes', suggestion: 'Kubernetes course - dopĺňa Michalove skills', priority: 'low', type: 'online-course' as TrainingType, days: 28, budget: 320, level: 3 },
+              { person: 'Filip Dudáš', empId: 'emp-14', skill: 'React', suggestion: isEn ? 'React workshop with Tomáš Polák (mentor matching)' : 'React workshop s Tomášom Polákom (mentor matching)', priority: 'high', type: 'mentor' as TrainingType, days: 30, budget: 0, level: 3 },
+              { person: 'Barbora Sedláková', empId: 'emp-11', skill: 'UI Design', suggestion: isEn ? 'Figma Advanced course - strong UX potential' : 'Figma Advanced course - má talent na UX', priority: 'medium', type: 'online-course' as TrainingType, days: 14, budget: 280, level: 4 },
+              { person: 'Andrea Mikušová', empId: 'emp-15', skill: 'Video Editing', suggestion: isEn ? 'Video editing certificate - increases seniority' : 'Video editing certifikát - zvýši seniority', priority: 'medium', type: 'external-course' as TrainingType, days: 21, budget: 450, level: 4 },
+              { person: 'Adam Hornák', empId: 'emp-12', skill: 'Kubernetes', suggestion: isEn ? 'Kubernetes course - complements Michal skills' : 'Kubernetes course - dopĺňa Michalove skills', priority: 'low', type: 'online-course' as TrainingType, days: 28, budget: 320, level: 3 },
             ].map((rec, i) => (
               <div key={i} className="flex items-start gap-3 p-3 rounded-lg hover:bg-tertiary transition-colors">
                 <div className={cn(
@@ -460,7 +477,7 @@ export function SkillMatrix() {
                   })}
                   className="text-xs accent-text font-medium hover:underline whitespace-nowrap"
                 >
-                  Naplánovať
+                  {isEn ? 'Plan' : 'Naplánovať'}
                 </button>
               </div>
             ))}
@@ -471,13 +488,13 @@ export function SkillMatrix() {
       {/* Planned trainings */}
       {trainings.length > 0 && (
         <div className="card">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
             <div className="flex items-center gap-2">
               <GraduationCap size={16} className="text-tertiary" />
-              <h2 className="font-medium">Naplánované školenia ({trainings.length})</h2>
+              <h2 className="font-medium">{isEn ? `Planned trainings (${trainings.length})` : `Naplánované školenia (${trainings.length})`}</h2>
             </div>
-            <p className="text-xs text-tertiary">
-              Celkový rozpočet: <strong className="text-primary">{trainings.reduce((sum, t) => sum + t.budget, 0)} €</strong>
+            <p className="text-xs text-tertiary w-full sm:w-auto">
+              {isEn ? 'Total budget:' : 'Celkový rozpočet:'} <strong className="text-primary">{trainings.reduce((sum, t) => sum + t.budget, 0)} €</strong>
             </p>
           </div>
           <div className="grid md:grid-cols-2 gap-3">
@@ -537,7 +554,7 @@ export function SkillMatrix() {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 card shadow-xl-themed px-4 py-3 flex items-center gap-2 max-w-md"
+            className="fixed bottom-20 md:bottom-24 left-1/2 -translate-x-1/2 z-50 card shadow-xl-themed px-3 sm:px-4 py-3 flex items-center gap-2 max-w-[calc(100vw-1.5rem)] sm:max-w-md"
           >
             <Check size={16} className="accent-text flex-shrink-0" />
             <p className="text-sm">{toast}</p>
@@ -564,6 +581,8 @@ function CellEditor({
   onClose: () => void;
   onPlanTraining: () => void;
 }) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const popoverRef = useRef<HTMLDivElement>(null);
 
   // Click outside to close
@@ -604,7 +623,7 @@ function CellEditor({
       >
         <div className="flex items-center justify-between mb-3">
           <div>
-            <p className="text-xs uppercase tracking-wider text-tertiary">Úroveň zručnosti</p>
+            <p className="text-xs uppercase tracking-wider text-tertiary">{isEn ? 'Skill level' : 'Úroveň zručnosti'}</p>
             <p className="text-sm font-medium">{cell.skill}</p>
           </div>
           <button onClick={onClose} className="btn-ghost p-1">
@@ -622,11 +641,11 @@ function CellEditor({
 
         <div className="space-y-1 mb-3">
           {[
-            { lvl: 0, label: 'Žiadne', desc: 'Bez znalosti' },
-            { lvl: 1, label: 'Začiatočník', desc: 'Základná teória' },
-            { lvl: 2, label: 'Junior', desc: 'Pod dohľadom' },
-            { lvl: 3, label: 'Mid', desc: 'Samostatne' },
-            { lvl: 4, label: 'Senior', desc: 'Mentoring iných' },
+            { lvl: 0, label: isEn ? 'None' : 'Žiadne', desc: isEn ? 'No knowledge' : 'Bez znalosti' },
+            { lvl: 1, label: isEn ? 'Beginner' : 'Začiatočník', desc: isEn ? 'Basic theory' : 'Základná teória' },
+            { lvl: 2, label: 'Junior', desc: isEn ? 'With supervision' : 'Pod dohľadom' },
+            { lvl: 3, label: 'Mid', desc: isEn ? 'Independent' : 'Samostatne' },
+            { lvl: 4, label: 'Senior', desc: isEn ? 'Mentors others' : 'Mentoring iných' },
             { lvl: 5, label: 'Expert', desc: 'Industry expert' },
           ].map(({ lvl, label, desc }) => (
             <button
@@ -654,7 +673,7 @@ function CellEditor({
           className="btn-primary text-xs w-full"
         >
           <GraduationCap size={12} />
-          Naplánovať školenie
+          {isEn ? 'Plan training' : 'Naplánovať školenie'}
         </button>
       </motion.div>
     </>
@@ -677,6 +696,8 @@ function TrainingModal({
   onClose: () => void;
   onSubmit: (training: Omit<Training, 'id' | 'createdAt'>) => void;
 }) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [skillName, setSkillName] = useState(prefill?.skillName || allSkills[0] || '');
   const [customSkill, setCustomSkill] = useState('');
   const [useCustom, setUseCustom] = useState(false);
@@ -708,8 +729,8 @@ function TrainingModal({
   };
 
   const handleSubmit = () => {
-    if (!finalSkill.trim()) return alert('Vyber alebo zadaj skill');
-    if (participantIds.length === 0) return alert('Vyber aspoň 1 účastníka');
+    if (!finalSkill.trim()) return alert(isEn ? 'Select or enter a skill' : 'Vyber alebo zadaj skill');
+    if (participantIds.length === 0) return alert(isEn ? 'Select at least 1 participant' : 'Vyber aspoň 1 účastníka');
 
     onSubmit({
       skillName: finalSkill,
@@ -740,48 +761,48 @@ function TrainingModal({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="card max-w-3xl w-full p-0 overflow-hidden max-h-[90vh] flex flex-col"
+        className="card max-w-3xl w-full p-0 overflow-hidden max-h-[92vh] sm:max-h-[90vh] flex flex-col"
       >
         {/* Header */}
-        <div className="p-5 border-b border-subtle mesh-bg flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-subtle mesh-bg flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg accent-bg flex items-center justify-center text-white">
               <GraduationCap size={18} />
             </div>
             <div>
-              <h2 className="font-display text-2xl">Naplánovať školenie</h2>
-              <p className="text-xs text-tertiary">Vyber skill, účastníkov a parametre</p>
+              <h2 className="font-display text-2xl">{isEn ? 'Plan training' : 'Naplánovať školenie'}</h2>
+              <p className="text-xs text-tertiary">{isEn ? 'Choose skill, participants, and parameters' : 'Vyber skill, účastníkov a parametre'}</p>
             </div>
           </div>
           <button onClick={onClose} className="btn-ghost"><X size={18} /></button>
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
           {/* Skill */}
           <div>
             <label className="text-xs uppercase tracking-wider text-tertiary block mb-2">
-              Skill / Tréning <span className="text-red-500">*</span>
+              {isEn ? 'Skill / Training' : 'Skill / Tréning'} <span className="text-red-500">*</span>
             </label>
             <div className="flex gap-2 mb-2">
               <button
                 onClick={() => setUseCustom(false)}
                 className={cn('badge', !useCustom && 'badge-accent')}
               >
-                Existujúci skill
+                {isEn ? 'Existing skill' : 'Existujúci skill'}
               </button>
               <button
                 onClick={() => setUseCustom(true)}
                 className={cn('badge', useCustom && 'badge-accent')}
               >
-                + Nový skill
+                {isEn ? '+ New skill' : '+ Nový skill'}
               </button>
             </div>
             {useCustom ? (
               <input
                 value={customSkill}
                 onChange={(e) => setCustomSkill(e.target.value)}
-                placeholder="napr. Kubernetes, Public Speaking, ..."
+                placeholder={isEn ? 'e.g. Kubernetes, Public Speaking, ...' : 'napr. Kubernetes, Public Speaking, ...'}
                 className="input-field text-sm"
               />
             ) : (
@@ -798,24 +819,24 @@ function TrainingModal({
           </div>
 
           {/* Type + Target level */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs uppercase tracking-wider text-tertiary block mb-2">Typ</label>
+              <label className="text-xs uppercase tracking-wider text-tertiary block mb-2">{isEn ? 'Type' : 'Typ'}</label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as TrainingType)}
                 className="input-field text-sm"
               >
-                <option value="online-course">📺 Online kurz</option>
-                <option value="internal-workshop">🏢 Interný workshop</option>
+                <option value="online-course">📺 {isEn ? 'Online course' : 'Online kurz'}</option>
+                <option value="internal-workshop">🏢 {isEn ? 'Internal workshop' : 'Interný workshop'}</option>
                 <option value="mentor">👨‍🏫 Mentor matching</option>
-                <option value="external-course">🎓 Externý kurz</option>
-                <option value="conference">🎤 Konferencia</option>
+                <option value="external-course">🎓 {isEn ? 'External course' : 'Externý kurz'}</option>
+                <option value="conference">🎤 {isEn ? 'Conference' : 'Konferencia'}</option>
               </select>
             </div>
             <div>
               <label className="text-xs uppercase tracking-wider text-tertiary block mb-2">
-                Cieľová úroveň
+                {isEn ? 'Target level' : 'Cieľová úroveň'}
               </label>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((lvl) => (
@@ -839,15 +860,15 @@ function TrainingModal({
           {/* Participants */}
           <div>
             <label className="text-xs uppercase tracking-wider text-tertiary block mb-2">
-              Účastníci <span className="text-red-500">*</span>
+              {isEn ? 'Participants' : 'Účastníci'} <span className="text-red-500">*</span>
               {participantIds.length > 0 && (
-                <span className="ml-2 badge badge-accent">{participantIds.length} vybraných</span>
+                <span className="ml-2 badge badge-accent">{isEn ? `${participantIds.length} selected` : `${participantIds.length} vybraných`}</span>
               )}
             </label>
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Hľadať zamestnanca..."
+              placeholder={isEn ? 'Search employee...' : 'Hľadať zamestnanca...'}
               className="input-field text-sm mb-2"
             />
             <div className="border border-subtle rounded-lg max-h-48 overflow-y-auto">
@@ -875,15 +896,15 @@ function TrainingModal({
                 </label>
               ))}
               {filteredEmployees.length === 0 && (
-                <p className="text-center text-xs text-tertiary py-4">Žiadne výsledky</p>
+                <p className="text-center text-xs text-tertiary py-4">{isEn ? 'No results' : 'Žiadne výsledky'}</p>
               )}
             </div>
           </div>
 
           {/* Date + Duration + Budget */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="text-xs uppercase tracking-wider text-tertiary block mb-2">Termín</label>
+              <label className="text-xs uppercase tracking-wider text-tertiary block mb-2">{isEn ? 'Start date' : 'Termín'}</label>
               <input
                 type="date"
                 value={startDate}
@@ -893,7 +914,7 @@ function TrainingModal({
             </div>
             <div>
               <label className="text-xs uppercase tracking-wider text-tertiary block mb-2">
-                Trvanie (dni)
+                {isEn ? 'Duration (days)' : 'Trvanie (dni)'}
               </label>
               <input
                 type="number"
@@ -905,7 +926,7 @@ function TrainingModal({
             </div>
             <div>
               <label className="text-xs uppercase tracking-wider text-tertiary block mb-2">
-                Rozpočet / osoba
+                {isEn ? 'Budget / person' : 'Rozpočet / osoba'}
               </label>
               <div className="relative">
                 <input
@@ -923,12 +944,12 @@ function TrainingModal({
           {/* Provider */}
           <div>
             <label className="text-xs uppercase tracking-wider text-tertiary block mb-2">
-              Poskytovateľ (voliteľné)
+              {isEn ? 'Provider (optional)' : 'Poskytovateľ (voliteľné)'}
             </label>
             <input
               value={provider}
               onChange={(e) => setProvider(e.target.value)}
-              placeholder="napr. Udemy, EXPONEA Academy, interne..."
+              placeholder={isEn ? 'e.g. Udemy, EXPONEA Academy, internal...' : 'napr. Udemy, EXPONEA Academy, interne...'}
               className="input-field text-sm"
             />
           </div>
@@ -936,12 +957,12 @@ function TrainingModal({
           {/* Notes */}
           <div>
             <label className="text-xs uppercase tracking-wider text-tertiary block mb-2">
-              Poznámky
+              {isEn ? 'Notes' : 'Poznámky'}
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Dôvod, ciele, kontext..."
+              placeholder={isEn ? 'Reason, goals, context...' : 'Dôvod, ciele, kontext...'}
               className="input-field text-sm resize-none"
               rows={2}
             />
@@ -952,7 +973,7 @@ function TrainingModal({
             <div className="card bg-tertiary p-3">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-secondary">
-                  {participantIds.length} {participantIds.length === 1 ? 'účastník' : 'účastníkov'} × {budget} €
+                  {participantIds.length} {isEn ? (participantIds.length === 1 ? 'participant' : 'participants') : (participantIds.length === 1 ? 'účastník' : 'účastníkov')} × {budget} €
                 </span>
                 <span className="font-display text-2xl">{totalCost} €</span>
               </div>
@@ -962,10 +983,10 @@ function TrainingModal({
 
         {/* Footer */}
         <div className="p-4 border-t border-subtle flex justify-end gap-2">
-          <button onClick={onClose} className="btn-secondary text-sm">Zrušiť</button>
+          <button onClick={onClose} className="btn-secondary text-sm">{isEn ? 'Cancel' : 'Zrušiť'}</button>
           <button onClick={handleSubmit} className="btn-primary text-sm">
             <Sparkles size={14} />
-            Naplánovať školenie
+            {isEn ? 'Plan training' : 'Naplánovať školenie'}
           </button>
         </div>
       </motion.div>
@@ -985,16 +1006,18 @@ function TrainingCard({
   allEmployees: Employee[];
   onRemove: () => void;
 }) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const participants = training.participantIds
     .map((id) => allEmployees.find((e) => e.id === id))
     .filter(Boolean) as Employee[];
 
   const typeLabels: Record<TrainingType, { label: string; emoji: string; color: string }> = {
-    'online-course': { label: 'Online kurz', emoji: '📺', color: '#3b82f6' },
-    'internal-workshop': { label: 'Interný workshop', emoji: '🏢', color: '#8b5cf6' },
+    'online-course': { label: isEn ? 'Online course' : 'Online kurz', emoji: '📺', color: '#3b82f6' },
+    'internal-workshop': { label: isEn ? 'Internal workshop' : 'Interný workshop', emoji: '🏢', color: '#8b5cf6' },
     'mentor': { label: 'Mentor', emoji: '👨‍🏫', color: '#10b981' },
-    'external-course': { label: 'Externý kurz', emoji: '🎓', color: '#f59e0b' },
-    'conference': { label: 'Konferencia', emoji: '🎤', color: '#ec4899' },
+    'external-course': { label: isEn ? 'External course' : 'Externý kurz', emoji: '🎓', color: '#f59e0b' },
+    'conference': { label: isEn ? 'Conference' : 'Konferencia', emoji: '🎤', color: '#ec4899' },
   };
 
   const tcfg = typeLabels[training.type];
@@ -1023,31 +1046,31 @@ function TrainingCard({
             {training.provider && ` · ${training.provider}`}
           </p>
         </div>
-        <button onClick={onRemove} className="btn-ghost text-tertiary hover:text-red-500 p-1" title="Zrušiť">
+        <button onClick={onRemove} className="btn-ghost text-tertiary hover:text-red-500 p-1" title={isEn ? 'Cancel' : 'Zrušiť'}>
           <Trash2 size={12} />
         </button>
       </div>
 
       <div className="grid grid-cols-3 gap-2 my-3 py-2 border-y border-subtle">
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-tertiary">Termín</p>
+          <p className="text-[10px] uppercase tracking-wider text-tertiary">{isEn ? 'Date' : 'Termín'}</p>
           <p className="text-xs font-medium">
-            {startDate.toLocaleDateString('sk-SK', { day: 'numeric', month: 'short' })}
+            {startDate.toLocaleDateString(isEn ? 'en-US' : 'sk-SK', { day: 'numeric', month: 'short' })}
           </p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-tertiary">Trvanie</p>
+          <p className="text-[10px] uppercase tracking-wider text-tertiary">{isEn ? 'Duration' : 'Trvanie'}</p>
           <p className="text-xs font-medium">{training.durationDays}d</p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-tertiary">Rozpočet</p>
+          <p className="text-[10px] uppercase tracking-wider text-tertiary">{isEn ? 'Budget' : 'Rozpočet'}</p>
           <p className="text-xs font-medium">{training.budget * participants.length} €</p>
         </div>
       </div>
 
       <div>
         <p className="text-[10px] uppercase tracking-wider text-tertiary mb-1.5">
-          Účastníci ({participants.length})
+          {isEn ? `Participants (${participants.length})` : `Účastníci (${participants.length})`}
         </p>
         <div className="flex -space-x-2">
           {participants.slice(0, 5).map((p) => (

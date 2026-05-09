@@ -3,20 +3,13 @@ import { useState } from 'react';
 import { MessageSquare, TrendingUp, Sparkles, Plus } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { surveys } from '../data/content';
+import { useLanguage } from '../hooks/useLanguage';
 import { LeadCTA } from './Requests';
 import { formatDate } from '../lib/utils';
 
 interface SurveysProps {
   onLeadCapture: (module: string) => void;
 }
-
-const emojiOptions = [
-  { emoji: '😞', label: 'Veľmi zle', value: 1 },
-  { emoji: '😕', label: 'Zle', value: 2 },
-  { emoji: '😐', label: 'Stredne', value: 3 },
-  { emoji: '😊', label: 'Dobre', value: 4 },
-  { emoji: '🤩', label: 'Super', value: 5 },
-];
 
 const pulseTrend = [
   { week: '1', score: 4.0 }, { week: '2', score: 4.1 }, { week: '3', score: 3.9 },
@@ -25,6 +18,15 @@ const pulseTrend = [
 ];
 
 export function Surveys({ onLeadCapture }: SurveysProps) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
+  const emojiOptions = [
+    { emoji: '😞', label: isEn ? 'Very bad' : 'Veľmi zle', value: 1 },
+    { emoji: '😕', label: isEn ? 'Bad' : 'Zle', value: 2 },
+    { emoji: '😐', label: isEn ? 'Neutral' : 'Stredne', value: 3 },
+    { emoji: '😊', label: isEn ? 'Good' : 'Dobre', value: 4 },
+    { emoji: '🤩', label: isEn ? 'Great' : 'Super', value: 5 },
+  ];
   const [selectedScore, setSelectedScore] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -32,9 +34,9 @@ export function Surveys({ onLeadCapture }: SurveysProps) {
     <div className="page-enter space-y-6">
       <div>
         <p className="text-sm text-tertiary uppercase tracking-wider mb-1">Engagement</p>
-        <h1 className="font-display text-3xl">Pulse Surveys & eNPS</h1>
+          <h1 className="font-display text-3xl">Pulse Surveys & eNPS</h1>
         <p className="text-secondary text-sm mt-1">
-          Krátke pravidelné prieskumy spokojnosti · AI detekcia trendov
+            {isEn ? 'Short recurring sentiment surveys · AI trend detection' : 'Krátke pravidelné prieskumy spokojnosti · AI detekcia trendov'}
         </p>
       </div>
 
@@ -46,11 +48,11 @@ export function Surveys({ onLeadCapture }: SurveysProps) {
       >
         <div className="flex items-center gap-2 mb-4">
           <span className="badge badge-accent">📊 LIVE</span>
-          <p className="text-sm text-tertiary">Týždenný Pulse · zostáva 3 dni</p>
+          <p className="text-sm text-tertiary">{isEn ? 'Weekly Pulse · 3 days left' : 'Týždenný Pulse · zostáva 3 dni'}</p>
         </div>
 
         <h2 className="font-display text-2xl mb-6 text-center">
-          Ako sa cítiš tento týždeň?
+          {isEn ? 'How do you feel this week?' : 'Ako sa cítiš tento týždeň?'}
         </h2>
 
         {!submitted ? (
@@ -78,13 +80,13 @@ export function Surveys({ onLeadCapture }: SurveysProps) {
             className="text-center py-6"
           >
             <p className="text-4xl mb-3">🎉</p>
-            <p className="font-medium">Ďakujeme!</p>
-            <p className="text-sm text-tertiary">Tvoja odpoveď je anonymná</p>
+            <p className="font-medium">{isEn ? 'Thank you!' : 'Ďakujeme!'}</p>
+            <p className="text-sm text-tertiary">{isEn ? 'Your response is anonymous' : 'Tvoja odpoveď je anonymná'}</p>
           </motion.div>
         )}
 
         <div className="text-center text-xs text-tertiary">
-          13 z 15 už odpovedalo · Anonymné · 30 sekúnd
+          {isEn ? '13 of 15 responded · Anonymous · 30 seconds' : '13 z 15 už odpovedalo · Anonymné · 30 sekúnd'}
         </div>
       </motion.div>
 
@@ -107,11 +109,11 @@ export function Surveys({ onLeadCapture }: SurveysProps) {
             <div className="flex items-end justify-between">
               <div>
                 <p className="font-display text-3xl accent-text">{s.averageScore}</p>
-                <p className="text-xs text-tertiary">priemer</p>
+                <p className="text-xs text-tertiary">{isEn ? 'average' : 'priemer'}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm font-medium">{s.responses}/{s.total}</p>
-                <p className="text-xs text-tertiary">odpovedí</p>
+                <p className="text-xs text-tertiary">{isEn ? 'responses' : 'odpovedí'}</p>
               </div>
             </div>
           </motion.div>
@@ -122,8 +124,8 @@ export function Surveys({ onLeadCapture }: SurveysProps) {
       <div className="card">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="font-medium">Pulse Trend (8 týždňov)</h2>
-            <p className="text-xs text-tertiary mt-0.5">Týždenné priemerné skóre · stabilný rast</p>
+            <h2 className="font-medium">{isEn ? 'Pulse Trend (8 weeks)' : 'Pulse Trend (8 týždňov)'}</h2>
+            <p className="text-xs text-tertiary mt-0.5">{isEn ? 'Weekly average score · stable growth' : 'Týždenné priemerné skóre · stabilný rast'}</p>
           </div>
           <span className="badge badge-success">
             <TrendingUp size={12} />
@@ -157,9 +159,11 @@ export function Surveys({ onLeadCapture }: SurveysProps) {
           <div>
             <p className="font-medium text-sm mb-1">AI Trend Analysis</p>
             <p className="text-sm text-secondary leading-relaxed">
-              Pulse v Sales tíme klesol o 17% za posledné 3 týždne. Identifikované témy v komentároch:
+              {isEn
+                ? 'Pulse in Sales dropped by 17% in the last 3 weeks. Key comment themes:'
+                : 'Pulse v Sales tíme klesol o 17% za posledné 3 týždne. Identifikované témy v komentároch:'}
               <strong> "deadline pressure" (8x), "tooling issues" (5x), "compensation" (3x)</strong>.
-              Odporúčam 1:1 s Jakubom (Sales Manager).
+              {isEn ? ' Recommended: 1:1 with Jakub (Sales Manager).' : ' Odporúčam 1:1 s Jakubom (Sales Manager).'}
             </p>
           </div>
         </div>

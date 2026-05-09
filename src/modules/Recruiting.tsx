@@ -6,6 +6,7 @@ import {
   Loader2, Check, MessageCircle, Clock, ChevronRight, Edit3, Trash2, UserPlus
 } from 'lucide-react';
 import { candidates as initialCandidates, openPositions } from '../data/candidates';
+import { useLanguage } from '../hooks/useLanguage';
 import { cn, formatDate, fireConfetti } from '../lib/utils';
 import type { Candidate, ActivityEntry } from '../types';
 
@@ -30,7 +31,7 @@ const AI_SOURCE_POOL: Omit<Candidate, 'id' | 'appliedDate' | 'stage' | 'activity
     rating: 5,
     matchScore: 92,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=patrik',
-    notes: 'AI: 7 rokov React expertízy, 2.5k GitHub stars, lead architect na enterprise SaaS. Top 5% kandidátov.',
+    notes: 'AI: 7 years of React expertise, 2.5k GitHub stars, lead architect on enterprise SaaS. Top 5% candidate.',
     phone: '+421 911 234 567',
     linkedin: 'linkedin.com/in/patriksura',
   },
@@ -42,7 +43,7 @@ const AI_SOURCE_POOL: Omit<Candidate, 'id' | 'appliedDate' | 'stage' | 'activity
     rating: 5,
     matchScore: 89,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tomas',
-    notes: 'AI: AWS Solutions Architect Professional + CKA. Reduced cloud costs by 40% vo svojej súčasnej firme.',
+    notes: 'AI: AWS Solutions Architect Professional + CKA. Reduced cloud costs by 40% in current company.',
     phone: '+421 905 887 332',
     linkedin: 'linkedin.com/in/tomasfischer',
   },
@@ -54,7 +55,7 @@ const AI_SOURCE_POOL: Omit<Candidate, 'id' | 'appliedDate' | 'stage' | 'activity
     rating: 4,
     matchScore: 81,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=evajank',
-    notes: 'AI: Senior UX Designer, 5 rokov skúseností v B2B SaaS, portfolio s prácami pre Slovak Telecom.',
+    notes: 'AI: Senior UX Designer, 5 years of experience in B2B SaaS, portfolio includes work for Slovak Telecom.',
     linkedin: 'linkedin.com/in/evajankovicova',
   },
   {
@@ -65,12 +66,18 @@ const AI_SOURCE_POOL: Omit<Candidate, 'id' | 'appliedDate' | 'stage' | 'activity
     rating: 4,
     matchScore: 78,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=mareksokol',
-    notes: 'AI: 6 rokov React, momentálne pracuje v ESET. Dobrá kultúrna kompatibilita.',
+    notes: 'AI: 6 years of React, currently at ESET. Strong culture fit.',
     phone: '+421 944 123 456',
   },
 ];
 
 export function Recruiting() {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
+  const stageLabel = (id: string) =>
+    isEn
+      ? ({ applied: 'Applied', screening: 'Screening', interview: 'Interview', offer: 'Offer', hired: 'Hired', rejected: 'Rejected' } as any)[id] || id
+      : ({ applied: 'Aplikoval/a', screening: 'Screening', interview: 'Pohovor', offer: 'Ponuka', hired: 'Prijatý/á', rejected: 'Zamietnutý/á' } as any)[id] || id;
   // Load persisted state or initial
   const [candidates, setCandidates] = useState<Candidate[]>(() => {
     try {
@@ -150,17 +157,17 @@ export function Recruiting() {
   const moveCandidate = (id: string, newStage: Candidate['stage']) => {
     const candidate = candidates.find((c) => c.id === id);
     if (!candidate || candidate.stage === newStage) return;
-    const oldStageLabel = stages.find((s) => s.id === candidate.stage)?.label;
-    const newStageLabel = stages.find((s) => s.id === newStage)?.label;
+    const oldStageLabel = stageLabel(candidate.stage);
+    const newStageLabel = stageLabel(newStage);
 
     setCandidates((prev) =>
       prev.map((c) => (c.id === id ? { ...c, stage: newStage } : c))
     );
-    addActivity(id, 'stage-change', `Posunutý: ${oldStageLabel} → ${newStageLabel}`);
+    addActivity(id, 'stage-change', isEn ? `Moved: ${oldStageLabel} → ${newStageLabel}` : `Posunutý: ${oldStageLabel} → ${newStageLabel}`);
 
     if (newStage === 'hired') {
       fireConfetti();
-      showToast(`🎉 ${candidate.name} bol prijatý!`);
+      showToast(isEn ? `🎉 ${candidate.name} was hired!` : `🎉 ${candidate.name} bol prijatý!`);
     } else {
       showToast(`✓ ${candidate.name}: ${newStageLabel}`);
     }
@@ -174,13 +181,13 @@ export function Recruiting() {
 
   const updateNotes = (id: string, notes: string) => {
     updateCandidate(id, { notes });
-    addActivity(id, 'note-added', 'Aktualizoval poznámky');
+    addActivity(id, 'note-added', isEn ? 'Updated notes' : 'Aktualizoval poznámky');
   };
 
   const updateRating = (id: string, rating: number) => {
     updateCandidate(id, { rating });
-    addActivity(id, 'rating-changed', `Hodnotenie zmenené na ${rating}/5`);
-    showToast(`✓ Hodnotenie aktualizované`);
+    addActivity(id, 'rating-changed', isEn ? `Rating changed to ${rating}/5` : `Hodnotenie zmenené na ${rating}/5`);
+    showToast(isEn ? '✓ Rating updated' : '✓ Hodnotenie aktualizované');
   };
 
   const addCandidate = (data: Omit<Candidate, 'id' | 'activity' | 'appliedDate' | 'stage'>) => {
@@ -193,20 +200,20 @@ export function Recruiting() {
         id: `act-${Date.now()}`,
         timestamp: Date.now(),
         type: 'created',
-        description: `Manuálne pridaný cez ${data.source}`,
+        description: isEn ? `Manually added via ${data.source}` : `Manuálne pridaný cez ${data.source}`,
       }],
     };
     setCandidates((prev) => [newCandidate, ...prev]);
     setAddCandidateOpen(false);
     fireConfetti();
-    showToast(`✓ ${data.name} pridaný do pipeline`);
+    showToast(isEn ? `✓ ${data.name} added to pipeline` : `✓ ${data.name} pridaný do pipeline`);
   };
 
   const removeCandidate = (id: string) => {
-    if (!window.confirm('Naozaj odstrániť tohto kandidáta?')) return;
+    if (!window.confirm(isEn ? 'Really remove this candidate?' : 'Naozaj odstrániť tohto kandidáta?')) return;
     setCandidates((prev) => prev.filter((c) => c.id !== id));
     setSelectedCandidate(null);
-    showToast('Kandidát odstránený');
+    showToast(isEn ? 'Candidate removed' : 'Kandidát odstránený');
   };
 
   const scheduleInterview = (id: string, date: string, time: string) => {
@@ -214,9 +221,9 @@ export function Recruiting() {
     if (!candidate) return;
     const interviewDate = `${date}T${time}`;
     updateCandidate(id, { interviewDate, stage: 'interview' });
-    addActivity(id, 'interview-scheduled', `Pohovor naplánovaný na ${date} o ${time}`);
+    addActivity(id, 'interview-scheduled', isEn ? `Interview scheduled for ${date} at ${time}` : `Pohovor naplánovaný na ${date} o ${time}`);
     setInterviewModalCandidate(null);
-    showToast(`📅 Pohovor naplánovaný · ${candidate.name}`);
+    showToast(isEn ? `📅 Interview scheduled · ${candidate.name}` : `📅 Pohovor naplánovaný · ${candidate.name}`);
   };
 
   const sendEmail = (id: string, subject: string, body: string) => {
@@ -224,9 +231,9 @@ export function Recruiting() {
     if (!candidate) return;
     // Open mailto in new tab
     window.open(`mailto:${candidate.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
-    addActivity(id, 'email-sent', `Email odoslaný: "${subject}"`);
+    addActivity(id, 'email-sent', isEn ? `Email sent: "${subject}"` : `Email odoslaný: "${subject}"`);
     setEmailModalCandidate(null);
-    showToast(`✉️ Email otvorený v default mail klientovi`);
+    showToast(isEn ? '✉️ Email opened in default mail client' : '✉️ Email otvorený v default mail klientovi');
   };
 
   // ==========================
@@ -285,33 +292,35 @@ export function Recruiting() {
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-sm text-tertiary uppercase tracking-wider mb-1">Admin · Talent Acquisition</p>
-          <h1 className="font-display text-3xl">Recruiting Pipeline</h1>
+            <h1 className="font-display text-3xl">Recruiting Pipeline</h1>
           <p className="text-secondary text-sm mt-1">
-            {candidates.length} kandidátov · {openPositions.length} otvorených pozícií ·
-            <span className="accent-text font-medium"> AI scoring zapnutý</span>
+            {isEn
+              ? `${candidates.length} candidates · ${openPositions.length} open positions ·`
+              : `${candidates.length} kandidátov · ${openPositions.length} otvorených pozícií ·`}
+            <span className="accent-text font-medium">{isEn ? ' AI scoring enabled' : ' AI scoring zapnutý'}</span>
           </p>
         </div>
 
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap w-full sm:w-auto">
           <button
             onClick={() => setAiSourceOpen(true)}
-            className="btn-secondary text-sm"
+            className="btn-secondary text-sm flex-1 sm:flex-none"
           >
             <Sparkles size={14} />
             AI Source
           </button>
           <button
             onClick={() => setAddCandidateOpen(true)}
-            className="btn-primary text-sm"
+            className="btn-primary text-sm flex-1 sm:flex-none"
           >
             <Plus size={14} />
-            Pridať kandidáta
+            {isEn ? 'Add candidate' : 'Pridať kandidáta'}
           </button>
         </div>
       </div>
 
       {/* Open positions row */}
-      <div className="grid md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
         {openPositions.map((pos, i) => (
           <motion.button
             key={pos.title}
@@ -345,7 +354,7 @@ export function Recruiting() {
           onClick={() => setFilterPosition('all')}
           className={cn('badge transition-all', filterPosition === 'all' ? 'badge-accent' : '')}
         >
-          Všetky pozície ({candidates.length})
+          {isEn ? `All positions (${candidates.length})` : `Všetky pozície (${candidates.length})`}
         </button>
         {positions.map((pos) => (
           <button
@@ -359,7 +368,7 @@ export function Recruiting() {
       </div>
 
       {/* Kanban board with drag & drop */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="flex md:grid md:grid-cols-3 lg:grid-cols-6 gap-3 overflow-x-auto pb-2 md:overflow-visible md:pb-0 -mx-1 px-1">
         {stages.map((stage) => {
           const stageCandidates = filtered.filter((c) => c.stage === stage.id);
           const isDragOver = dragOverStage === stage.id;
@@ -370,7 +379,7 @@ export function Recruiting() {
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, stage.id as Candidate['stage'])}
               className={cn(
-                'rounded-xl p-2 min-h-[400px] flex flex-col transition-all',
+                'rounded-xl p-2 min-h-[340px] md:min-h-[400px] flex flex-col transition-all flex-shrink-0 w-[82vw] sm:w-[62vw] md:w-auto',
                 isDragOver
                   ? 'bg-accent ring-2 ring-offset-2'
                   : 'bg-tertiary'
@@ -380,7 +389,7 @@ export function Recruiting() {
               <div className="px-2 py-2 flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full" style={{ background: stage.color }} />
-                  <p className="text-xs font-medium uppercase tracking-wider">{stage.label}</p>
+                  <p className="text-xs font-medium uppercase tracking-wider">{stageLabel(stage.id)}</p>
                 </div>
                 <span className="text-xs text-tertiary font-medium">{stageCandidates.length}</span>
               </div>
@@ -454,7 +463,7 @@ export function Recruiting() {
 
                 {stageCandidates.length === 0 && (
                   <div className="text-center py-8 text-xs text-tertiary border-2 border-dashed border-subtle rounded-lg">
-                    {isDragOver ? '⬇️ Pustite tu' : 'Žiadny kandidát'}
+                    {isDragOver ? (isEn ? '⬇️ Drop here' : '⬇️ Pustite tu') : (isEn ? 'No candidate' : 'Žiadny kandidát')}
                   </div>
                 )}
               </div>
@@ -471,11 +480,11 @@ export function Recruiting() {
               <Sparkles size={16} className="accent-text" />
             </div>
             <div className="flex-1">
-              <p className="font-medium text-sm mb-1">AI Insight: Top kandidáti tento týždeň</p>
+              <p className="font-medium text-sm mb-1">{isEn ? 'AI Insight: Top candidates this week' : 'AI Insight: Top kandidáti tento týždeň'}</p>
               <p className="text-sm text-secondary leading-relaxed mb-3">
                 {aiInsightCandidates.map((c, i) => (
                   <span key={c.id}>
-                    <strong>{c.name}</strong> ({c.position}) má <strong>{c.matchScore}% match</strong> — {c.notes.replace(/^AI:\s*/, '')}
+                    <strong>{c.name}</strong> ({c.position}) {isEn ? 'has' : 'má'} <strong>{c.matchScore}% match</strong> — {c.notes.replace(/^AI:\s*/, '')}
                     {i < aiInsightCandidates.length - 1 && <br />}
                   </span>
                 ))}
@@ -487,7 +496,7 @@ export function Recruiting() {
                     onClick={() => setInterviewModalCandidate(c)}
                     className="badge badge-accent hover:opacity-80"
                   >
-                    📅 Naplánovať {c.name.split(' ')[0]}
+                    {isEn ? `📅 Schedule ${c.name.split(' ')[0]}` : `📅 Naplánovať ${c.name.split(' ')[0]}`}
                   </button>
                 ))}
                 <button
@@ -500,7 +509,7 @@ export function Recruiting() {
                   }}
                   className="badge hover:opacity-80"
                 >
-                  Zobraziť všetky AI scores →
+                  {isEn ? 'Show all AI scores →' : 'Zobraziť všetky AI scores →'}
                 </button>
               </div>
             </div>
@@ -560,7 +569,7 @@ export function Recruiting() {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 card shadow-xl-themed px-4 py-3 flex items-center gap-2 max-w-md"
+            className="fixed bottom-20 md:bottom-24 left-1/2 -translate-x-1/2 z-50 card shadow-xl-themed px-3 sm:px-4 py-3 flex items-center gap-2 max-w-[calc(100vw-1.5rem)] sm:max-w-md"
           >
             <Check size={16} className="accent-text flex-shrink-0" />
             <p className="text-sm">{toast}</p>
@@ -593,6 +602,8 @@ function CandidateDetailPanel({
   onSendEmail: () => void;
   onRemove: () => void;
 }) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [editingNotes, setEditingNotes] = useState(false);
   const [notesDraft, setNotesDraft] = useState(candidate.notes);
 
@@ -624,7 +635,7 @@ function CandidateDetailPanel({
         onClick={(e) => e.stopPropagation()}
         className="bg-secondary h-full w-full max-w-md overflow-y-auto"
       >
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <div className="flex justify-between items-start mb-6">
             <div className="flex items-center gap-3">
               <img src={candidate.avatar} className="w-14 h-14 rounded-full" alt="" />
@@ -667,24 +678,24 @@ function CandidateDetailPanel({
               onClick={(e) => {
                 if (!candidate.phone) {
                   e.preventDefault();
-                  alert('Telefónne číslo nie je k dispozícii');
+                  alert(isEn ? 'Phone number is not available' : 'Telefónne číslo nie je k dispozícii');
                 }
               }}
               className={cn('btn-secondary text-xs flex-col py-3', !candidate.phone && 'opacity-50 cursor-not-allowed')}
             >
               <Phone size={14} />
-              Hovor
+              {isEn ? 'Call' : 'Hovor'}
             </a>
             <button onClick={onScheduleInterview} className="btn-secondary text-xs flex-col py-3">
               <CalendarIcon size={14} />
-              Pohovor
+              {isEn ? 'Interview' : 'Pohovor'}
             </button>
           </div>
 
           {/* Inline rating */}
           <div className="card bg-tertiary mb-4">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs uppercase tracking-wider text-tertiary">Hodnotenie</p>
+              <p className="text-xs uppercase tracking-wider text-tertiary">{isEn ? 'Rating' : 'Hodnotenie'}</p>
               <span className="text-xs text-tertiary">{candidate.rating}/5</span>
             </div>
             <div className="flex gap-1">
@@ -693,7 +704,7 @@ function CandidateDetailPanel({
                   key={i}
                   onClick={() => onUpdateRating(candidate.id, i + 1)}
                   className="hover:scale-125 transition-transform"
-                  title={`${i + 1} hviezdičiek`}
+                  title={isEn ? `${i + 1} stars` : `${i + 1} hviezdičiek`}
                 >
                   <Star
                     size={20}
@@ -712,7 +723,7 @@ function CandidateDetailPanel({
               </a>
             } />
             {candidate.phone && (
-              <Row label="Telefón" value={
+              <Row label={isEn ? 'Phone' : 'Telefón'} value={
                 <a href={`tel:${candidate.phone}`} className="accent-text hover:underline">
                   {candidate.phone}
                 </a>
@@ -722,17 +733,17 @@ function CandidateDetailPanel({
               <Row label="LinkedIn" value={
                 <a href={`https://${candidate.linkedin}`} target="_blank" rel="noreferrer" className="accent-text hover:underline flex items-center gap-1">
                   <Linkedin size={11} />
-                  Profil
+                  {isEn ? 'Profile' : 'Profil'}
                 </a>
               } />
             )}
-            <Row label="Pozícia" value={candidate.position} />
-            <Row label="Zdroj" value={candidate.source} />
-            <Row label="Aplikoval/a" value={formatDate(candidate.appliedDate)} />
+            <Row label={isEn ? 'Position' : 'Pozícia'} value={candidate.position} />
+            <Row label={isEn ? 'Source' : 'Zdroj'} value={candidate.source} />
+            <Row label={isEn ? 'Applied' : 'Aplikoval/a'} value={formatDate(candidate.appliedDate)} />
             {candidate.interviewDate && (
-              <Row label="Pohovor" value={
+              <Row label={isEn ? 'Interview' : 'Pohovor'} value={
                 <span className="font-medium" style={{ color: 'var(--info)' }}>
-                  {new Date(candidate.interviewDate).toLocaleString('sk-SK', { dateStyle: 'medium', timeStyle: 'short' })}
+                  {new Date(candidate.interviewDate).toLocaleString(isEn ? 'en-US' : 'sk-SK', { dateStyle: 'medium', timeStyle: 'short' })}
                 </span>
               } />
             )}
@@ -741,11 +752,11 @@ function CandidateDetailPanel({
           {/* Notes (editable) */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs uppercase tracking-wider text-tertiary">Poznámky</p>
+            <p className="text-xs uppercase tracking-wider text-tertiary">{isEn ? 'Notes' : 'Poznámky'}</p>
               {!editingNotes && (
                 <button onClick={() => setEditingNotes(true)} className="btn-ghost text-xs">
                   <Edit3 size={11} />
-                  Upraviť
+                  {isEn ? 'Edit' : 'Upraviť'}
                 </button>
               )}
             </div>
@@ -761,22 +772,22 @@ function CandidateDetailPanel({
                 <div className="flex gap-2">
                   <button onClick={handleSaveNotes} className="btn-primary text-xs flex-1">
                     <Check size={11} />
-                    Uložiť
+                    {isEn ? 'Save' : 'Uložiť'}
                   </button>
                   <button onClick={() => { setNotesDraft(candidate.notes); setEditingNotes(false); }} className="btn-secondary text-xs">
-                    Zrušiť
+                    {isEn ? 'Cancel' : 'Zrušiť'}
                   </button>
                 </div>
               </div>
             ) : (
               <div className="card bg-tertiary text-sm leading-relaxed">
-                {candidate.notes || <span className="text-tertiary italic">Žiadne poznámky</span>}
+                {candidate.notes || <span className="text-tertiary italic">{isEn ? 'No notes' : 'Žiadne poznámky'}</span>}
               </div>
             )}
           </div>
 
           {/* Move stage */}
-          <p className="text-xs uppercase tracking-wider text-tertiary mb-2">Posunúť do</p>
+          <p className="text-xs uppercase tracking-wider text-tertiary mb-2">{isEn ? 'Move to' : 'Posunúť do'}</p>
           <div className="grid grid-cols-2 gap-2 mb-6">
             {stages.map((s) => (
               <button
@@ -789,7 +800,9 @@ function CandidateDetailPanel({
                 )}
               >
                 <div className="w-2 h-2 rounded-full" style={{ background: s.color }} />
-                {s.label}
+                {isEn
+                  ? ({ applied: 'Applied', screening: 'Screening', interview: 'Interview', offer: 'Offer', hired: 'Hired', rejected: 'Rejected' } as any)[s.id]
+                  : s.label}
               </button>
             ))}
           </div>
@@ -826,7 +839,7 @@ function CandidateDetailPanel({
               className="btn-ghost text-xs text-red-500 hover:bg-red-500/10 w-full"
             >
               <Trash2 size={11} />
-              Odstrániť kandidáta
+              {isEn ? 'Remove candidate' : 'Odstrániť kandidáta'}
             </button>
           </div>
         </div>
@@ -857,6 +870,8 @@ function AddCandidateModal({
   onClose: () => void;
   onSubmit: (data: any) => void;
 }) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [position, setPosition] = useState(openPositions[0]?.title || '');
@@ -867,7 +882,7 @@ function AddCandidateModal({
 
   const handleSubmit = () => {
     if (!name.trim() || !email.trim()) {
-      alert('Meno a email sú povinné');
+      alert(isEn ? 'Name and email are required' : 'Meno a email sú povinné');
       return;
     }
     onSubmit({
@@ -883,33 +898,33 @@ function AddCandidateModal({
   };
 
   return (
-    <ModalShell onClose={onClose} title="Pridať kandidáta" icon={UserPlus}>
+    <ModalShell onClose={onClose} title={isEn ? 'Add candidate' : 'Pridať kandidáta'} icon={UserPlus}>
       <div className="space-y-3">
-        <Field label="Meno *" required>
-          <input value={name} onChange={(e) => setName(e.target.value)} className="input-field text-sm" placeholder="Ján Novák" autoFocus />
+        <Field label={isEn ? 'Name *' : 'Meno *'} required>
+          <input value={name} onChange={(e) => setName(e.target.value)} className="input-field text-sm" placeholder={isEn ? 'John Doe' : 'Ján Novák'} autoFocus />
         </Field>
         <Field label="Email *" required>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field text-sm" placeholder="jan.novak@email.com" />
         </Field>
-        <Field label="Telefón">
+        <Field label={isEn ? 'Phone' : 'Telefón'}>
           <input value={phone} onChange={(e) => setPhone(e.target.value)} className="input-field text-sm" placeholder="+421 ..." />
         </Field>
-        <Field label="Pozícia">
+        <Field label={isEn ? 'Position' : 'Pozícia'}>
           <select value={position} onChange={(e) => setPosition(e.target.value)} className="input-field text-sm">
             {openPositions.map((p) => <option key={p.title} value={p.title}>{p.title}</option>)}
           </select>
         </Field>
-        <Field label="Zdroj">
+        <Field label={isEn ? 'Source' : 'Zdroj'}>
           <select value={source} onChange={(e) => setSource(e.target.value)} className="input-field text-sm">
             <option>LinkedIn</option>
             <option>Profesia</option>
             <option>Referral</option>
             <option>GitHub</option>
             <option>Email priamo</option>
-            <option>Iný</option>
+            <option>{isEn ? 'Other' : 'Iný'}</option>
           </select>
         </Field>
-        <Field label="Hodnotenie">
+        <Field label={isEn ? 'Rating' : 'Hodnotenie'}>
           <div className="flex gap-1">
             {Array.from({ length: 5 }).map((_, i) => (
               <button
@@ -922,16 +937,16 @@ function AddCandidateModal({
             ))}
           </div>
         </Field>
-        <Field label="Poznámky">
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className="input-field text-sm resize-none" rows={3} placeholder="Prvý dojem, kontext..." />
+        <Field label={isEn ? 'Notes' : 'Poznámky'}>
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className="input-field text-sm resize-none" rows={3} placeholder={isEn ? 'First impression, context...' : 'Prvý dojem, kontext...'} />
         </Field>
       </div>
 
       <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-subtle">
-        <button onClick={onClose} className="btn-secondary text-sm">Zrušiť</button>
+        <button onClick={onClose} className="btn-secondary text-sm">{isEn ? 'Cancel' : 'Zrušiť'}</button>
         <button onClick={handleSubmit} className="btn-primary text-sm">
           <Plus size={14} />
-          Pridať do pipeline
+          {isEn ? 'Add to pipeline' : 'Pridať do pipeline'}
         </button>
       </div>
     </ModalShell>
@@ -950,6 +965,8 @@ function AISourceModal({
   onClose: () => void;
   onAdd: (data: any) => void;
 }) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [isSearching, setIsSearching] = useState(true);
   const [results, setResults] = useState<typeof AI_SOURCE_POOL>([]);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
@@ -972,24 +989,26 @@ function AISourceModal({
   };
 
   return (
-    <ModalShell onClose={onClose} title="AI Source: Hľadanie kandidátov" icon={Sparkles}>
+    <ModalShell onClose={onClose} title={isEn ? 'AI Source: Candidate discovery' : 'AI Source: Hľadanie kandidátov'} icon={Sparkles}>
       {isSearching ? (
         <div className="text-center py-12">
           <Loader2 size={40} className="mx-auto accent-text animate-spin mb-3" />
-          <p className="font-medium text-sm">AI prehľadáva LinkedIn, GitHub, Profesia...</p>
-          <p className="text-xs text-tertiary mt-1">Hľadáme najlepšie matche pre vaše otvorené pozície</p>
+          <p className="font-medium text-sm">{isEn ? 'AI is scanning LinkedIn, GitHub, job portals...' : 'AI prehľadáva LinkedIn, GitHub, Profesia...'}</p>
+          <p className="text-xs text-tertiary mt-1">{isEn ? 'Looking for best matches for your open roles' : 'Hľadáme najlepšie matche pre vaše otvorené pozície'}</p>
         </div>
       ) : results.length === 0 ? (
         <div className="text-center py-12">
           <Check size={40} className="mx-auto text-success mb-3" />
-          <p className="font-medium text-sm">Všetci top kandidáti už sú v pipeline! 🎉</p>
-          <p className="text-xs text-tertiary mt-1">AI nenašlo žiadnych nových matchov.</p>
+          <p className="font-medium text-sm">{isEn ? 'All top candidates are already in your pipeline! 🎉' : 'Všetci top kandidáti už sú v pipeline! 🎉'}</p>
+          <p className="text-xs text-tertiary mt-1">{isEn ? 'AI found no new matches.' : 'AI nenašlo žiadnych nových matchov.'}</p>
         </div>
       ) : (
         <>
           <div className="card bg-accent mb-4">
             <p className="text-xs leading-relaxed" style={{ color: 'var(--text-on-accent)' }}>
-              ✨ Našli sme <strong>{results.length} kandidátov</strong> ktorí matchujú vaše otvorené pozície (match score ≥ 75%).
+              {isEn
+                ? <>✨ We found <strong>{results.length} candidates</strong> matching your open roles (match score ≥ 75%).</>
+                : <>✨ Našli sme <strong>{results.length} kandidátov</strong> ktorí matchujú vaše otvorené pozície (match score ≥ 75%).</>}
             </p>
           </div>
           <div className="space-y-3">
@@ -1031,12 +1050,12 @@ function AISourceModal({
                       {isAdded ? (
                         <>
                           <Check size={11} />
-                          Pridané
+                          {isEn ? 'Added' : 'Pridané'}
                         </>
                       ) : (
                         <>
                           <Plus size={11} />
-                          Pridať
+                          {isEn ? 'Add' : 'Pridať'}
                         </>
                       )}
                     </button>
@@ -1049,7 +1068,7 @@ function AISourceModal({
       )}
 
       <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-subtle">
-        <button onClick={onClose} className="btn-secondary text-sm">Zatvoriť</button>
+        <button onClick={onClose} className="btn-secondary text-sm">{isEn ? 'Close' : 'Zatvoriť'}</button>
       </div>
     </ModalShell>
   );
@@ -1067,6 +1086,8 @@ function InterviewModal({
   onClose: () => void;
   onSchedule: (id: string, date: string, time: string) => void;
 }) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [date, setDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() + 3);
@@ -1081,7 +1102,7 @@ function InterviewModal({
   };
 
   return (
-    <ModalShell onClose={onClose} title={`Pohovor · ${candidate.name}`} icon={CalendarIcon}>
+    <ModalShell onClose={onClose} title={`${isEn ? 'Interview' : 'Pohovor'} · ${candidate.name}`} icon={CalendarIcon}>
       <div className="space-y-4">
         <div className="card bg-tertiary flex items-center gap-3">
           <img src={candidate.avatar} className="w-10 h-10 rounded-full" alt="" />
@@ -1092,20 +1113,20 @@ function InterviewModal({
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Dátum">
+          <Field label={isEn ? 'Date' : 'Dátum'}>
             <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="input-field text-sm" />
           </Field>
-          <Field label="Čas">
+          <Field label={isEn ? 'Time' : 'Čas'}>
             <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="input-field text-sm" />
           </Field>
         </div>
 
-        <Field label="Typ pohovoru">
+        <Field label={isEn ? 'Interview type' : 'Typ pohovoru'}>
           <div className="grid grid-cols-3 gap-2">
             {[
               { id: 'video', label: 'Video', emoji: '📹' },
-              { id: 'in-person', label: 'Osobný', emoji: '🤝' },
-              { id: 'phone', label: 'Telefón', emoji: '📞' },
+              { id: 'in-person', label: isEn ? 'In-person' : 'Osobný', emoji: '🤝' },
+              { id: 'phone', label: isEn ? 'Phone' : 'Telefón', emoji: '📞' },
             ].map((t) => (
               <button
                 key={t.id}
@@ -1122,26 +1143,28 @@ function InterviewModal({
           </div>
         </Field>
 
-        <Field label="Trvanie">
+        <Field label={isEn ? 'Duration' : 'Trvanie'}>
           <select value={duration} onChange={(e) => setDuration(parseInt(e.target.value))} className="input-field text-sm">
-            <option value={30}>30 minút</option>
-            <option value={45}>45 minút</option>
-            <option value={60}>60 minút</option>
-            <option value={90}>90 minút</option>
-            <option value={120}>120 minút</option>
+            <option value={30}>{isEn ? '30 minutes' : '30 minút'}</option>
+            <option value={45}>{isEn ? '45 minutes' : '45 minút'}</option>
+            <option value={60}>{isEn ? '60 minutes' : '60 minút'}</option>
+            <option value={90}>{isEn ? '90 minutes' : '90 minút'}</option>
+            <option value={120}>{isEn ? '120 minutes' : '120 minút'}</option>
           </select>
         </Field>
 
         <div className="card bg-accent text-xs leading-relaxed" style={{ color: 'var(--text-on-accent)' }}>
-          ✨ AI: Po naplánovaní automaticky pošleme kalendárovú pozvánku, pripravíme Zoom link a vygenerujeme základné technické otázky pre {candidate.position}.
+          {isEn
+            ? `✨ AI: after scheduling we auto-send a calendar invite, prepare a Zoom link, and generate baseline technical questions for ${candidate.position}.`
+            : `✨ AI: Po naplánovaní automaticky pošleme kalendárovú pozvánku, pripravíme Zoom link a vygenerujeme základné technické otázky pre ${candidate.position}.`}
         </div>
       </div>
 
       <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-subtle">
-        <button onClick={onClose} className="btn-secondary text-sm">Zrušiť</button>
+        <button onClick={onClose} className="btn-secondary text-sm">{isEn ? 'Cancel' : 'Zrušiť'}</button>
         <button onClick={handleSubmit} className="btn-primary text-sm">
           <CalendarIcon size={14} />
-          Naplánovať pohovor
+          {isEn ? 'Schedule interview' : 'Naplánovať pohovor'}
         </button>
       </div>
     </ModalShell>
@@ -1160,12 +1183,24 @@ function EmailModal({
   onClose: () => void;
   onSend: (id: string, subject: string, body: string) => void;
 }) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const templates = [
     {
       id: 'screening',
-      label: 'Screening pozvánka',
+      label: isEn ? 'Screening invite' : 'Screening pozvánka',
       subject: `Re: ${candidate.position} · Aurora`,
-      body: `Dobrý deň, ${candidate.name.split(' ')[0]},
+      body: isEn
+        ? `Hello ${candidate.name.split(' ')[0]},
+
+thank you for your interest in the ${candidate.position} role.
+
+After reviewing your CV, we would like to schedule a short screening interview (30 min, video). Would any slot this week work for you?
+
+Best regards,
+Janka Horváthová
+HR Manager · Aurora`
+        : `Dobrý deň, ${candidate.name.split(' ')[0]},
 
 ďakujeme za Váš záujem o pozíciu ${candidate.position}.
 
@@ -1177,9 +1212,23 @@ HR Manager · Aurora`,
     },
     {
       id: 'interview',
-      label: 'Pozvánka na pohovor',
-      subject: `Pozvánka na pohovor · ${candidate.position}`,
-      body: `Dobrý deň, ${candidate.name.split(' ')[0]},
+      label: isEn ? 'Interview invite' : 'Pozvánka na pohovor',
+      subject: isEn ? `Interview invitation · ${candidate.position}` : `Pozvánka na pohovor · ${candidate.position}`,
+      body: isEn
+        ? `Hello ${candidate.name.split(' ')[0]},
+
+we are pleased to invite you to an interview for the ${candidate.position} role. The interview will be a video call (Zoom), duration ~60 minutes.
+
+Topics:
+- Your previous experience
+- Technical questions relevant to the role
+- Discussion about our team and culture
+- Your questions for us
+
+Best regards,
+Janka Horváthová
+HR Manager · Aurora`
+        : `Dobrý deň, ${candidate.name.split(' ')[0]},
 
 s potešením Vás pozývame na pohovor na pozíciu ${candidate.position}. Pohovor bude prebiehať vo formáte video calls (Zoom), trvanie ~60 minút.
 
@@ -1195,9 +1244,27 @@ HR Manager · Aurora`,
     },
     {
       id: 'offer',
-      label: 'Ponuka práce',
-      subject: `Ponuka práce · ${candidate.position}`,
-      body: `Dobrý deň, ${candidate.name.split(' ')[0]},
+      label: isEn ? 'Job offer' : 'Ponuka práce',
+      subject: isEn ? `Job offer · ${candidate.position}` : `Ponuka práce · ${candidate.position}`,
+      body: isEn
+        ? `Hello ${candidate.name.split(' ')[0]},
+
+we are happy to offer you the ${candidate.position} role in our company.
+
+Details:
+- Position: ${candidate.position}
+- Salary: agreed during interview process
+- Start date: negotiable
+- Location: Bratislava / Remote
+- Benefits: 25 vacation days, Multisport, BetterHelp, MacBook setup
+
+You can find the full offer in the attachment. The offer is valid for 7 days.
+
+We look forward to welcoming you to the team!
+
+Janka Horváthová
+HR Manager · Aurora`
+        : `Dobrý deň, ${candidate.name.split(' ')[0]},
 
 s potešením Vám ponúkame pozíciu ${candidate.position} v našej firme.
 
@@ -1217,9 +1284,23 @@ HR Manager · Aurora`,
     },
     {
       id: 'rejection',
-      label: 'Zamietnutie',
+      label: isEn ? 'Rejection' : 'Zamietnutie',
       subject: `Re: ${candidate.position}`,
-      body: `Dobrý deň, ${candidate.name.split(' ')[0]},
+      body: isEn
+        ? `Hello ${candidate.name.split(' ')[0]},
+
+thank you for your time and interest in the ${candidate.position} role.
+
+After careful consideration, we decided to continue with another candidate whose experience aligns more closely with our current needs.
+
+We appreciate your application and will keep your CV in our database for relevant future opportunities.
+
+We wish you all the best.
+
+Best regards,
+Janka Horváthová
+HR Manager · Aurora`
+        : `Dobrý deň, ${candidate.name.split(' ')[0]},
 
 ďakujeme za Váš čas a záujem o pozíciu ${candidate.position}.
 
@@ -1254,11 +1335,11 @@ HR Manager · Aurora`,
   return (
     <ModalShell onClose={onClose} title={`Email · ${candidate.name}`} icon={Mail}>
       <div className="space-y-4">
-        <Field label="Pre">
+        <Field label={isEn ? 'To' : 'Pre'}>
           <input value={candidate.email} disabled className="input-field text-sm opacity-70" />
         </Field>
 
-        <Field label="Šablóna">
+        <Field label={isEn ? 'Template' : 'Šablóna'}>
           <div className="flex flex-wrap gap-1">
             {templates.map((t) => (
               <button
@@ -1272,11 +1353,11 @@ HR Manager · Aurora`,
           </div>
         </Field>
 
-        <Field label="Predmet">
+        <Field label={isEn ? 'Subject' : 'Predmet'}>
           <input value={subject} onChange={(e) => setSubject(e.target.value)} className="input-field text-sm" />
         </Field>
 
-        <Field label="Správa">
+        <Field label={isEn ? 'Message' : 'Správa'}>
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
@@ -1286,15 +1367,17 @@ HR Manager · Aurora`,
         </Field>
 
         <div className="card bg-accent text-xs" style={{ color: 'var(--text-on-accent)' }}>
-          💡 Po kliknutí "Otvoriť v Mail" sa otvorí Váš default email klient s vyplnenou správou. Môžete ju ešte upraviť pred odoslaním.
+          {isEn
+            ? '💡 Clicking "Open in mail" opens your default mail client with this draft. You can still edit it before sending.'
+            : '💡 Po kliknutí "Otvoriť v Mail" sa otvorí Váš default email klient s vyplnenou správou. Môžete ju ešte upraviť pred odoslaním.'}
         </div>
       </div>
 
       <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-subtle">
-        <button onClick={onClose} className="btn-secondary text-sm">Zrušiť</button>
+        <button onClick={onClose} className="btn-secondary text-sm">{isEn ? 'Cancel' : 'Zrušiť'}</button>
         <button onClick={handleSend} className="btn-primary text-sm">
           <Mail size={14} />
-          Otvoriť v Mail
+          {isEn ? 'Open in mail' : 'Otvoriť v Mail'}
         </button>
       </div>
     </ModalShell>
@@ -1328,14 +1411,14 @@ function ModalShell({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
-      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4"
     >
       <motion.div
         initial={{ scale: 0.95, opacity: 0, y: 10 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="card max-w-2xl w-full p-0 overflow-hidden max-h-[90vh] flex flex-col"
+        className="card max-w-2xl w-full p-0 overflow-hidden max-h-[92vh] sm:max-h-[90vh] flex flex-col"
       >
         <div className="p-5 border-b border-subtle mesh-bg flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">

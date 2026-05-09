@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { timeOffEntries } from '../data/hrData';
 import { employees, getEmployeeById } from '../data/employees';
+import { useLanguage } from '../hooks/useLanguage';
 import { LeadCTA } from './Requests';
 import { cn } from '../lib/utils';
 import type { TimeOffEntry } from '../types';
@@ -32,6 +33,8 @@ function isDateInRange(date: Date, start: string, end: string): boolean {
 }
 
 export function TimeOff({ onLeadCapture }: TimeOffProps) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [currentMonth, setCurrentMonth] = useState(new Date(2026, 4, 1)); // May 2026
   const [filterType, setFilterType] = useState<string>('all');
   const [selectedEntry, setSelectedEntry] = useState<TimeOffEntry | null>(null);
@@ -117,9 +120,11 @@ export function TimeOff({ onLeadCapture }: TimeOffProps) {
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-sm text-tertiary uppercase tracking-wider mb-1">People Operations</p>
-          <h1 className="font-display text-3xl">Dovolenky & Kapacita timu</h1>
+            <h1 className="font-display text-3xl">{isEn ? 'Time Off & Team Capacity' : 'Dovolenky & Kapacita timu'}</h1>
           <p className="text-secondary text-sm mt-1">
-            Planovacie nastroj pre HR · vidis kedy je kazdy prec a kde su kriticke vykryty
+            {isEn
+              ? 'Planning tool for HR · see who is away and where coverage is critical'
+              : 'Planovacie nastroj pre HR · vidis kedy je kazdy prec a kde su kriticke vykryty'}
           </p>
         </div>
       </div>
@@ -132,7 +137,7 @@ export function TimeOff({ onLeadCapture }: TimeOffProps) {
               <Sparkles size={16} className="accent-text" />
             </div>
             <div className="flex-1">
-              <p className="font-medium text-sm mb-2">AI insights · plánovacie warnings</p>
+              <p className="font-medium text-sm mb-2">{isEn ? 'AI insights · planning warnings' : 'AI insights · plánovacie warnings'}</p>
               <ul className="space-y-1.5">
                 {aiInsights.map((ins, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
@@ -153,7 +158,7 @@ export function TimeOff({ onLeadCapture }: TimeOffProps) {
             <div className="flex items-center gap-2">
               <button onClick={() => navigate(-1)} className="btn-ghost"><ChevronLeft size={18} /></button>
               <h2 className="font-display text-xl capitalize min-w-[170px] text-center">
-                {currentMonth.toLocaleDateString('sk-SK', { month: 'long', year: 'numeric' })}
+                {currentMonth.toLocaleDateString(isEn ? 'en-US' : 'sk-SK', { month: 'long', year: 'numeric' })}
               </h2>
               <button onClick={() => navigate(1)} className="btn-ghost"><ChevronRight size={18} /></button>
             </div>
@@ -164,7 +169,7 @@ export function TimeOff({ onLeadCapture }: TimeOffProps) {
                 onClick={() => setFilterType('all')}
                 className={cn('badge text-[11px]', filterType === 'all' && 'badge-accent')}
               >
-                Vsetko
+                {isEn ? 'All' : 'Vsetko'}
               </button>
               {Object.entries(typeConfig).map(([key, cfg]) => (
                 <button
@@ -172,7 +177,9 @@ export function TimeOff({ onLeadCapture }: TimeOffProps) {
                   onClick={() => setFilterType(key)}
                   className={cn('badge text-[11px]', filterType === key && 'badge-accent')}
                 >
-                  {cfg.emoji} {cfg.label}
+                  {cfg.emoji} {isEn
+                    ? ({ vacation: 'Vacation', sick: 'Sick', personal: 'Personal', parental: 'Parental', other: 'Other' } as any)[key]
+                    : cfg.label}
                 </button>
               ))}
             </div>
@@ -180,7 +187,7 @@ export function TimeOff({ onLeadCapture }: TimeOffProps) {
 
           {/* Days grid */}
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'].map((d) => (
+            {(isEn ? ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'] : ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne']).map((d) => (
               <div key={d} className="text-center text-xs font-medium text-tertiary py-2">{d}</div>
             ))}
           </div>
@@ -240,18 +247,18 @@ export function TimeOff({ onLeadCapture }: TimeOffProps) {
           {/* Legend */}
           <div className="mt-4 pt-4 border-t border-subtle flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-3 text-xs">
-              <span className="text-tertiary">Vykryt timu:</span>
+              <span className="text-tertiary">{isEn ? 'Team coverage:' : 'Vykryt timu:'}</span>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded" style={{ background: 'color-mix(in srgb, var(--success) 25%, transparent)' }} />
-                <span>OK</span>
+                <span>{isEn ? 'OK' : 'OK'}</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded" style={{ background: 'color-mix(in srgb, var(--warning) 35%, transparent)' }} />
-                <span>Sledovat</span>
+                <span>{isEn ? 'Watch' : 'Sledovat'}</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded" style={{ background: 'color-mix(in srgb, var(--danger) 45%, transparent)' }} />
-                <span>Kriticke</span>
+                <span>{isEn ? 'Critical' : 'Kriticke'}</span>
               </div>
             </div>
           </div>
@@ -261,18 +268,18 @@ export function TimeOff({ onLeadCapture }: TimeOffProps) {
         <div className="space-y-4">
           {/* Stats */}
           <div className="card">
-            <p className="text-xs uppercase tracking-wider text-tertiary mb-3">Tento mesiac</p>
+            <p className="text-xs uppercase tracking-wider text-tertiary mb-3">{isEn ? 'This month' : 'Tento mesiac'}</p>
             <div className="space-y-3">
-              <Stat icon={Plane} label="Dovolenky" value={timeOffEntries.filter((e) => e.type === 'vacation' && e.status === 'approved').length} color="#10b981" />
+              <Stat icon={Plane} label={isEn ? 'Vacation' : 'Dovolenky'} value={timeOffEntries.filter((e) => e.type === 'vacation' && e.status === 'approved').length} color="#10b981" />
               <Stat icon={Heart} label="PN" value={timeOffEntries.filter((e) => e.type === 'sick').length} color="#ef4444" />
-              <Stat icon={Baby} label="Materska" value={timeOffEntries.filter((e) => e.type === 'parental').length} color="#ec4899" />
+              <Stat icon={Baby} label={isEn ? 'Parental' : 'Materska'} value={timeOffEntries.filter((e) => e.type === 'parental').length} color="#ec4899" />
               <Stat icon={Users} label="Pending" value={timeOffEntries.filter((e) => e.status === 'pending').length} color="#f59e0b" />
             </div>
           </div>
 
           {/* Upcoming list */}
           <div className="card">
-            <p className="text-xs uppercase tracking-wider text-tertiary mb-3">Najblizsie absencie</p>
+            <p className="text-xs uppercase tracking-wider text-tertiary mb-3">{isEn ? 'Upcoming absences' : 'Najblizsie absencie'}</p>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {timeOffEntries
                 .filter((e) => new Date(e.endDate) >= new Date('2026-05-08'))
@@ -295,9 +302,9 @@ export function TimeOff({ onLeadCapture }: TimeOffProps) {
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium truncate">{emp.name}</p>
                         <p className="text-[10px] text-tertiary">
-                          {start.toLocaleDateString('sk-SK', { day: 'numeric', month: 'short' })}
+                          {start.toLocaleDateString(isEn ? 'en-US' : 'sk-SK', { day: 'numeric', month: 'short' })}
                           {' - '}
-                          {end.toLocaleDateString('sk-SK', { day: 'numeric', month: 'short' })}
+                          {end.toLocaleDateString(isEn ? 'en-US' : 'sk-SK', { day: 'numeric', month: 'short' })}
                           {' · '}{days}d
                         </p>
                       </div>
@@ -315,7 +322,7 @@ export function TimeOff({ onLeadCapture }: TimeOffProps) {
         </div>
       </div>
 
-      <LeadCTA module="Dovolenky kalendar" onLeadCapture={onLeadCapture} />
+      <LeadCTA module={isEn ? 'Time Off Calendar' : 'Dovolenky kalendar'} onLeadCapture={onLeadCapture} />
     </div>
   );
 }

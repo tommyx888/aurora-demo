@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useBranding } from '../hooks/useBranding';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface BrandingCTAProps {
   onLeadCapture: () => void;
@@ -15,6 +16,7 @@ const DISMISS_KEY = 'de-demo-branding-cta-dismissed';
  */
 export function BrandingCTA({ onLeadCapture }: BrandingCTAProps) {
   const { branding } = useBranding();
+  const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const [dismissed, setDismissed] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -44,30 +46,30 @@ export function BrandingCTA({ onLeadCapture }: BrandingCTAProps) {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-md w-[calc(100%-3rem)]"
+          className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-md w-[calc(100%-1.5rem)] md:w-[calc(100%-3rem)]"
         >
-          <div className="card shadow-xl-themed flex items-center gap-3 p-3 pr-2 mesh-bg">
+          <div className="card shadow-xl-themed flex flex-wrap md:flex-nowrap items-center gap-3 p-3 pr-2 mesh-bg">
             <div className="w-9 h-9 rounded-lg accent-bg flex items-center justify-center text-white flex-shrink-0">
               <Heart size={16} />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium leading-tight">
-                Páči sa ti to v <em>tvojich</em> farbách?
+                {t('brandingCta.title')}
               </p>
               <p className="text-xs text-tertiary mt-0.5">
-                Postavíme ti to za 4-6 týždňov
+                {t('brandingCta.subtitle')}
               </p>
             </div>
             <button
               onClick={onLeadCapture}
-              className="btn-primary text-xs whitespace-nowrap"
+              className="btn-primary text-xs whitespace-nowrap w-full md:w-auto order-3 md:order-none"
             >
-              Mám záujem
+              {t('brandingCta.cta')}
             </button>
             <button
               onClick={handleDismiss}
               className="btn-ghost p-1.5"
-              title="Zatvoriť"
+              title={t('brandingCta.close')}
             >
               <X size={14} />
             </button>

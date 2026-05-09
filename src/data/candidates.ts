@@ -14,7 +14,7 @@ export const candidates: Candidate[] = [
     appliedDate: '2026-05-04',
     source: 'LinkedIn',
     rating: 0,
-    notes: 'Profil vyzerá zaujímavo, 5 rokov skúseností',
+    notes: 'Profile looks interesting, 5 years of experience',
     avatar: avatar('roman-b'),
   },
   {
@@ -26,7 +26,7 @@ export const candidates: Candidate[] = [
     appliedDate: '2026-05-05',
     source: 'Referral - Lucia Š.',
     rating: 4,
-    notes: 'Odporúčaná Luciou, silné portfólio',
+    notes: 'Recommended by Lucia, strong portfolio',
     avatar: avatar('katarina-l'),
   },
   {
@@ -52,7 +52,7 @@ export const candidates: Candidate[] = [
     appliedDate: '2026-05-01',
     source: 'LinkedIn',
     rating: 4,
-    notes: 'Telefonický rozhovor naplánovaný na 8.5.',
+    notes: 'Phone screening scheduled for 8 May.',
     avatar: avatar('veronika-h'),
   },
   {
@@ -64,7 +64,7 @@ export const candidates: Candidate[] = [
     appliedDate: '2026-04-28',
     source: 'GitHub',
     rating: 5,
-    notes: 'Veľmi silný kandidát, open source contributions',
+    notes: 'Very strong candidate, notable open-source contributions',
     avatar: avatar('patrik-s'),
   },
 
@@ -78,7 +78,7 @@ export const candidates: Candidate[] = [
     appliedDate: '2026-04-22',
     source: 'Profesia.sk',
     rating: 4,
-    notes: 'Druhé kolo - technický pohovor 10.5.',
+    notes: 'Second round - technical interview on 10 May.',
     avatar: avatar('linda-b'),
   },
   {
@@ -90,7 +90,7 @@ export const candidates: Candidate[] = [
     appliedDate: '2026-04-25',
     source: 'LinkedIn',
     rating: 5,
-    notes: 'Fenomenálny kandidát, AWS certified, 7 rokov skúseností',
+    notes: 'Outstanding candidate, AWS certified, 7 years of experience',
     avatar: avatar('tomas-f'),
   },
 
@@ -104,7 +104,7 @@ export const candidates: Candidate[] = [
     appliedDate: '2026-04-15',
     source: 'University Career Fair',
     rating: 4,
-    notes: 'Ponuka odoslaná 5.5., čakáme odpoveď do 12.5.',
+    notes: 'Offer sent on 5 May, waiting for response by 12 May.',
     avatar: avatar('magdalena-p'),
   },
 
@@ -118,7 +118,7 @@ export const candidates: Candidate[] = [
     appliedDate: '2026-03-12',
     source: 'Referral',
     rating: 5,
-    notes: 'Nastupuje 1.6.2026',
+    notes: 'Starts on 1 Jun 2026',
     avatar: avatar('marek-sokol'),
   },
 
@@ -132,7 +132,7 @@ export const candidates: Candidate[] = [
     appliedDate: '2026-04-10',
     source: 'Profesia.sk',
     rating: 2,
-    notes: 'Nevyhovel technickým požiadavkám',
+    notes: 'Did not meet technical requirements',
     avatar: avatar('stefan-h'),
   },
 ];

@@ -7,6 +7,7 @@ import {
 import type { Page, UserRole } from '../types';
 import { cn } from '../lib/utils';
 import { useBranding } from '../hooks/useBranding';
+import { useLanguage } from '../hooks/useLanguage';
 import { DemoDisclaimerBadge } from './DemoDisclaimer';
 
 interface SidebarProps {
@@ -15,46 +16,65 @@ interface SidebarProps {
   role: UserRole;
   onToggleRole: () => void;
   onOpenDemoInfo: () => void;
+  className?: string;
+  onNavigateComplete?: () => void;
 }
 
-const employeeNav: { page: Page; label: string; icon: any; badge?: string }[] = [
-  { page: 'employee-dashboard', label: 'Domov', icon: Home },
-  { page: 'onboarding', label: 'Onboarding', icon: Sparkles, badge: '6' },
-  { page: 'newsletter', label: 'Firemné správy', icon: Newspaper, badge: 'NEW' },
-  { page: 'events', label: 'Kalendár & Eventy', icon: Calendar },
-  { page: 'time-off', label: 'Dovolenky', icon: Plane, badge: 'NEW' },
-  { page: 'requests', label: 'Moje žiadanky', icon: FileText },
-  { page: 'performance', label: 'Performance', icon: Target, badge: 'NEW' },
-  { page: 'orgchart', label: 'Org Chart', icon: GitBranch },
-  { page: 'surveys', label: 'Pulse Surveys', icon: MessageSquare },
+const employeeNav: { page: Page; labelKey: string; icon: any; badge?: string }[] = [
+  { page: 'employee-dashboard', labelKey: 'nav.home', icon: Home },
+  { page: 'onboarding', labelKey: 'nav.onboarding', icon: Sparkles, badge: '6' },
+  { page: 'newsletter', labelKey: 'nav.news', icon: Newspaper, badge: 'NEW' },
+  { page: 'events', labelKey: 'nav.events', icon: Calendar },
+  { page: 'time-off', labelKey: 'nav.timeOff', icon: Plane, badge: 'NEW' },
+  { page: 'requests', labelKey: 'nav.requests', icon: FileText },
+  { page: 'performance', labelKey: 'nav.performance', icon: Target, badge: 'NEW' },
+  { page: 'orgchart', labelKey: 'nav.orgChart', icon: GitBranch },
+  { page: 'surveys', labelKey: 'nav.surveys', icon: MessageSquare },
 ];
 
-const adminNav: { page: Page; label: string; icon: any; badge?: string }[] = [
-  { page: 'admin-dashboard', label: 'Admin Dashboard', icon: BarChart3 },
-  { page: 'skill-matrix', label: 'Skill Heatmap', icon: Brain, badge: 'AI' },
-  { page: 'recruiting', label: 'Recruiting', icon: BriefcaseBusiness, badge: '23' },
-  { page: 'cv-screener', label: 'CV Screener', icon: FileSearch, badge: 'AI' },
-  { page: 'time-off', label: 'Dovolenky & Kapacita', icon: Plane, badge: 'AI' },
-  { page: 'performance', label: 'Performance', icon: Target },
-  { page: 'ai-office', label: 'AI Office', icon: Wand2, badge: 'AI' },
-  { page: 'requests', label: 'Schvaľovanie', icon: FileText, badge: '4' },
-  { page: 'orgchart', label: 'Org Chart', icon: GitBranch },
-  { page: 'newsletter', label: 'News Editor', icon: Newspaper },
-  { page: 'events', label: 'Events Manager', icon: Calendar },
-  { page: 'surveys', label: 'Surveys Manager', icon: MessageSquare },
+const adminNav: { page: Page; labelKey: string; icon: any; badge?: string }[] = [
+  { page: 'admin-dashboard', labelKey: 'nav.adminDashboard', icon: BarChart3 },
+  { page: 'skill-matrix', labelKey: 'nav.skillMatrix', icon: Brain, badge: 'AI' },
+  { page: 'recruiting', labelKey: 'nav.recruiting', icon: BriefcaseBusiness, badge: '23' },
+  { page: 'cv-screener', labelKey: 'nav.cvScreener', icon: FileSearch, badge: 'AI' },
+  { page: 'time-off', labelKey: 'nav.timeOffAdmin', icon: Plane, badge: 'AI' },
+  { page: 'performance', labelKey: 'nav.performance', icon: Target },
+  { page: 'ai-office', labelKey: 'nav.aiOffice', icon: Wand2, badge: 'AI' },
+  { page: 'requests', labelKey: 'nav.approvals', icon: FileText, badge: '4' },
+  { page: 'orgchart', labelKey: 'nav.orgChart', icon: GitBranch },
+  { page: 'newsletter', labelKey: 'nav.newsAdmin', icon: Newspaper },
+  { page: 'events', labelKey: 'nav.eventsAdmin', icon: Calendar },
+  { page: 'surveys', labelKey: 'nav.surveysAdmin', icon: MessageSquare },
 ];
 
-export function Sidebar({ currentPage, onNavigate, role, onToggleRole, onOpenDemoInfo }: SidebarProps) {
+export function Sidebar({
+  currentPage,
+  onNavigate,
+  role,
+  onToggleRole,
+  onOpenDemoInfo,
+  className,
+  onNavigateComplete,
+}: SidebarProps) {
   const isAdmin = role === 'admin';
   const items = isAdmin ? adminNav : employeeNav;
   const { branding } = useBranding();
+  const { t } = useLanguage();
+  const navigateAndClose = (page: Page) => {
+    onNavigate(page);
+    onNavigateComplete?.();
+  };
+  const toggleRoleAndClose = () => {
+    onToggleRole();
+    onNavigateComplete?.();
+  };
 
   return (
-    <aside className="w-64 border-r border-subtle bg-secondary flex flex-col h-screen sticky top-0">
+    <aside className={cn('w-64 border-r border-subtle bg-secondary flex flex-col h-screen sticky top-0', className)}>
       {/* Logo */}
       <div className="p-5 pb-3 border-b border-subtle">
         <button
-          onClick={() => onNavigate(isAdmin ? 'admin-dashboard' : 'employee-dashboard')}
+          onClick={() => navigateAndClose(isAdmin ? 'admin-dashboard' : 'employee-dashboard')}
           className="flex items-center gap-2 group w-full"
         >
           {branding.isActive && branding.logoDataUrl ? (
@@ -68,7 +88,7 @@ export function Sidebar({ currentPage, onNavigate, role, onToggleRole, onOpenDem
           )}
           <div className="text-left min-w-0">
             <p className="font-display text-lg leading-none truncate">{branding.companyName}</p>
-            <p className="text-[10px] text-tertiary uppercase tracking-wider">by Digital Evolution</p>
+            <p className="text-[10px] text-tertiary uppercase tracking-wider">{t('sidebar.poweredBy')}</p>
           </div>
         </button>
 
@@ -79,7 +99,7 @@ export function Sidebar({ currentPage, onNavigate, role, onToggleRole, onOpenDem
       {/* Role toggle */}
       <div className="p-3 border-b border-subtle">
         <button
-          onClick={onToggleRole}
+          onClick={toggleRoleAndClose}
           className={cn(
             'w-full px-3 py-2.5 rounded-lg flex items-center justify-between transition-all',
             isAdmin ? 'bg-accent text-on-accent' : 'bg-tertiary text-primary'
@@ -89,13 +109,13 @@ export function Sidebar({ currentPage, onNavigate, role, onToggleRole, onOpenDem
           <div className="flex items-center gap-2">
             {isAdmin ? <Crown size={16} /> : <UserCircle size={16} />}
             <span className="text-sm font-medium">
-              {isAdmin ? 'Admin View' : 'Employee View'}
+              {isAdmin ? t('nav.adminView') : t('nav.employeeView')}
             </span>
           </div>
           <ChevronRight size={14} className="opacity-60" />
         </button>
         <p className="text-[10px] text-tertiary mt-2 px-1">
-          💡 Klikni pre prepnutie pohľadu
+          💡 {t('nav.switchView')}
         </p>
       </div>
 
@@ -108,7 +128,7 @@ export function Sidebar({ currentPage, onNavigate, role, onToggleRole, onOpenDem
           return (
             <motion.button
               key={item.page + i}
-              onClick={() => onNavigate(item.page)}
+              onClick={() => navigateAndClose(item.page)}
               whileHover={{ x: 2 }}
               transition={{ duration: 0.15 }}
               className={cn(
@@ -119,7 +139,7 @@ export function Sidebar({ currentPage, onNavigate, role, onToggleRole, onOpenDem
               )}
             >
               <Icon size={16} />
-              <span className="flex-1 text-left font-medium">{item.label}</span>
+              <span className="flex-1 text-left font-medium">{t(item.labelKey)}</span>
               {item.badge && (
                 <span
                   className={cn(
@@ -146,8 +166,8 @@ export function Sidebar({ currentPage, onNavigate, role, onToggleRole, onOpenDem
             className="w-9 h-9 rounded-full border-2 border-medium"
           />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate text-primary">Ty (Demo)</p>
-            <p className="text-xs text-tertiary truncate">{isAdmin ? 'HR Manager' : 'New Hire'}</p>
+            <p className="text-sm font-medium truncate text-primary">{t('sidebar.you')}</p>
+            <p className="text-xs text-tertiary truncate">{isAdmin ? t('sidebar.hrManager') : t('sidebar.newHire')}</p>
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { X, Sparkles, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { fireConfetti } from '../lib/utils';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface LeadCaptureModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface LeadCaptureModalProps {
 type SubmitState = 'idle' | 'sending' | 'success' | 'error';
 
 export function LeadCaptureModal({ isOpen, module, onClose }: LeadCaptureModalProps) {
+  const { t } = useLanguage();
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [formData, setFormData] = useState({
@@ -77,7 +79,7 @@ export function LeadCaptureModal({ isOpen, module, onClose }: LeadCaptureModalPr
         fireConfetti();
         setSubmitState('success');
       } else {
-        setErrorMsg(e?.message || 'Nepodarilo sa odoslať dopyt');
+        setErrorMsg(e?.message || t('leadCapture.errorTitle'));
         setSubmitState('error');
       }
     }
@@ -131,68 +133,68 @@ export function LeadCaptureModal({ isOpen, module, onClose }: LeadCaptureModalPr
                     </button>
                   </div>
                   <h2 className="font-display text-2xl mb-2">
-                    Postavíme ti to na mieru
+                    {t('leadCapture.title')}
                   </h2>
                   <p className="text-sm text-secondary">
                     {module
-                      ? `Páči sa ti modul "${module}". Vyplň formulár a ozveme sa do 24h.`
-                      : 'Vyplň formulár a my sa ti ozveme s návrhom riešenia do 24h.'}
+                      ? t('leadCapture.subtitleWithModule', { module })
+                      : t('leadCapture.subtitle')}
                   </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-tertiary block mb-1">Meno *</label>
+                      <label className="text-xs text-tertiary block mb-1">{t('common.name')} *</label>
                       <input
                         required
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="input-field text-sm"
-                        placeholder="Tomáš Novák"
+                        placeholder={t('leadCapture.namePlaceholder')}
                         disabled={submitState === 'sending'}
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-tertiary block mb-1">Firma *</label>
+                      <label className="text-xs text-tertiary block mb-1">{t('common.company')} *</label>
                       <input
                         required
                         value={formData.company}
                         onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                         className="input-field text-sm"
-                        placeholder="Aurora s.r.o."
+                        placeholder={t('leadCapture.companyPlaceholder')}
                         disabled={submitState === 'sending'}
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-xs text-tertiary block mb-1">Email *</label>
+                    <label className="text-xs text-tertiary block mb-1">{t('common.email')} *</label>
                     <input
                       required
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="input-field text-sm"
-                      placeholder="tomas@firma.sk"
+                      placeholder={t('leadCapture.emailPlaceholder')}
                       disabled={submitState === 'sending'}
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs text-tertiary block mb-1">Telefón (voliteľné)</label>
+                    <label className="text-xs text-tertiary block mb-1">{t('leadCapture.phoneOptional')}</label>
                     <input
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="input-field text-sm"
-                      placeholder="+421 9XX XXX XXX"
+                      placeholder={t('leadCapture.phonePlaceholder')}
                       disabled={submitState === 'sending'}
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs text-tertiary block mb-1">Počet zamestnancov *</label>
+                    <label className="text-xs text-tertiary block mb-1">{t('leadCapture.employeeCount')} *</label>
                     <select
                       required
                       value={formData.employees}
@@ -200,7 +202,7 @@ export function LeadCaptureModal({ isOpen, module, onClose }: LeadCaptureModalPr
                       className="input-field text-sm"
                       disabled={submitState === 'sending'}
                     >
-                      <option value="">-- vyber --</option>
+                      <option value="">{t('leadCapture.selectOption')}</option>
                       <option value="1-10">1-10</option>
                       <option value="11-25">11-25</option>
                       <option value="26-50">26-50</option>
@@ -211,7 +213,7 @@ export function LeadCaptureModal({ isOpen, module, onClose }: LeadCaptureModalPr
                   </div>
 
                   <div>
-                    <label className="text-xs text-tertiary block mb-1">Poznámka (voliteľné)</label>
+                    <label className="text-xs text-tertiary block mb-1">{t('leadCapture.notesLabel')}</label>
                     <textarea
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -231,10 +233,10 @@ export function LeadCaptureModal({ isOpen, module, onClose }: LeadCaptureModalPr
                     >
                       <AlertCircle size={14} className="mt-0.5 flex-shrink-0" style={{ color: 'var(--danger)' }} />
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium" style={{ color: 'var(--danger)' }}>Nepodarilo sa odoslať</p>
+                        <p className="font-medium" style={{ color: 'var(--danger)' }}>{t('leadCapture.errorTitle')}</p>
                         <p className="text-xs text-tertiary mt-0.5 break-words">{errorMsg}</p>
                         <p className="text-xs text-tertiary mt-1">
-                          Údaje sú uložené lokálne. Skús neskôr alebo pošli mail priamo na{' '}
+                          {t('leadCapture.errorBody')}{' '}
                           <a href="mailto:t.ficek@gmail.com" className="accent-text hover:underline">
                             t.ficek@gmail.com
                           </a>
@@ -251,23 +253,23 @@ export function LeadCaptureModal({ isOpen, module, onClose }: LeadCaptureModalPr
                     {submitState === 'sending' ? (
                       <>
                         <Loader2 size={14} className="animate-spin" />
-                        Odosielam...
+                        {t('common.sending')}
                       </>
                     ) : submitState === 'error' ? (
                       <>
-                        Skúsiť znova
+                        {t('leadCapture.retry')}
                         <Sparkles size={14} />
                       </>
                     ) : (
                       <>
-                        Poslať dopyt
+                        {t('leadCapture.submit')}
                         <Sparkles size={14} />
                       </>
                     )}
                   </button>
 
                   <p className="text-[10px] text-tertiary text-center">
-                    Tvoje údaje uložíme len pre účely odpovede. GDPR compliant.
+                    {t('leadCapture.gdpr')}
                   </p>
                 </form>
               </>
@@ -287,15 +289,15 @@ export function LeadCaptureModal({ isOpen, module, onClose }: LeadCaptureModalPr
                 >
                   <CheckCircle2 size={32} style={{ color: 'var(--success)' }} />
                 </motion.div>
-                <h2 className="font-display text-3xl mb-2">Hotovo! 🎉</h2>
+                <h2 className="font-display text-3xl mb-2">{t('leadCapture.successTitle')}</h2>
                 <p className="text-secondary mb-6">
-                  Ďakujeme! Ozveme sa na <strong>{formData.email}</strong> do 24h s konkrétnym návrhom.
+                  {t('leadCapture.successBody', { email: formData.email })}
                 </p>
                 <p className="text-xs text-tertiary mb-6">
-                  Medzitým skús ďalšie moduly demo - každý ti ukáže iný uhol pohľadu na to, čo dokážeme postaviť.
+                  {t('leadCapture.successLongFooter')}
                 </p>
                 <button onClick={handleClose} className="btn-primary">
-                  Pokračovať v demo
+                  {t('demoModal.continueDemo')}
                 </button>
               </motion.div>
             )}

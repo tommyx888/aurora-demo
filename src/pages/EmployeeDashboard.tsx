@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { news, events } from '../data/content';
 import { employees } from '../data/employees';
+import { useLanguage } from '../hooks/useLanguage';
 import { daysUntil, formatDate, getAge } from '../lib/utils';
 import type { Page } from '../types';
 
@@ -14,6 +15,8 @@ interface EmployeeDashboardProps {
 }
 
 export function EmployeeDashboard({ onNavigate, onOpenChat }: EmployeeDashboardProps) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const upcomingBirthdays = employees
     .map((e) => {
       const bday = new Date(e.birthday);
@@ -46,23 +49,26 @@ export function EmployeeDashboard({ onNavigate, onOpenChat }: EmployeeDashboardP
         </div>
         <div className="relative">
           <p className="text-sm uppercase tracking-wider text-tertiary mb-2">
-            {new Date().toLocaleDateString('sk-SK', { weekday: 'long', day: 'numeric', month: 'long' })}
+            {new Date().toLocaleDateString(isEn ? 'en-US' : 'sk-SK', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
-          <h1 className="font-display text-4xl mb-2">Dobré ráno, Demo! 👋</h1>
+          <h1 className="font-display text-4xl mb-2">{isEn ? 'Good morning, Demo! 👋' : 'Dobré ráno, Demo! 👋'}</h1>
           <p className="text-secondary mb-6 max-w-lg">
-            Máš <strong>3 nové úlohy</strong>, <strong>1 schvaľovanie</strong> a o 14:00 stretnutie s Petrom.
-            Káva v kuchyni voňia 🤤
+            {isEn ? (
+              <>You have <strong>3 new tasks</strong>, <strong>1 approval</strong>, and a 2:00 PM meeting with Peter. Coffee is waiting in the kitchen 🤤</>
+            ) : (
+              <>Máš <strong>3 nové úlohy</strong>, <strong>1 schvaľovanie</strong> a o 14:00 stretnutie s Petrom. Káva v kuchyni voňia 🤤</>
+            )}
           </p>
 
           <div className="flex gap-3 flex-wrap">
             <button onClick={() => onNavigate('onboarding')} className="btn-primary">
               <Sparkles size={16} />
-              Pokračovať v onboardingu
+              {isEn ? 'Continue onboarding' : 'Pokračovať v onboardingu'}
               <span className="badge bg-white/20 text-white ml-1">3/6</span>
             </button>
             <button onClick={onOpenChat} className="btn-secondary">
               <Bot size={16} />
-              Spýtať sa Evy
+              {isEn ? 'Ask Eva' : 'Spýtať sa Evy'}
             </button>
           </div>
         </div>
@@ -70,10 +76,10 @@ export function EmployeeDashboard({ onNavigate, onOpenChat }: EmployeeDashboardP
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <QuickStat icon={Trophy} label="Tvoje skóre" value="847" change="+12 dnes" color="#f59e0b" />
-        <QuickStat icon={Heart} label="Pulse" value="4.5/5" change="Posledný týždeň" color="#ec4899" />
-        <QuickStat icon={Coffee} label="Koľko káv" value="143" change="Tento rok" color="#8b5cf6" />
-        <QuickStat icon={Calendar} label="Dovolenka" value="18 / 25" change="Dní zostáva" color="#10b981" />
+        <QuickStat icon={Trophy} label={isEn ? 'Your score' : 'Tvoje skóre'} value="847" change={isEn ? '+12 today' : '+12 dnes'} color="#f59e0b" />
+        <QuickStat icon={Heart} label="Pulse" value="4.5/5" change={isEn ? 'Last week' : 'Posledný týždeň'} color="#ec4899" />
+        <QuickStat icon={Coffee} label={isEn ? 'Coffee count' : 'Koľko káv'} value="143" change={isEn ? 'This year' : 'Tento rok'} color="#8b5cf6" />
+        <QuickStat icon={Calendar} label={isEn ? 'Vacation' : 'Dovolenka'} value="18 / 25" change={isEn ? 'Days left' : 'Dní zostáva'} color="#10b981" />
       </div>
 
       {/* Main grid */}
@@ -83,11 +89,11 @@ export function EmployeeDashboard({ onNavigate, onOpenChat }: EmployeeDashboardP
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Newspaper size={18} className="text-tertiary" />
-              <h2 className="font-medium">Firemné správy</h2>
+              <h2 className="font-medium">{isEn ? 'Company News' : 'Firemné správy'}</h2>
               <span className="badge badge-danger text-[10px]">{news.length} NEW</span>
             </div>
             <button onClick={() => onNavigate('newsletter')} className="text-xs accent-text font-medium hover:underline">
-              Všetky →
+              {isEn ? 'All →' : 'Všetky →'}
             </button>
           </div>
 
@@ -125,7 +131,7 @@ export function EmployeeDashboard({ onNavigate, onOpenChat }: EmployeeDashboardP
         <div className="card">
           <div className="flex items-center gap-2 mb-4">
             <Cake size={18} className="text-tertiary" />
-            <h2 className="font-medium">Narodeniny</h2>
+            <h2 className="font-medium">{isEn ? 'Birthdays' : 'Narodeniny'}</h2>
           </div>
 
           <div className="space-y-3">
@@ -142,14 +148,16 @@ export function EmployeeDashboard({ onNavigate, onOpenChat }: EmployeeDashboardP
                   <p className="text-sm font-medium truncate">{emp.name}</p>
                   <p className="text-xs text-tertiary">
                     {emp.daysUntil === 0
-                      ? '🎉 Dnes!'
-                      : `Za ${emp.daysUntil} ${emp.daysUntil === 1 ? 'deň' : emp.daysUntil < 5 ? 'dni' : 'dní'}`}
-                    {' · bude mať '}{getAge(emp.birthday) + (emp.daysUntil > 0 ? 1 : 0)}
+                      ? (isEn ? '🎉 Today!' : '🎉 Dnes!')
+                      : (isEn
+                        ? `In ${emp.daysUntil} ${emp.daysUntil === 1 ? 'day' : 'days'}`
+                        : `Za ${emp.daysUntil} ${emp.daysUntil === 1 ? 'deň' : emp.daysUntil < 5 ? 'dni' : 'dní'}`)}
+                    {isEn ? ' · turning ' : ' · bude mať '}{getAge(emp.birthday) + (emp.daysUntil > 0 ? 1 : 0)}
                   </p>
                 </div>
                 {emp.daysUntil <= 7 && (
                   <button className="text-xs accent-text font-medium hover:underline">
-                    AI prianie
+                    {isEn ? 'AI wish' : 'AI prianie'}
                   </button>
                 )}
               </motion.div>
@@ -158,7 +166,9 @@ export function EmployeeDashboard({ onNavigate, onOpenChat }: EmployeeDashboardP
 
           <div className="mt-4 pt-4 border-t border-subtle">
             <p className="text-xs text-tertiary leading-relaxed">
-              💡 <strong className="text-primary">Tip:</strong> AI vie napísať personalizované prianie za 5 sekúnd, založené na tom, čo o danom kolegovi vie firma.
+              {isEn
+                ? '💡 Tip: AI can write a personalized birthday wish in 5 seconds based on what the company knows about that teammate.'
+                : '💡 Tip: AI vie napísať personalizované prianie za 5 sekúnd, založené na tom, čo o danom kolegovi vie firma.'}
             </p>
           </div>
         </div>
@@ -168,10 +178,10 @@ export function EmployeeDashboard({ onNavigate, onOpenChat }: EmployeeDashboardP
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Calendar size={18} className="text-tertiary" />
-              <h2 className="font-medium">Najbližšie udalosti</h2>
+              <h2 className="font-medium">{isEn ? 'Upcoming events' : 'Najbližšie udalosti'}</h2>
             </div>
             <button onClick={() => onNavigate('events')} className="text-xs accent-text font-medium hover:underline">
-              Kalendár →
+              {isEn ? 'Calendar →' : 'Kalendár →'}
             </button>
           </div>
 
@@ -187,7 +197,7 @@ export function EmployeeDashboard({ onNavigate, onOpenChat }: EmployeeDashboardP
                 <div className="w-12 text-center">
                   <p className="font-display text-2xl leading-none">{new Date(ev.date).getDate()}</p>
                   <p className="text-[10px] uppercase text-tertiary">
-                    {new Date(ev.date).toLocaleString('sk-SK', { month: 'short' })}
+                    {new Date(ev.date).toLocaleString(isEn ? 'en-US' : 'sk-SK', { month: 'short' })}
                   </p>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -201,30 +211,30 @@ export function EmployeeDashboard({ onNavigate, onOpenChat }: EmployeeDashboardP
 
         {/* Quick actions */}
         <div className="lg:col-span-2 card">
-          <h2 className="font-medium mb-4">Rýchle akcie</h2>
+          <h2 className="font-medium mb-4">{isEn ? 'Quick actions' : 'Rýchle akcie'}</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <QuickAction
               icon={FileText}
-              label="Nová žiadanka"
-              hint="Dovolenka, equipment..."
+              label={isEn ? 'New request' : 'Nová žiadanka'}
+              hint={isEn ? 'Vacation, equipment...' : 'Dovolenka, equipment...'}
               onClick={() => onNavigate('requests')}
             />
             <QuickAction
               icon={MessageSquare}
               label="Pulse Survey"
-              hint="2 min · voliteľné"
+              hint={isEn ? '2 min · optional' : '2 min · voliteľné'}
               onClick={() => onNavigate('surveys')}
             />
             <QuickAction
               icon={Bot}
-              label="Spýtaj sa Evy"
+              label={isEn ? 'Ask Eva' : 'Spýtaj sa Evy'}
               hint="AI buddy"
               onClick={onOpenChat}
             />
             <QuickAction
               icon={ArrowRight}
               label="Org Chart"
-              hint="Spoznaj kolegov"
+              hint={isEn ? 'Meet teammates' : 'Spoznaj kolegov'}
               onClick={() => onNavigate('orgchart')}
             />
           </div>

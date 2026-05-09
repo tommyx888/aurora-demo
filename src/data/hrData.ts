@@ -1,25 +1,25 @@
 import type { TimeOffEntry, PerformanceReview, CVAnalysis } from '../types';
 
 // ============================================
-// TIME-OFF / DOVOLENKY
+// TIME-OFF
 // ============================================
 export const timeOffEntries: TimeOffEntry[] = [
   // May 2026
-  { id: 'to-1', employeeId: 'emp-11', startDate: '2026-05-01', endDate: '2026-05-31', type: 'parental', status: 'approved', note: 'Materska dovolenka' },
-  { id: 'to-2', employeeId: 'emp-5', startDate: '2026-05-07', endDate: '2026-05-07', type: 'sick', status: 'approved', note: 'Migrena' },
-  { id: 'to-3', employeeId: 'emp-8', startDate: '2026-05-12', endDate: '2026-05-16', type: 'vacation', status: 'approved', note: 'Predlzeny vikend' },
+  { id: 'to-1', employeeId: 'emp-11', startDate: '2026-05-01', endDate: '2026-05-31', type: 'parental', status: 'approved', note: 'Parental leave' },
+  { id: 'to-2', employeeId: 'emp-5', startDate: '2026-05-07', endDate: '2026-05-07', type: 'sick', status: 'approved', note: 'Migraine' },
+  { id: 'to-3', employeeId: 'emp-8', startDate: '2026-05-12', endDate: '2026-05-16', type: 'vacation', status: 'approved', note: 'Extended weekend' },
   { id: 'to-4', employeeId: 'emp-15', startDate: '2026-05-18', endDate: '2026-05-22', type: 'vacation', status: 'approved' },
-  { id: 'to-5', employeeId: 'emp-2', startDate: '2026-05-26', endDate: '2026-05-30', type: 'vacation', status: 'pending', note: 'Rodinny vylet' },
+  { id: 'to-5', employeeId: 'emp-2', startDate: '2026-05-26', endDate: '2026-05-30', type: 'vacation', status: 'pending', note: 'Family trip' },
   // June 2026
-  { id: 'to-6', employeeId: 'emp-4', startDate: '2026-06-09', endDate: '2026-06-20', type: 'vacation', status: 'approved', note: 'Chorvatsko' },
+  { id: 'to-6', employeeId: 'emp-4', startDate: '2026-06-09', endDate: '2026-06-20', type: 'vacation', status: 'approved', note: 'Croatia' },
   { id: 'to-7', employeeId: 'emp-6', startDate: '2026-06-16', endDate: '2026-06-27', type: 'vacation', status: 'approved' },
-  { id: 'to-8', employeeId: 'emp-12', startDate: '2026-06-23', endDate: '2026-07-04', type: 'vacation', status: 'approved', note: 'Letny break' },
+  { id: 'to-8', employeeId: 'emp-12', startDate: '2026-06-23', endDate: '2026-07-04', type: 'vacation', status: 'approved', note: 'Summer break' },
   { id: 'to-9', employeeId: 'emp-10', startDate: '2026-06-30', endDate: '2026-07-11', type: 'vacation', status: 'pending' },
   // July 2026 - peak season
-  { id: 'to-10', employeeId: 'emp-7', startDate: '2026-07-07', endDate: '2026-07-18', type: 'vacation', status: 'approved', note: 'Taliansko' },
+  { id: 'to-10', employeeId: 'emp-7', startDate: '2026-07-07', endDate: '2026-07-18', type: 'vacation', status: 'approved', note: 'Italy' },
   { id: 'to-11', employeeId: 'emp-3', startDate: '2026-07-14', endDate: '2026-07-25', type: 'vacation', status: 'approved' },
   { id: 'to-12', employeeId: 'emp-9', startDate: '2026-07-21', endDate: '2026-08-01', type: 'vacation', status: 'approved' },
-  { id: 'to-13', employeeId: 'emp-1', startDate: '2026-07-28', endDate: '2026-08-08', type: 'vacation', status: 'approved', note: 'CEO sa odpojil' },
+  { id: 'to-13', employeeId: 'emp-1', startDate: '2026-07-28', endDate: '2026-08-08', type: 'vacation', status: 'approved', note: 'CEO offline' },
   { id: 'to-14', employeeId: 'emp-13', startDate: '2026-07-04', endDate: '2026-07-04', type: 'sick', status: 'approved' },
 ];
 
@@ -35,18 +35,18 @@ export const performanceReviews: PerformanceReview[] = [
     status: 'in-progress',
     scheduledDate: '2026-05-15',
     overallScore: 4.5,
-    strengths: ['Technicka excellence v React', 'Mentoring juniorov', 'Dobre zvlada kritiku'],
-    improvements: ['Public speaking pri prezentaciach', 'Obcas berie prilis vela prace naraz'],
+    strengths: ['Technical excellence in React', 'Mentoring juniors', 'Handles feedback well'],
+    improvements: ['Public speaking during presentations', 'Sometimes takes too much work at once'],
     goals: [
-      { id: 'g1', title: 'Lead frontend rebuild Q2', description: 'Novy design system + migracia 3 modulov', progress: 65, dueDate: '2026-06-30', status: 'on-track' },
-      { id: 'g2', title: 'Mentoring 2 juniorov', description: 'Tyzdenne 1:1 s Filipom a Barborou', progress: 80, dueDate: '2026-07-31', status: 'on-track' },
-      { id: 'g3', title: 'Conference talk', description: 'Prezentovat na React Summit', progress: 30, dueDate: '2026-09-30', status: 'at-risk' },
+      { id: 'g1', title: 'Lead frontend rebuild Q2', description: 'New design system + migration of 3 modules', progress: 65, dueDate: '2026-06-30', status: 'on-track' },
+      { id: 'g2', title: 'Mentor 2 juniors', description: 'Weekly 1:1 with Filip and Barbora', progress: 80, dueDate: '2026-07-31', status: 'on-track' },
+      { id: 'g3', title: 'Conference talk', description: 'Present at React Summit', progress: 30, dueDate: '2026-09-30', status: 'at-risk' },
     ],
     feedback360: [
-      { fromId: 'emp-2', fromRole: 'manager', rating: 5, comment: 'Moj #1 senior. Bez neho by som nezvladol tento kvartal.', anonymous: false },
-      { fromId: 'emp-6', fromRole: 'peer', rating: 5, comment: 'Vzdy ochotny pomoct, code reviewy su top.', anonymous: false },
-      { fromId: 'emp-14', fromRole: 'peer', rating: 5, comment: 'Najlepsi mentor co som mal.', anonymous: true },
-      { fromId: 'emp-10', fromRole: 'peer', rating: 4, comment: 'Skvela spolupraca na deploymentoch.', anonymous: false },
+      { fromId: 'emp-2', fromRole: 'manager', rating: 5, comment: 'My #1 senior. I would not handle this quarter without him.', anonymous: false },
+      { fromId: 'emp-6', fromRole: 'peer', rating: 5, comment: 'Always willing to help, top-quality code reviews.', anonymous: false },
+      { fromId: 'emp-14', fromRole: 'peer', rating: 5, comment: 'Best mentor I have had.', anonymous: true },
+      { fromId: 'emp-10', fromRole: 'peer', rating: 4, comment: 'Great collaboration on deployments.', anonymous: false },
     ],
   },
   {
@@ -57,8 +57,8 @@ export const performanceReviews: PerformanceReview[] = [
     status: 'scheduled',
     scheduledDate: '2026-05-20',
     goals: [
-      { id: 'g4', title: 'Redesign celeho app suite', description: 'Konzistentny design language', progress: 45, dueDate: '2026-08-30', status: 'on-track' },
-      { id: 'g5', title: 'Onboard Barbora', description: 'Mentoring novej Junior Designer', progress: 70, dueDate: '2026-06-30', status: 'on-track' },
+      { id: 'g4', title: 'Redesign whole app suite', description: 'Consistent design language', progress: 45, dueDate: '2026-08-30', status: 'on-track' },
+      { id: 'g5', title: 'Onboard Barbora', description: 'Mentoring new Junior Designer', progress: 70, dueDate: '2026-06-30', status: 'on-track' },
     ],
   },
   {
@@ -69,10 +69,10 @@ export const performanceReviews: PerformanceReview[] = [
     status: 'completed',
     scheduledDate: '2026-04-22',
     overallScore: 4.2,
-    strengths: ['Tatra Bank deal', 'Timova kultura', 'Strategicke myslenie'],
-    improvements: ['Reporting Sprint Excel-y', 'Delegovanie viac na Evu'],
+    strengths: ['Tatra Bank deal', 'Team culture', 'Strategic thinking'],
+    improvements: ['Sprint reporting in spreadsheets', 'Delegate more to Eva'],
     goals: [
-      { id: 'g6', title: 'Q2 Revenue: 2.5M EUR', description: 'Zatvorit 3 deals nad 500k', progress: 100, dueDate: '2026-06-30', status: 'achieved' },
+      { id: 'g6', title: 'Q2 Revenue: 2.5M EUR', description: 'Close 3 deals above 500k', progress: 100, dueDate: '2026-06-30', status: 'achieved' },
     ],
   },
   {
@@ -91,7 +91,7 @@ export const performanceReviews: PerformanceReview[] = [
     status: 'in-progress',
     scheduledDate: '2026-05-10',
     goals: [
-      { id: 'g7', title: 'AWS migration complete', description: 'Migracia z Hetzner na AWS', progress: 90, dueDate: '2026-05-31', status: 'on-track' },
+      { id: 'g7', title: 'AWS migration complete', description: 'Migration from Hetzner to AWS', progress: 90, dueDate: '2026-05-31', status: 'on-track' },
       { id: 'g8', title: 'CI/CD pipeline rewrite', description: 'GitHub Actions + Terraform', progress: 50, dueDate: '2026-07-15', status: 'on-track' },
     ],
   },
@@ -135,9 +135,9 @@ LANGUAGES: Slovak (native), English (C1), Czech (native)`,
       extractedSkills: ['React', 'TypeScript', 'Next.js', 'GraphQL', 'Node.js', 'AWS', 'Docker', 'Cypress'],
       yearsExperience: 7,
       redFlags: [],
-      highlights: ['7 rokov React skusenosti', 'Open source 2.5k GitHub stars', 'Mentoring tímu 6 ludi', 'Lead architect na enterprise SaaS'],
+      highlights: ['7 years of React experience', 'Open source 2.5k GitHub stars', 'Mentored team of 6 people', 'Lead architect on enterprise SaaS'],
       recommendation: 'strong-fit',
-      summary: 'Vynikajuci kandidat. 7 rokov React expertizy + leadership + open source. Top 5% kandidatov. Odporucam preskocit screening a ist rovno na technicky pohovor.',
+      summary: 'Excellent candidate. 7 years of React expertise + leadership + open source. Top 5% candidate. Recommend skipping screening and moving straight to technical interview.',
     },
   },
   {
@@ -175,9 +175,9 @@ EDUCATION: B.Sc. CS, TU Kosice (2018)`,
       extractedSkills: ['AWS', 'Kubernetes', 'Terraform', 'Docker', 'Python', 'GitOps', 'Prometheus'],
       yearsExperience: 7,
       redFlags: [],
-      highlights: ['AWS Solutions Architect Professional certified', '7 rokov skusenosti', 'Reduced cloud costs by 40%', 'CKA certified'],
+      highlights: ['AWS Solutions Architect Professional certified', '7 years of experience', 'Reduced cloud costs by 40%', 'CKA certified'],
       recommendation: 'strong-fit',
-      summary: 'Senior DevOps s AWS Pro certifikatom a CKA. Doplni Michalov tim. Silny kandidat, odporucam rychlo posunut do offer fazy.',
+      summary: 'Senior DevOps with AWS Pro certification and CKA. Great addition to Michal team. Strong candidate, recommend fast-tracking to offer stage.',
     },
   },
   {
@@ -208,10 +208,10 @@ LANGUAGES: Slovak (native), English (B1)`,
       cultureMatch: 60,
       extractedSkills: ['HTML', 'CSS', 'JavaScript', 'jQuery', 'WordPress'],
       yearsExperience: 1,
-      redFlags: ['Iba 1 rok skusenosti (poziaduje sa 5+)', 'Ziadny TypeScript', 'Iba "basic React"', 'Prevazne WordPress/jQuery (legacy stack)'],
-      highlights: ['Cerstvy absolvent', 'Slovak native'],
+      redFlags: ['Only 1 year of experience (role requires 5+)', 'No TypeScript', 'Only "basic React"', 'Mostly WordPress/jQuery (legacy stack)'],
+      highlights: ['Recent graduate', 'Slovak native'],
       recommendation: 'not-fit',
-      summary: 'Pre Senior React poziciu nedostatocna seniorita. Skusenosti su prevazne s legacy stack-om. Odporucam zvazit pre Junior poziciu.',
+      summary: 'Insufficient seniority for Senior React role. Experience is mostly with legacy stack. Recommend considering for a junior position.',
     },
   },
   {
@@ -240,9 +240,9 @@ EDUCATION: M.Sc. Marketing, EU Bratislava`,
       extractedSkills: ['B2B Sales', 'Salesforce', 'HubSpot', 'Customer Success', 'Negotiation'],
       yearsExperience: 4,
       redFlags: [],
-      highlights: ['92% retention rate', '2M EUR ARR portfolio', 'Trojjazycna (SK/EN/DE)', '+28% upsell'],
+      highlights: ['92% retention rate', '2M EUR ARR portfolio', 'Trilingual (SK/EN/DE)', '+28% upsell'],
       recommendation: 'good-fit',
-      summary: 'Solidny mid-level Account Manager. 4 roky relevantnej skusenosti, vyborne retention metriky, jazykovo vhodna. Odporucam pozvat na pohovor.',
+      summary: 'Solid mid-level Account Manager. 4 years of relevant experience, excellent retention metrics, strong language fit. Recommend inviting to interview.',
     },
   },
 ];

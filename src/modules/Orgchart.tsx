@@ -6,6 +6,7 @@ import {
   ZoomIn, ZoomOut, Maximize2, Minus, Plus, ChevronsDownUp, ChevronsUpDown
 } from 'lucide-react';
 import { employees, getEmployeeById, departments } from '../data/employees';
+import { useLanguage } from '../hooks/useLanguage';
 import { LeadCTA } from './Requests';
 import { cn, yearsOfService } from '../lib/utils';
 import type { Employee } from '../types';
@@ -42,6 +43,8 @@ const COLLAPSED_KEY = 'de-demo-orgchart-collapsed';
 const ZOOM_KEY = 'de-demo-orgchart-zoom';
 
 export function Orgchart({ onLeadCapture }: OrgchartProps) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [view, setView] = useState<ViewMode>(() => {
     const saved = localStorage.getItem(VIEW_KEY);
     return (saved === 'tree' || saved === 'departments') ? saved : 'tree';
@@ -160,26 +163,27 @@ export function Orgchart({ onLeadCapture }: OrgchartProps) {
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-sm text-tertiary uppercase tracking-wider mb-1">People</p>
-          <h1 className="font-display text-3xl">Organizačná štruktúra</h1>
+          <h1 className="font-display text-3xl">{isEn ? 'Organization Structure' : 'Organizačná štruktúra'}</h1>
           <p className="text-secondary text-sm mt-1">
-            {employees.length} zamestnancov · {departments.length} oddelení · Klikni na kolegu pre detail
+            {isEn
+              ? `${employees.length} employees · ${departments.length} departments · Click teammate for detail`
+              : `${employees.length} zamestnancov · ${departments.length} oddelení · Klikni na kolegu pre detail`}
           </p>
         </div>
 
-        <div className="flex gap-2 items-center flex-wrap">
+        <div className="flex gap-2 items-center flex-wrap w-full sm:w-auto">
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-tertiary" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Meno, rola, oddelenie..."
-              className="input-field pl-9 text-sm py-2"
-              style={{ width: 240 }}
+              placeholder={isEn ? 'Name, role, department...' : 'Meno, rola, oddelenie...'}
+              className="input-field pl-9 text-sm py-2 w-full sm:w-[240px]"
             />
           </div>
 
           {/* View toggle */}
-          <div className="flex items-center gap-1 p-1 bg-tertiary rounded-lg">
+          <div className="flex items-center gap-1 p-1 bg-tertiary rounded-lg overflow-x-auto max-w-full">
             <button
               onClick={() => setView('tree')}
               className={cn(
@@ -188,7 +192,7 @@ export function Orgchart({ onLeadCapture }: OrgchartProps) {
               )}
             >
               <GitBranch size={13} />
-              Hierarchia
+              {isEn ? 'Hierarchy' : 'Hierarchia'}
             </button>
             <button
               onClick={() => setView('departments')}
@@ -198,7 +202,7 @@ export function Orgchart({ onLeadCapture }: OrgchartProps) {
               )}
             >
               <LayoutGrid size={13} />
-              Oddelenia
+              {isEn ? 'Departments' : 'Oddelenia'}
             </button>
           </div>
 
@@ -207,7 +211,7 @@ export function Orgchart({ onLeadCapture }: OrgchartProps) {
             className={cn('btn-secondary text-sm', showSettings && 'accent-bg text-white border-transparent')}
           >
             <Settings2 size={14} />
-            <span className="hidden sm:inline">Zobrazenie</span>
+            <span className="hidden sm:inline">{isEn ? 'View' : 'Zobrazenie'}</span>
           </button>
         </div>
       </div>
@@ -224,27 +228,27 @@ export function Orgchart({ onLeadCapture }: OrgchartProps) {
             <div className="card">
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <p className="font-medium text-sm">Čo zobraziť na karte</p>
-                  <p className="text-xs text-tertiary">Vyber, ktoré informácie sa zobrazia pri každom zamestnancovi</p>
+                  <p className="font-medium text-sm">{isEn ? 'What to show on cards' : 'Čo zobraziť na karte'}</p>
+                  <p className="text-xs text-tertiary">{isEn ? 'Choose which info appears for each employee' : 'Vyber, ktoré informácie sa zobrazia pri každom zamestnancovi'}</p>
                 </div>
                 <button onClick={() => setSettings(DEFAULT_SETTINGS)} className="btn-ghost text-xs">
-                  Reset
+                  {isEn ? 'Reset' : 'Reset'}
                 </button>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                <SettingToggle label="Pozícia" icon={Briefcase} value={settings.showRole}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
+                <SettingToggle label={isEn ? 'Position' : 'Pozícia'} icon={Briefcase} value={settings.showRole}
                   onChange={(v) => setSettings({ ...settings, showRole: v })} />
-                <SettingToggle label="Oddelenie" icon={Building2} value={settings.showDepartment}
+                <SettingToggle label={isEn ? 'Department' : 'Oddelenie'} icon={Building2} value={settings.showDepartment}
                   onChange={(v) => setSettings({ ...settings, showDepartment: v })} />
-                <SettingToggle label="Lokalita" icon={MapPin} value={settings.showLocation}
+                <SettingToggle label={isEn ? 'Location' : 'Lokalita'} icon={MapPin} value={settings.showLocation}
                   onChange={(v) => setSettings({ ...settings, showLocation: v })} />
-                <SettingToggle label="Podriadení" icon={Users} value={settings.showReports}
+                <SettingToggle label={isEn ? 'Reports' : 'Podriadení'} icon={Users} value={settings.showReports}
                   onChange={(v) => setSettings({ ...settings, showReports: v })} />
                 <SettingToggle label="Email" icon={Mail} value={settings.showEmail}
                   onChange={(v) => setSettings({ ...settings, showEmail: v })} />
-                <SettingToggle label="Roky vo firme" icon={CalendarIcon} value={settings.showTenure}
+                <SettingToggle label={isEn ? 'Years in company' : 'Roky vo firme'} icon={CalendarIcon} value={settings.showTenure}
                   onChange={(v) => setSettings({ ...settings, showTenure: v })} />
-                <SettingToggle label="Status (dovolenka)" icon={Plane} value={settings.showStatus}
+                <SettingToggle label={isEn ? 'Status (time off)' : 'Status (dovolenka)'} icon={Plane} value={settings.showStatus}
                   onChange={(v) => setSettings({ ...settings, showStatus: v })} />
               </div>
             </div>
@@ -256,7 +260,7 @@ export function Orgchart({ onLeadCapture }: OrgchartProps) {
       {filteredEmployees && (
         <div className="card">
           <p className="text-sm text-tertiary mb-3">
-            {filteredEmployees.length} výsledkov pre "{search}"
+            {isEn ? `${filteredEmployees.length} results for "${search}"` : `${filteredEmployees.length} výsledkov pre "${search}"`}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {filteredEmployees.map((emp) => (
@@ -315,7 +319,7 @@ export function Orgchart({ onLeadCapture }: OrgchartProps) {
         )}
       </AnimatePresence>
 
-      <LeadCTA module="Org Chart" onLeadCapture={onLeadCapture} />
+      <LeadCTA module={isEn ? 'Org Chart' : 'Org Chart'} onLeadCapture={onLeadCapture} />
     </div>
   );
 }
@@ -353,6 +357,8 @@ function TreeView({
   onZoomOut: () => void;
   onResetZoom: () => void;
 }) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -454,23 +460,23 @@ function TreeView({
   return (
     <div className="card p-0 overflow-hidden relative">
       {/* Toolbar */}
-      <div className="flex items-center justify-between gap-2 p-3 border-b border-subtle bg-secondary flex-wrap">
+      <div className="flex items-center justify-between gap-2 p-2 sm:p-3 border-b border-subtle bg-secondary flex-wrap">
         <div className="flex items-center gap-1">
           <button
             onClick={onExpandAll}
             className="btn-ghost text-xs"
-            title="Rozbaliť všetko"
+            title={isEn ? 'Expand all' : 'Rozbaliť všetko'}
           >
             <ChevronsUpDown size={13} />
-            Rozbaliť
+            <span className="hidden sm:inline">{isEn ? 'Expand' : 'Rozbaliť'}</span>
           </button>
           <button
             onClick={onCollapseAll}
             className="btn-ghost text-xs"
-            title="Zbaliť všetko"
+            title={isEn ? 'Collapse all' : 'Zbaliť všetko'}
           >
             <ChevronsDownUp size={13} />
-            Zbaliť
+            <span className="hidden sm:inline">{isEn ? 'Collapse' : 'Zbaliť'}</span>
           </button>
         </div>
 
@@ -479,7 +485,7 @@ function TreeView({
             onClick={onZoomOut}
             disabled={zoom <= 0.4}
             className="btn-ghost text-xs disabled:opacity-30 disabled:cursor-not-allowed"
-            title="Oddíaliť"
+            title={isEn ? 'Zoom out' : 'Oddíaliť'}
           >
             <Minus size={14} />
           </button>
@@ -494,14 +500,14 @@ function TreeView({
             onClick={onZoomIn}
             disabled={zoom >= 1.2}
             className="btn-ghost text-xs disabled:opacity-30 disabled:cursor-not-allowed"
-            title="Priblížiť"
+            title={isEn ? 'Zoom in' : 'Priblížiť'}
           >
             <Plus size={14} />
           </button>
           <button
             onClick={resetPan}
             className="btn-ghost text-xs ml-1"
-            title="Reset pohľadu"
+            title={isEn ? 'Reset view' : 'Reset pohľadu'}
           >
             <Maximize2 size={13} />
           </button>
@@ -513,8 +519,8 @@ function TreeView({
         ref={containerRef}
         className="relative overflow-hidden select-none touch-none"
         style={{
-          height: 'calc(100vh - 320px)',
-          minHeight: 500,
+          height: 'calc(100vh - 300px)',
+          minHeight: 360,
           cursor: isDragging ? 'grabbing' : 'grab',
           background:
             'radial-gradient(circle at center, var(--bg-secondary) 0%, var(--bg-tertiary) 100%)',
@@ -552,8 +558,10 @@ function TreeView({
       </div>
 
       {/* Hint */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-tertiary bg-secondary/80 backdrop-blur px-2 py-1 rounded pointer-events-none">
-        ✋ Chyť a ťahaj kdekoľvek · <span className="font-mono accent-text">+/−</span> rozbalí tím · <span className="font-mono accent-text">Ctrl+scroll</span> = zoom
+      <div className="hidden sm:block absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-tertiary bg-secondary/80 backdrop-blur px-2 py-1 rounded pointer-events-none">
+        {isEn
+          ? <>✋ Drag anywhere · <span className="font-mono accent-text">+/−</span> toggles team · <span className="font-mono accent-text">Ctrl+scroll</span> = zoom</>
+          : <>✋ Chyť a ťahaj kdekoľvek · <span className="font-mono accent-text">+/−</span> rozbalí tím · <span className="font-mono accent-text">Ctrl+scroll</span> = zoom</>}
       </div>
     </div>
   );
@@ -578,6 +586,8 @@ function TreeNode({
   onToggleNode: (id: string) => void;
   depth: number;
 }) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const reports = directReportsOf(emp.id);
   const hasReports = reports.length > 0;
   const isCollapsed = collapsed.has(emp.id);
@@ -606,7 +616,9 @@ function TreeNode({
                 ? 'accent-bg text-white border-white'
                 : 'bg-secondary text-secondary border-medium hover:accent-border'
             )}
-            title={isCollapsed ? `Rozbaliť tím (${getReportCount(emp.id)})` : 'Zbaliť tím'}
+            title={isCollapsed
+              ? (isEn ? `Expand team (${getReportCount(emp.id)})` : `Rozbaliť tím (${getReportCount(emp.id)})`)
+              : (isEn ? 'Collapse team' : 'Zbaliť tím')}
           >
             {isCollapsed ? <Plus size={12} /> : <Minus size={12} />}
           </button>
@@ -689,6 +701,8 @@ function DepartmentsView({
   getReportCount: (id: string) => number;
   onSelectEmp: (e: Employee) => void;
 }) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [expanded, setExpanded] = useState<Set<string>>(
     () => new Set(departments.map((d) => d.name))
   );
@@ -728,7 +742,7 @@ function DepartmentsView({
                 </div>
                 {head && (
                   <p className="text-xs text-tertiary mt-0.5 truncate">
-                    Vedie: {head.name}
+                    {isEn ? 'Lead:' : 'Vedie:'} {head.name}
                   </p>
                 )}
               </div>
@@ -785,6 +799,8 @@ function PersonNode({
   reportCount: number;
   onClick: () => void;
 }) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const dept = departments.find((d) => d.name === emp.department);
 
   return (
@@ -804,7 +820,7 @@ function PersonNode({
       {settings.showStatus && emp.isOnLeave && (
         <div className="absolute top-2 right-2 flex items-center gap-1 badge badge-warning">
           <Plane size={9} />
-          <span className="text-[9px]">Dovolenka</span>
+          <span className="text-[9px]">{isEn ? 'Time off' : 'Dovolenka'}</span>
         </div>
       )}
 
@@ -839,7 +855,9 @@ function PersonNode({
         {settings.showTenure && (
           <div className="flex items-center gap-1.5 text-tertiary">
             <CalendarIcon size={10} />
-            <span>{yearsOfService(emp.startDate)} {yearsOfService(emp.startDate) === 1 ? 'rok' : 'rok(ov)'} vo firme</span>
+            <span>
+              {yearsOfService(emp.startDate)} {isEn ? 'years in company' : `${yearsOfService(emp.startDate) === 1 ? 'rok' : 'rok(ov)'} vo firme`}
+            </span>
           </div>
         )}
         {settings.showEmail && (
@@ -852,7 +870,7 @@ function PersonNode({
 
       {settings.showReports && reportCount > 0 && (
         <div className="mt-2 pt-2 border-t border-subtle flex items-center justify-between">
-          <span className="text-[10px] text-tertiary uppercase tracking-wider">Tím</span>
+          <span className="text-[10px] text-tertiary uppercase tracking-wider">{isEn ? 'Team' : 'Tím'}</span>
           <span className="badge badge-accent text-[10px] flex items-center gap-1">
             <Users size={9} />
             {reportCount}
@@ -997,6 +1015,8 @@ function PersonDetailPanel({
   onClose: () => void;
   onSelectOther: (e: Employee) => void;
 }) {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const dept = departments.find((d) => d.name === emp.department);
 
   return (
@@ -1017,7 +1037,7 @@ function PersonDetailPanel({
       >
         {/* Hero */}
         <div
-          className="relative p-6 text-white"
+          className="relative p-4 sm:p-6 text-white"
           style={{ background: dept?.color || 'var(--accent-primary)' }}
         >
           <button
@@ -1040,33 +1060,33 @@ function PersonDetailPanel({
           {emp.isOnLeave && (
             <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/20 text-xs mt-2">
               <Plane size={11} />
-              Momentálne na dovolenke
+              {isEn ? 'Currently on time off' : 'Momentálne na dovolenke'}
             </div>
           )}
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-5">
+        <div className="p-4 sm:p-6 space-y-5">
           {/* Stats row */}
-          <div className="grid grid-cols-3 gap-3">
-            <Stat label="Tím" value={reportCount.toString()} />
-            <Stat label="Vo firme" value={`${yearsOfService(emp.startDate)}r`} />
-            <Stat label="Lokalita" value={emp.location} small />
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <Stat label={isEn ? 'Team' : 'Tím'} value={reportCount.toString()} />
+            <Stat label={isEn ? 'Tenure' : 'Vo firme'} value={`${yearsOfService(emp.startDate)}r`} />
+            <Stat label={isEn ? 'Location' : 'Lokalita'} value={emp.location} small />
           </div>
 
           {/* Info */}
           <div className="space-y-2 text-sm">
-            <DetailRow icon={Briefcase} label="Pozícia" value={emp.role} />
-            <DetailRow icon={Building2} label="Oddelenie" value={emp.department} />
+            <DetailRow icon={Briefcase} label={isEn ? 'Position' : 'Pozícia'} value={emp.role} />
+            <DetailRow icon={Building2} label={isEn ? 'Department' : 'Oddelenie'} value={emp.department} />
             <DetailRow icon={Mail} label="Email" value={emp.email} />
-            <DetailRow icon={MapPin} label="Lokalita" value={emp.location} />
-            <DetailRow icon={CalendarIcon} label="Vo firme od" value={emp.startDate} />
+            <DetailRow icon={MapPin} label={isEn ? 'Location' : 'Lokalita'} value={emp.location} />
+            <DetailRow icon={CalendarIcon} label={isEn ? 'In company since' : 'Vo firme od'} value={emp.startDate} />
           </div>
 
           {/* Manager */}
           {manager && (
             <div>
-              <p className="text-xs uppercase tracking-wider text-tertiary mb-2">Manažér</p>
+              <p className="text-xs uppercase tracking-wider text-tertiary mb-2">{isEn ? 'Manager' : 'Manažér'}</p>
               <button
                 onClick={() => onSelectOther(manager)}
                 className="w-full card flex items-center gap-3 p-3 text-left hover:bg-tertiary/40 transition-colors"
@@ -1085,7 +1105,7 @@ function PersonDetailPanel({
           {directReports.length > 0 && (
             <div>
               <p className="text-xs uppercase tracking-wider text-tertiary mb-2">
-                Priami podriadení ({directReports.length})
+                {isEn ? `Direct reports (${directReports.length})` : `Priami podriadení (${directReports.length})`}
               </p>
               <div className="space-y-1.5">
                 {directReports.map((rep) => (
@@ -1110,7 +1130,7 @@ function PersonDetailPanel({
           {Object.keys(emp.skills).length > 0 && (
             <div>
               <p className="text-xs uppercase tracking-wider text-tertiary mb-2">
-                Top zručnosti
+                {isEn ? 'Top skills' : 'Top zručnosti'}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {Object.entries(emp.skills)

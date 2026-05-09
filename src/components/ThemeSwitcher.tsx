@@ -3,12 +3,13 @@ import { Palette, Check, Wand2, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useTheme } from '../hooks/useTheme';
 import { useBranding } from '../hooks/useBranding';
+import { useLanguage } from '../hooks/useLanguage';
 import type { Theme } from '../types';
 
 const themes: { id: Theme; name: string; emoji: string; description: string; color: string }[] = [
-  { id: 'mint', name: 'Modern Mint', emoji: '🌿', description: 'Linear / Vercel štýl', color: '#10b981' },
-  { id: 'coral', name: 'Playful Coral', emoji: '🌅', description: 'Notion / Slack štýl', color: '#f97316' },
-  { id: 'navy', name: 'Corporate Navy', emoji: '💼', description: 'BambooHR / Workday štýl', color: '#2563eb' },
+  { id: 'mint', name: 'Modern Mint', emoji: '🌿', description: 'theme.modernMintDesc', color: '#10b981' },
+  { id: 'coral', name: 'Playful Coral', emoji: '🌅', description: 'theme.playfulCoralDesc', color: '#f97316' },
+  { id: 'navy', name: 'Corporate Navy', emoji: '💼', description: 'theme.corporateNavyDesc', color: '#2563eb' },
 ];
 
 interface ThemeSwitcherProps {
@@ -18,10 +19,11 @@ interface ThemeSwitcherProps {
 export function ThemeSwitcher({ onOpenBranding }: ThemeSwitcherProps) {
   const { theme, setTheme } = useTheme();
   const { branding } = useBranding();
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50">
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -29,32 +31,32 @@ export function ThemeSwitcher({ onOpenBranding }: ThemeSwitcherProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-16 right-0 card shadow-xl-themed w-80 p-2"
+            className="absolute bottom-14 md:bottom-16 right-0 card shadow-xl-themed w-[min(20rem,calc(100vw-1.5rem))] md:w-80 p-2"
           >
             <div className="px-3 py-2 mb-1">
-              <p className="text-xs uppercase tracking-wider text-tertiary font-medium">Vizuálny štýl</p>
+              <p className="text-xs uppercase tracking-wider text-tertiary font-medium">{t('theme.visualStyle')}</p>
             </div>
 
-            {themes.map((t) => (
+            {themes.map((themeOption) => (
               <button
-                key={t.id}
+                key={themeOption.id}
                 onClick={() => {
-                  setTheme(t.id);
+                  setTheme(themeOption.id);
                   setIsOpen(false);
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-tertiary transition-colors text-left"
               >
                 <div
                   className="w-8 h-8 rounded-md flex items-center justify-center text-lg"
-                  style={{ background: t.color + '20', color: t.color }}
+                  style={{ background: themeOption.color + '20', color: themeOption.color }}
                 >
-                  {t.emoji}
+                  {themeOption.emoji}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-primary">{t.name}</p>
-                  <p className="text-xs text-tertiary truncate">{t.description}</p>
+                  <p className="font-medium text-sm text-primary">{themeOption.name}</p>
+                  <p className="text-xs text-tertiary truncate">{t(themeOption.description)}</p>
                 </div>
-                {theme === t.id && (
+                {theme === themeOption.id && (
                   <Check size={16} className="accent-text" />
                 )}
               </button>
@@ -81,7 +83,7 @@ export function ThemeSwitcher({ onOpenBranding }: ThemeSwitcherProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm text-primary truncate">{branding.companyName}</p>
-                  <p className="text-xs text-tertiary truncate">Tvoj custom branding</p>
+                  <p className="text-xs text-tertiary truncate">{t('theme.customBranding')}</p>
                 </div>
                 {theme === 'custom' && (
                   <Check size={16} className="accent-text" />
@@ -102,10 +104,10 @@ export function ThemeSwitcher({ onOpenBranding }: ThemeSwitcherProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm accent-text">
-                    {branding.isActive ? 'Upraviť branding' : 'Nahrať tvoje logo'}
+                    {branding.isActive ? t('theme.editBranding') : t('theme.uploadLogo')}
                   </p>
                   <p className="text-xs text-tertiary">
-                    {branding.isActive ? 'Reset alebo zmeniť' : 'Auto-paleta z loga'}
+                    {branding.isActive ? t('theme.resetOrChange') : t('theme.autoPalette')}
                   </p>
                 </div>
                 <span className="text-[10px] uppercase tracking-wider badge badge-accent">NEW</span>
@@ -119,10 +121,10 @@ export function ThemeSwitcher({ onOpenBranding }: ThemeSwitcherProps) {
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="w-14 h-14 rounded-full accent-bg shadow-xl-themed flex items-center justify-center text-white relative"
-        title="Zmeniť tému"
+        className="w-12 h-12 md:w-14 md:h-14 rounded-full accent-bg shadow-xl-themed flex items-center justify-center text-white relative"
+        title={t('theme.changeTheme')}
       >
-        <Palette size={22} />
+        <Palette size={20} />
         {branding.isActive && (
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full border-2 flex items-center justify-center" style={{ borderColor: branding.primary }}>
             <Sparkles size={8} style={{ color: branding.primary }} />
