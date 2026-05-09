@@ -1392,11 +1392,13 @@ function ModalShell({
   title,
   icon: Icon,
   children,
+  closeOnBackdrop = false,
 }: {
   onClose: () => void;
   title: string;
   icon: any;
   children: React.ReactNode;
+  closeOnBackdrop?: boolean;
 }) {
   // ESC to close
   useEffect(() => {
@@ -1410,7 +1412,7 @@ function ModalShell({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      onClick={onClose}
+      onClick={closeOnBackdrop ? onClose : undefined}
       className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4"
     >
       <motion.div
