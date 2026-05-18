@@ -4,6 +4,7 @@ import { MessageSquare, TrendingUp, Sparkles, Plus } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { surveys } from '../data/content';
 import { useLanguage } from '../hooks/useLanguage';
+import { useDesignMode } from '../hooks/useDesignMode';
 import { LeadCTA } from './Requests';
 import { formatDate } from '../lib/utils';
 
@@ -19,7 +20,10 @@ const pulseTrend = [
 
 export function Surveys({ onLeadCapture }: SurveysProps) {
   const { lang } = useLanguage();
+  const { mode } = useDesignMode();
   const isEn = lang === 'en';
+  const isEditorial = mode === 'editorial';
+  const isBrutalist = mode === 'brutalist';
   const emojiOptions = [
     { emoji: '😞', label: isEn ? 'Very bad' : 'Veľmi zle', value: 1 },
     { emoji: '😕', label: isEn ? 'Bad' : 'Zle', value: 2 },
@@ -32,6 +36,39 @@ export function Surveys({ onLeadCapture }: SurveysProps) {
 
   return (
     <div className="page-enter space-y-6">
+      {isBrutalist ? (
+        <div className="br-fade-in">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="br-tag" data-tone="accent">● PULSE</span>
+            <span className="br-eyebrow">ENGAGEMENT · AI TREND DETECTION</span>
+          </div>
+          <h1 className="br-poster text-5xl md:text-7xl mb-4" style={{ lineHeight: 0.9 }}>
+            {isEn ? <>Pulse. <em className="br-italic">Weekly.</em></> : <>Pulz. <em className="br-italic">Týždenne.</em></>}
+          </h1>
+          <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}>
+            {isEn ? 'Short recurring sentiment surveys.' : 'Krátke pravidelné prieskumy spokojnosti.'}{' '}
+            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{isEn ? 'AI detects mood shifts.' : 'AI deteguje zmeny nálady.'}</span>
+          </p>
+          <hr className="br-divider mt-6" />
+        </div>
+      ) : isEditorial ? (
+        <div className="ed-fade-in">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="ed-eyebrow">Engagement</span>
+            <span className="ed-tag" data-status="live">
+              <span className="ed-pulse-dot"></span>
+              AI trend detection
+            </span>
+          </div>
+          <h1 className="ed-display text-5xl md:text-6xl mb-3" style={{ lineHeight: 0.95 }}>
+            Pulse surveys &amp; <em className="ed-italic-flourish">eNPS</em>.
+          </h1>
+          <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--ed-text-secondary)' }}>
+            {isEn ? 'Short recurring sentiment surveys — AI detects mood shifts.' : 'Krátke pravidelné prieskumy spokojnosti — AI deteguje zmeny nálady.'}
+          </p>
+          <hr className="ed-divider mt-6" />
+        </div>
+      ) : (
       <div>
         <p className="text-sm text-tertiary uppercase tracking-wider mb-1">Engagement</p>
           <h1 className="font-display text-3xl">Pulse Surveys & eNPS</h1>
@@ -39,6 +76,7 @@ export function Surveys({ onLeadCapture }: SurveysProps) {
             {isEn ? 'Short recurring sentiment surveys · AI trend detection' : 'Krátke pravidelné prieskumy spokojnosti · AI detekcia trendov'}
         </p>
       </div>
+      )}
 
       {/* Active pulse */}
       <motion.div

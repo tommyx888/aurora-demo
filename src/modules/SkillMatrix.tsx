@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { employees as initialEmployees } from '../data/employees';
 import { useLanguage } from '../hooks/useLanguage';
+import { useDesignMode } from '../hooks/useDesignMode';
 import { cn, fireConfetti } from '../lib/utils';
 import type { Employee, Training, TrainingType } from '../types';
 
@@ -37,7 +38,10 @@ const heatColor = (level: number) => {
 // ============================================
 export function SkillMatrix() {
   const { lang } = useLanguage();
+  const { mode } = useDesignMode();
   const isEn = lang === 'en';
+  const isEditorial = mode === 'editorial';
+  const isBrutalist = mode === 'brutalist';
   // Employees with overrides applied
   const [employees, setEmployees] = useState<Employee[]>(() => {
     try {
@@ -173,7 +177,100 @@ export function SkillMatrix() {
 
   return (
     <div className="page-enter space-y-6">
-      {/* Header */}
+      {/* Header — design-mode aware */}
+      {isBrutalist ? (
+        <div className="br-fade-in mb-2">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="br-tag" data-tone="accent">● SKILLS</span>
+            <span className="br-eyebrow">ADMIN · TALENT · HEATMAP</span>
+          </div>
+          <h1 className="br-poster text-5xl md:text-7xl mb-4" style={{ lineHeight: 0.9 }}>
+            Who knows <em className="br-italic">what.</em>
+          </h1>
+          <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}>
+            <span style={{ color: 'var(--br-text)', fontWeight: 600 }}>{employees.length} {isEn ? 'people' : 'ľudí'}</span>{' · '}
+            <span style={{ color: 'var(--br-text)', fontWeight: 600 }}>{allSkills.length} skills</span>{' mapped. '}
+            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{isEn ? 'Click a cell to edit.' : 'Klik na bunku pre úpravu.'}</span>
+          </p>
+          <hr className="br-divider mt-6" />
+          <div className="flex items-center gap-2 flex-wrap mt-4">
+            <div className="flex items-center gap-1" style={{ border: '1px solid var(--br-border)', padding: 2 }}>
+              <Filter size={12} strokeWidth={2} className="mx-2" style={{ color: 'var(--br-text-tertiary)' }} />
+              {departments.map((dept) => (
+                <button
+                  key={dept}
+                  onClick={() => setFilterDept(dept)}
+                  className="br-mono px-2 py-1 transition-all"
+                  style={{
+                    background: filterDept === dept ? 'var(--br-text)' : 'transparent',
+                    color: filterDept === dept ? 'var(--br-bg)' : 'var(--br-text-secondary)',
+                    fontSize: '0.625rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {dept === 'all' ? (isEn ? 'ALL' : 'VŠETKY') : dept.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setTrainingModal({ open: true })} className="br-btn br-btn-accent">
+              <GraduationCap size={13} strokeWidth={2} />
+              {(isEn ? 'Plan training' : 'Naplánovať školenie').toUpperCase()}
+            </button>
+            {hasEdits && (
+              <button onClick={resetAllChanges} className="br-btn" title="Reset">
+                <RotateCcw size={13} strokeWidth={2} />
+              </button>
+            )}
+          </div>
+        </div>
+      ) : isEditorial ? (
+        <div className="ed-fade-in mb-2">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="ed-eyebrow">Admin · Talent</span>
+            <span className="ed-tag" data-status="live">
+              <span className="ed-pulse-dot"></span>
+              {employees.length} {isEn ? 'people' : 'ľudí'}
+            </span>
+          </div>
+          <h1 className="ed-display text-5xl md:text-6xl mb-3" style={{ lineHeight: 0.95 }}>
+            Skill <em className="ed-italic-flourish">heatmap</em>.
+          </h1>
+          <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--ed-text-secondary)' }}>
+            {isEn
+              ? `${allSkills.length} skills mapped across the team — click any cell to edit.`
+              : `${allSkills.length} skillov namačovaných na tíme — klik na ktorúkoľvek bunku pre úpravu.`}
+          </p>
+          <hr className="ed-divider mt-6" />
+          <div className="flex items-center gap-2 flex-wrap mt-4">
+            <div className="flex items-center gap-1 p-1 bg-tertiary rounded-lg overflow-x-auto max-w-full">
+              <Filter size={13} strokeWidth={1.5} className="text-tertiary mx-2" />
+              {departments.map((dept) => (
+                <button
+                  key={dept}
+                  onClick={() => setFilterDept(dept)}
+                  className={cn(
+                    'px-3 py-1 rounded-md text-xs font-medium transition-all',
+                    filterDept === dept ? 'bg-secondary shadow-sm-themed text-primary' : 'text-secondary hover:text-primary'
+                  )}
+                >
+                  {dept === 'all' ? (isEn ? 'All' : 'Všetky') : dept}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setTrainingModal({ open: true })} className="ed-btn ed-btn-primary">
+              <GraduationCap size={13} strokeWidth={1.5} />
+              {isEn ? 'Plan training' : 'Naplánovať školenie'}
+            </button>
+            {hasEdits && (
+              <button onClick={resetAllChanges} className="ed-btn" title="Reset">
+                <RotateCcw size={13} strokeWidth={1.5} />
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-sm text-tertiary uppercase tracking-wider mb-1">Admin · Talent</p>
@@ -216,6 +313,7 @@ export function SkillMatrix() {
           )}
         </div>
       </div>
+      )}
 
       {/* AI Insights */}
       <motion.div

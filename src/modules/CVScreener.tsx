@@ -8,6 +8,7 @@ import {
 import { analyzeCv, isAILive } from '../lib/aiHelpers';
 import { sampleCVs } from '../data/hrData';
 import { LeadCTA } from './Requests';
+import { useDesignMode } from '../hooks/useDesignMode';
 import { cn } from '../lib/utils';
 import type { CVAnalysis } from '../types';
 
@@ -33,6 +34,9 @@ const recommendationConfig = {
 };
 
 export function CVScreener({ onLeadCapture }: CVScreenerProps) {
+  const { mode } = useDesignMode();
+  const isEditorial = mode === 'editorial';
+  const isBrutalist = mode === 'brutalist';
   const [position, setPosition] = useState(positions[0]);
   const [cvText, setCvText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -100,6 +104,39 @@ export function CVScreener({ onLeadCapture }: CVScreenerProps) {
 
   return (
     <div className="page-enter space-y-6">
+      {isBrutalist ? (
+        <div className="br-fade-in">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="br-tag" data-tone="accent">● CV SCREENER</span>
+            <span className="br-eyebrow">AI RECRUITER · {isAILive ? 'LIVE' : 'DEMO MODE'}</span>
+          </div>
+          <h1 className="br-poster text-5xl md:text-7xl mb-4" style={{ lineHeight: 0.9 }}>
+            CV in. <em className="br-italic">Verdict out.</em>
+          </h1>
+          <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}>
+            Drop a CV (or paste text), AI analyzes in seconds.{' '}
+            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>Match score, strengths, red flags.</span>
+          </p>
+          <hr className="br-divider mt-6" />
+        </div>
+      ) : isEditorial ? (
+        <div className="ed-fade-in">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="ed-eyebrow">AI Recruiter</span>
+            <span className="ed-tag" data-status="live">
+              <span className="ed-pulse-dot"></span>
+              {isAILive ? 'Live' : 'Demo mode'}
+            </span>
+          </div>
+          <h1 className="ed-display text-5xl md:text-6xl mb-3" style={{ lineHeight: 0.95 }}>
+            CV <em className="ed-italic-flourish">screener</em>.
+          </h1>
+          <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--ed-text-secondary)' }}>
+            Drop a CV or paste text — AI delivers a match score, strengths and risks within seconds.
+          </p>
+          <hr className="ed-divider mt-6" />
+        </div>
+      ) : (
       <div>
         <p className="text-sm text-tertiary uppercase tracking-wider mb-1">AI Recruiter</p>
         <h1 className="font-display text-3xl">CV Screener</h1>
@@ -107,6 +144,7 @@ export function CVScreener({ onLeadCapture }: CVScreenerProps) {
           Pretiahni CV (alebo skopiruj text), AI ho analyzuje za sekundu · {isAILive ? 'Live AI mode 🔥' : 'Demo mode'}
         </p>
       </div>
+      )}
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* LEFT: Input */}

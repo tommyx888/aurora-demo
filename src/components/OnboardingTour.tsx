@@ -1,7 +1,8 @@
-﻿import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Sparkles, X, ArrowRight, ArrowLeft, Wand2, Bot } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
+import { useDesignMode } from '../hooks/useDesignMode';
 
 interface TourStep {
   title: string;
@@ -73,7 +74,10 @@ interface OnboardingTourProps {
 
 export function OnboardingTour({ forceShow = false, onClose }: OnboardingTourProps) {
   const { lang } = useLanguage();
+  const { mode } = useDesignMode();
   const isEn = lang === 'en';
+  const isEditorial = mode === 'editorial';
+  const isBrutalist = mode === 'brutalist';
   const [step, setStep] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const steps = isEn ? STEPS_EN : STEPS_SK;
@@ -113,6 +117,318 @@ export function OnboardingTour({ forceShow = false, onClose }: OnboardingTourPro
   const current = steps[step];
   const progress = ((step + 1) / steps.length) * 100;
 
+  // Brutalist variant
+  if (isBrutalist) {
+    return (
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] flex items-center justify-center p-4"
+            style={{ background: 'rgba(10, 10, 9, 0.55)' }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.15 }}
+              className="br-root max-w-md w-full relative"
+              style={{
+                background: 'var(--br-surface)',
+                border: '1px solid var(--br-border)',
+                boxShadow: '8px 8px 0 var(--br-border)',
+              }}
+            >
+              {/* Progress bar — red signal */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 3,
+                  background: 'var(--br-text-muted)',
+                }}
+              >
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 0.4 }}
+                  style={{ height: '100%', background: 'var(--br-accent)' }}
+                />
+              </div>
+
+              <button
+                onClick={handleClose}
+                className="absolute top-4 right-4 br-btn"
+                style={{ padding: '0.25rem', zIndex: 10, border: 'none', background: 'transparent' }}
+                title={isEn ? 'Skip tour' : 'Preskocit tour'}
+              >
+                <X size={14} strokeWidth={2} />
+              </button>
+
+              <div className="p-8 pt-10">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={step}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <div className="flex items-baseline justify-between mb-6">
+                      <span className="br-index-large">
+                        / {String(step + 1).padStart(2, '0')} — {String(steps.length).padStart(2, '0')}
+                      </span>
+                      <span className="br-eyebrow" style={{ fontSize: '0.5625rem' }}>
+                        {isEn ? 'WELCOME' : 'VITAJ'}
+                      </span>
+                    </div>
+
+                    <h2 className="br-poster text-4xl md:text-5xl mb-4" style={{ lineHeight: 0.95 }}>
+                      {current.title}
+                    </h2>
+
+                    <p
+                      className="text-sm leading-relaxed mb-5"
+                      style={{ color: 'var(--br-text-secondary)' }}
+                    >
+                      {current.body}
+                    </p>
+
+                    {current.tip && (
+                      <div
+                        style={{
+                          borderLeft: '3px solid var(--br-accent)',
+                          paddingLeft: '0.875rem',
+                          marginTop: '1rem',
+                          background: 'var(--br-surface-2)',
+                          padding: '0.75rem 0.875rem',
+                        }}
+                      >
+                        <p
+                          className="br-eyebrow mb-1"
+                          style={{ fontSize: '0.5625rem', color: 'var(--br-accent)' }}
+                        >
+                          {isEn ? 'NOTE' : 'TIP'}
+                        </p>
+                        <p
+                          className="text-xs leading-relaxed"
+                          style={{ color: 'var(--br-text)' }}
+                        >
+                          {current.tip}
+                        </p>
+                      </div>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+
+                <hr className="br-divider my-6" />
+
+                {/* Step dots — brutalist squares with red accent on active */}
+                <div className="flex items-center justify-center gap-1 mb-6">
+                  {steps.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setStep(i)}
+                      className="transition-all"
+                      style={{
+                        width: i === step ? 24 : 6,
+                        height: 6,
+                        background: i === step ? 'var(--br-accent)' : 'var(--br-text-muted)',
+                      }}
+                    />
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between gap-2">
+                  <button
+                    onClick={handlePrev}
+                    disabled={step === 0}
+                    className="br-btn"
+                    style={{ opacity: step === 0 ? 0.3 : 1, padding: '0.5rem 0.875rem' }}
+                  >
+                    <ArrowLeft size={13} strokeWidth={2} />
+                    {isEn ? 'BACK' : 'SPAT'}
+                  </button>
+
+                  <button
+                    onClick={handleClose}
+                    className="br-mono"
+                    style={{ fontSize: '0.6875rem', color: 'var(--br-text-tertiary)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
+                  >
+                    {isEn ? 'SKIP' : 'PRESKOCIT'}
+                  </button>
+
+                  <button onClick={handleNext} className="br-btn br-btn-accent" style={{ padding: '0.5rem 0.875rem' }}>
+                    {step === steps.length - 1 ? (isEn ? 'GOT IT' : 'OK') : (isEn ? 'NEXT' : 'DALEJ')}
+                    <ArrowRight size={13} strokeWidth={2} />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  }
+
+  // Editorial variant
+  if (isEditorial) {
+    return (
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] flex items-center justify-center p-4"
+            style={{ background: 'rgba(24, 24, 27, 0.5)', backdropFilter: 'blur(4px)' }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="ed-root max-w-md w-full overflow-hidden relative"
+              style={{
+                background: 'var(--ed-surface)',
+                border: '1px solid var(--ed-border)',
+                borderRadius: 6,
+              }}
+            >
+              {/* Progress line */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 2,
+                  background: 'var(--ed-border)',
+                }}
+              >
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 0.4 }}
+                  style={{ height: '100%', background: 'var(--ed-text)' }}
+                />
+              </div>
+
+              <button
+                onClick={handleClose}
+                className="absolute top-4 right-4 ed-btn ed-btn-ghost"
+                style={{ padding: '0.25rem', zIndex: 10 }}
+                title={isEn ? 'Skip tour' : 'Preskocit tour'}
+              >
+                <X size={14} strokeWidth={1.5} />
+              </button>
+
+              <div className="p-8 pt-10">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={step}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <div className="flex items-baseline justify-between mb-6">
+                      <span className="ed-section-num">
+                        {String(step + 1).padStart(2, '0')} — {isEn ? 'of' : 'z'} {String(steps.length).padStart(2, '0')}
+                      </span>
+                      <span className="ed-eyebrow" style={{ fontSize: '0.5625rem' }}>
+                        {isEn ? 'Welcome' : 'Vitaj'}
+                      </span>
+                    </div>
+
+                    <h2 className="ed-display text-4xl mb-4" style={{ lineHeight: 1 }}>
+                      {current.title}
+                    </h2>
+
+                    <p
+                      className="text-sm leading-relaxed mb-5"
+                      style={{ color: 'var(--ed-text-secondary)' }}
+                    >
+                      {current.body}
+                    </p>
+
+                    {current.tip && (
+                      <div
+                        style={{
+                          borderLeft: '2px solid var(--ed-text)',
+                          paddingLeft: '0.875rem',
+                          marginTop: '1rem',
+                        }}
+                      >
+                        <p
+                          className="ed-eyebrow mb-1"
+                          style={{ fontSize: '0.5625rem' }}
+                        >
+                          {isEn ? 'Note' : 'Tip'}
+                        </p>
+                        <p
+                          className="text-xs leading-relaxed"
+                          style={{ color: 'var(--ed-text-secondary)' }}
+                        >
+                          {current.tip}
+                        </p>
+                      </div>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+
+                <hr className="ed-divider my-6" />
+
+                {/* Step dots — editorial style: small squares */}
+                <div className="flex items-center justify-center gap-1 mb-6">
+                  {steps.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setStep(i)}
+                      className="transition-all"
+                      style={{
+                        width: i === step ? 18 : 4,
+                        height: 4,
+                        background: i === step ? 'var(--ed-text)' : 'var(--ed-border-strong)',
+                        borderRadius: 1,
+                      }}
+                    />
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between gap-2">
+                  <button
+                    onClick={handlePrev}
+                    disabled={step === 0}
+                    className="ed-btn ed-btn-ghost"
+                    style={{ opacity: step === 0 ? 0.3 : 1 }}
+                  >
+                    <ArrowLeft size={13} strokeWidth={1.5} />
+                    {isEn ? 'Back' : 'Spat'}
+                  </button>
+
+                  <button onClick={handleClose} className="ed-mono" style={{ fontSize: '0.6875rem', color: 'var(--ed-text-tertiary)' }}>
+                    {isEn ? 'Skip' : 'Preskocit'}
+                  </button>
+
+                  <button onClick={handleNext} className="ed-btn ed-btn-primary">
+                    {step === steps.length - 1 ? (isEn ? 'Got it' : 'Pochopene') : (isEn ? 'Next' : 'Dalej')}
+                    <ArrowRight size={13} strokeWidth={1.5} />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  }
+
+  // Classic variant
   return (
     <AnimatePresence>
       {isOpen && (

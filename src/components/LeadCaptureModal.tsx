@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { X, Sparkles, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { fireConfetti } from '../lib/utils';
 import { useLanguage } from '../hooks/useLanguage';
+import { useDesignMode } from '../hooks/useDesignMode';
 
 interface LeadCaptureModalProps {
   isOpen: boolean;
@@ -14,6 +15,10 @@ type SubmitState = 'idle' | 'sending' | 'success' | 'error';
 
 export function LeadCaptureModal({ isOpen, module, onClose }: LeadCaptureModalProps) {
   const { t } = useLanguage();
+  const { mode } = useDesignMode();
+  const isEditorial = mode === 'editorial';
+  const isBrutalist = mode === 'brutalist';
+  const isMonochrome = isEditorial || isBrutalist;
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [formData, setFormData] = useState({
@@ -122,16 +127,28 @@ export function LeadCaptureModal({ isOpen, module, onClose }: LeadCaptureModalPr
           >
             {(submitState === 'idle' || submitState === 'sending' || submitState === 'error') && (
               <>
-                <div className="p-6 mesh-bg border-b border-subtle">
+                <div className={isMonochrome ? 'p-6 border-b border-subtle' : 'p-6 mesh-bg border-b border-subtle'}>
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-10 h-10 rounded-lg accent-bg flex items-center justify-center text-white">
-                      <Sparkles size={18} />
-                    </div>
+                    {isBrutalist ? (
+                      <div className="flex items-center gap-3">
+                        <span className="br-index-large">/ 00</span>
+                        <span className="br-eyebrow">INQUIRY</span>
+                      </div>
+                    ) : isEditorial ? (
+                      <span className="ed-section-num">00 — Inquiry</span>
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg accent-bg flex items-center justify-center text-white">
+                        <Sparkles size={18} />
+                      </div>
+                    )}
                     <button onClick={handleClose} className="btn-ghost">
-                      <X size={18} />
+                      <X size={18} strokeWidth={isMonochrome ? (isBrutalist ? 2 : 1.5) : 2} />
                     </button>
                   </div>
-                  <h2 className="font-display text-2xl mb-2">
+                  <h2
+                    className={isBrutalist ? 'br-poster text-4xl mb-2' : isEditorial ? 'ed-display text-3xl mb-2' : 'font-display text-2xl mb-2'}
+                    style={isMonochrome ? { lineHeight: 0.95 } : undefined}
+                  >
                     {t('leadCapture.title')}
                   </h2>
                   <p className="text-sm text-secondary">

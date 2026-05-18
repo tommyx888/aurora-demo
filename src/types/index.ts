@@ -2,7 +2,7 @@
 // CORE TYPES — Digital Evolution Demo
 // ============================================
 
-export type Theme = 'mint' | 'coral' | 'navy' | 'custom';
+export type Theme = 'mint' | 'coral' | 'navy' | 'custom' | 'editorial';
 
 export interface BrandingState {
   isActive: boolean;

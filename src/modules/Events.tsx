@@ -4,6 +4,7 @@ import { Calendar, ChevronLeft, ChevronRight, Cake, Users, MapPin, Sparkles, Plu
 import { events } from '../data/content';
 import { employees } from '../data/employees';
 import { useLanguage } from '../hooks/useLanguage';
+import { useDesignMode } from '../hooks/useDesignMode';
 import { LeadCTA } from './Requests';
 import { formatDate, daysUntil, getAge, cn } from '../lib/utils';
 
@@ -21,7 +22,10 @@ const typeConfig = {
 
 export function Events({ onLeadCapture }: EventsProps) {
   const { lang } = useLanguage();
+  const { mode } = useDesignMode();
   const isEn = lang === 'en';
+  const isEditorial = mode === 'editorial';
+  const isBrutalist = mode === 'brutalist';
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const upcomingBirthdays = employees
@@ -59,6 +63,51 @@ export function Events({ onLeadCapture }: EventsProps) {
 
   return (
     <div className="page-enter space-y-6">
+      {isBrutalist ? (
+        <div className="br-fade-in">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="br-tag" data-tone="accent">● EVENTS</span>
+            <span className="br-eyebrow">CALENDAR · {upcomingEvents.length} UPCOMING</span>
+          </div>
+          <h1 className="br-poster text-5xl md:text-7xl mb-4" style={{ lineHeight: 0.9 }}>
+            {isEn ? <>Mark <em className="br-italic">the dates.</em></> : <>Poznač <em className="br-italic">si termíny.</em></>}
+          </h1>
+          <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}>
+            {isEn ? 'Company events, public holidays, birthdays.' : 'Firemné akcie, štátne sviatky, narodeniny.'}{' '}
+            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{isEn ? 'All in one place.' : 'Všetko na jednom mieste.'}</span>
+          </p>
+          <hr className="br-divider mt-6" />
+          <div className="flex gap-2 flex-wrap mt-4">
+            <button className="br-btn br-btn-accent">
+              <Plus size={13} strokeWidth={2} />
+              {(isEn ? 'New event' : 'Nový event').toUpperCase()}
+            </button>
+          </div>
+        </div>
+      ) : isEditorial ? (
+        <div className="ed-fade-in">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="ed-eyebrow">Calendar</span>
+            <span className="ed-tag" data-status="live">
+              <span className="ed-pulse-dot"></span>
+              {upcomingEvents.length} upcoming
+            </span>
+          </div>
+          <h1 className="ed-display text-5xl md:text-6xl mb-3" style={{ lineHeight: 0.95 }}>
+            {isEn ? <>Events &amp; <em className="ed-italic-flourish">birthdays</em>.</> : <>Eventy &amp; <em className="ed-italic-flourish">narodeniny</em>.</>}
+          </h1>
+          <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--ed-text-secondary)' }}>
+            {isEn ? 'Company events, public holidays and team birthdays in one place.' : 'Firemné akcie, štátne sviatky a narodeniny tímu na jednom mieste.'}
+          </p>
+          <hr className="ed-divider mt-6" />
+          <div className="flex gap-2 flex-wrap mt-4">
+            <button className="ed-btn ed-btn-primary">
+              <Plus size={13} strokeWidth={1.5} />
+              {isEn ? 'New event' : 'Nový event'}
+            </button>
+          </div>
+        </div>
+      ) : (
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-sm text-tertiary uppercase tracking-wider mb-1">Calendar</p>
@@ -72,6 +121,7 @@ export function Events({ onLeadCapture }: EventsProps) {
           {isEn ? 'New event' : 'Nový event'}
         </button>
       </div>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Calendar */}

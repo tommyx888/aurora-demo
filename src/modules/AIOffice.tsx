@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { generateDoc, isAILive } from '../lib/aiHelpers';
 import { useLanguage } from '../hooks/useLanguage';
+import { useDesignMode } from '../hooks/useDesignMode';
 import { LeadCTA } from './Requests';
 import { cn } from '../lib/utils';
 import type { AIDocTemplate } from '../types';
@@ -113,7 +114,10 @@ const TEMPLATES: TemplateConfig[] = [
 
 export function AIOffice({ onLeadCapture }: AIOfficeProps) {
   const { lang } = useLanguage();
+  const { mode } = useDesignMode();
   const isEn = lang === 'en';
+  const isEditorial = mode === 'editorial';
+  const isBrutalist = mode === 'brutalist';
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateConfig>(TEMPLATES[0]);
   const [variables, setVariables] = useState<Record<string, string>>({});
   const [generated, setGenerated] = useState<string | null>(null);
@@ -166,6 +170,41 @@ export function AIOffice({ onLeadCapture }: AIOfficeProps) {
 
   return (
     <div className="page-enter space-y-6">
+      {isBrutalist ? (
+        <div className="br-fade-in">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="br-tag" data-tone="accent">● AI OFFICE</span>
+            <span className="br-eyebrow">DOCS · {isAILive ? 'LIVE' : 'DEMO MODE'}</span>
+          </div>
+          <h1 className="br-poster text-5xl md:text-7xl mb-4" style={{ lineHeight: 0.9 }}>
+            Docs in <em className="br-italic">seconds.</em>
+          </h1>
+          <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}>
+            {isEn ? 'Contracts, job ads, exit interviews and more.' : 'Zmluvy, inzeráty, exit interviews a viac.'}{' '}
+            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{TEMPLATES.length} {isEn ? 'templates ready' : 'šablón pripravených'}.</span>
+          </p>
+          <hr className="br-divider mt-6" />
+        </div>
+      ) : isEditorial ? (
+        <div className="ed-fade-in">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="ed-eyebrow">AI Office</span>
+            <span className="ed-tag" data-status="live">
+              <span className="ed-pulse-dot"></span>
+              {isAILive ? 'Live' : 'Demo mode'}
+            </span>
+          </div>
+          <h1 className="ed-display text-5xl md:text-6xl mb-3" style={{ lineHeight: 0.95 }}>
+            AI document <em className="ed-italic-flourish">generator</em>.
+          </h1>
+          <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--ed-text-secondary)' }}>
+            {isEn
+              ? `${TEMPLATES.length} ready-made templates — contracts, job ads, exit interviews and more.`
+              : `${TEMPLATES.length} pripravených šablón — zmluvy, inzeráty, exit interviews a viac.`}
+          </p>
+          <hr className="ed-divider mt-6" />
+        </div>
+      ) : (
       <div>
         <p className="text-sm text-tertiary uppercase tracking-wider mb-1">AI Office</p>
         <h1 className="font-display text-3xl">{isEn ? 'AI Document Generator' : 'AI Generator dokumentov'}</h1>
@@ -173,6 +212,7 @@ export function AIOffice({ onLeadCapture }: AIOfficeProps) {
           {isEn ? 'Contracts, job ads, exit interviews and more' : 'Zmluvy, inzeraty, exit interviews a viac'} · {isAILive ? 'Live AI mode 🔥' : 'Demo mode'}
         </p>
       </div>
+      )}
 
       {/* Template grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">

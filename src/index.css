@@ -77,6 +77,45 @@
   --shadow-xl: 0 24px 50px -12px rgba(249, 115, 22, 0.25);
 }
 
+/* THEME 4: Editorial (Linear/Vercel style — sophisticated, refined) */
+[data-theme='editorial'] {
+  --bg-primary: #fafaf9;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f5f5f4;
+  --bg-accent: #f4f4f5;
+
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-tertiary: #a1a1aa;
+  --text-on-accent: #18181b;
+
+  --accent-primary: #18181b;
+  --accent-secondary: #27272a;
+  --accent-tertiary: #3f3f46;
+
+  --border-subtle: #e4e4e7;
+  --border-medium: #d4d4d8;
+  --border-strong: #18181b;
+
+  --success: #16a34a;
+  --warning: #ca8a04;
+  --danger: #dc2626;
+  --info: #2563eb;
+
+  --shadow-sm: 0 1px 0 0 rgba(24, 24, 27, 0.04);
+  --shadow-md: 0 1px 0 0 rgba(24, 24, 27, 0.04);
+  --shadow-lg: 0 1px 0 0 rgba(24, 24, 27, 0.04);
+  --shadow-xl: 0 1px 0 0 rgba(24, 24, 27, 0.04);
+
+  --radius-sm: 4px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 8px;
+
+  --font-display: 'Fraunces', 'Instrument Serif', serif;
+  --font-sans: 'Geist', system-ui, sans-serif;
+}
+
 /* THEME 3: Corporate Navy (BambooHR/Workday style — professional, trustworthy) */
 [data-theme='navy'] {
   --bg-primary: #f8fafc;
@@ -480,3 +519,982 @@ body {
     background: white !important;
   }
 }
+
+/* ============================================
+   EDITORIAL DESIGN SYSTEM (Mix A+B aesthetic)
+   Used by redesigned components.
+   These are ADDITIVE — they don't break the old design.
+   ============================================ */
+
+:root {
+  --font-editorial: 'Fraunces', 'Instrument Serif', Georgia, serif;
+  --font-editorial-body: 'Geist', system-ui, -apple-system, sans-serif;
+  --font-editorial-mono: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Refined neutral palette (zinc-based) */
+  --ed-bg: #fafaf9;
+  --ed-surface: #ffffff;
+  --ed-surface-2: #f5f5f4;
+  --ed-surface-hover: #f0efed;
+
+  --ed-text: #18181b;
+  --ed-text-secondary: #52525b;
+  --ed-text-tertiary: #a1a1aa;
+  --ed-text-muted: #d4d4d8;
+
+  --ed-border: #e4e4e7;
+  --ed-border-strong: #d4d4d8;
+  --ed-border-bold: #18181b;
+
+  /* Status colors — muted, not loud */
+  --ed-positive: #16a34a;
+  --ed-negative: #dc2626;
+  --ed-warning: #ca8a04;
+  --ed-info: #2563eb;
+}
+
+/* Editorial body when this class is applied to a container */
+.ed-root {
+  font-family: var(--font-editorial-body);
+  background: var(--ed-bg);
+  color: var(--ed-text);
+  font-feature-settings: 'cv11', 'ss01';
+  letter-spacing: -0.01em;
+}
+
+/* Editorial headings — Fraunces with optical sizing */
+.ed-display {
+  font-family: var(--font-editorial);
+  font-optical-sizing: auto;
+  font-variation-settings: 'opsz' 144, 'SOFT' 30, 'WONK' 0;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  font-weight: 400;
+}
+
+.ed-headline {
+  font-family: var(--font-editorial);
+  font-optical-sizing: auto;
+  font-variation-settings: 'opsz' 48, 'SOFT' 50, 'WONK' 1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  font-weight: 500;
+}
+
+.ed-italic-flourish {
+  font-style: italic;
+  font-variation-settings: 'opsz' 144, 'SOFT' 100, 'WONK' 1;
+}
+
+/* Eyebrow text — small all-caps with letter-spacing */
+.ed-eyebrow {
+  font-family: var(--font-editorial-mono);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+  color: var(--ed-text-tertiary);
+}
+
+/* Big numbers (KPI displays) */
+.ed-number {
+  font-family: var(--font-editorial);
+  font-variation-settings: 'opsz' 144, 'SOFT' 0, 'WONK' 0;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  font-weight: 400;
+}
+
+/* Mono labels (used for numbers, dates, status codes) */
+.ed-mono {
+  font-family: var(--font-editorial-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+/* Editorial surfaces — 1px borders instead of shadows */
+.ed-surface {
+  background: var(--ed-surface);
+  border: 1px solid var(--ed-border);
+  border-radius: 4px;
+}
+
+.ed-surface-flat {
+  background: var(--ed-surface);
+}
+
+/* Section dividers — the editorial signature */
+.ed-divider {
+  border: none;
+  border-top: 1px solid var(--ed-border);
+  margin: 0;
+}
+
+.ed-divider-bold {
+  border: none;
+  border-top: 1px solid var(--ed-border-bold);
+  margin: 0;
+}
+
+/* Numbered section markers ("01", "02"...) */
+.ed-section-num {
+  font-family: var(--font-editorial-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--ed-text-tertiary);
+  letter-spacing: 0.08em;
+}
+
+/* Editorial buttons — minimal, 1px outline */
+.ed-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--ed-border);
+  background: var(--ed-surface);
+  color: var(--ed-text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  border-radius: 4px;
+  transition: all 0.15s ease-out;
+  cursor: pointer;
+  font-family: inherit;
+}
+.ed-btn:hover {
+  border-color: var(--ed-border-bold);
+  background: var(--ed-surface-hover);
+}
+.ed-btn-primary {
+  background: var(--ed-text);
+  color: var(--ed-bg);
+  border-color: var(--ed-text);
+}
+.ed-btn-primary:hover {
+  background: var(--ed-text-secondary);
+  border-color: var(--ed-text-secondary);
+}
+.ed-btn-ghost {
+  border-color: transparent;
+  background: transparent;
+}
+.ed-btn-ghost:hover {
+  background: var(--ed-surface-2);
+}
+
+/* Segmented control (period switcher etc.) */
+.ed-segment {
+  display: inline-flex;
+  border: 1px solid var(--ed-border);
+  border-radius: 4px;
+  padding: 2px;
+  background: var(--ed-surface);
+  gap: 0;
+}
+.ed-segment-item {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ed-text-secondary);
+  border-radius: 3px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.12s ease-out;
+  letter-spacing: -0.005em;
+}
+.ed-segment-item:hover:not([data-active='true']) {
+  color: var(--ed-text);
+}
+.ed-segment-item[data-active='true'] {
+  background: var(--ed-text);
+  color: var(--ed-bg);
+}
+
+/* Editorial tag (data badge) */
+.ed-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.4rem;
+  font-family: var(--font-editorial-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--ed-surface-2);
+  color: var(--ed-text-secondary);
+  border-radius: 2px;
+  border: 1px solid transparent;
+}
+.ed-tag[data-status='live'] { background: color-mix(in srgb, var(--ed-positive) 12%, transparent); color: var(--ed-positive); }
+.ed-tag[data-status='warn'] { background: color-mix(in srgb, var(--ed-warning) 14%, transparent); color: #854d0e; }
+.ed-tag[data-status='danger'] { background: color-mix(in srgb, var(--ed-negative) 12%, transparent); color: var(--ed-negative); }
+
+/* Pulse dot (used inline with eyebrow text for live/active indicators) */
+.ed-pulse-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ed-positive);
+  position: relative;
+}
+.ed-pulse-dot::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: var(--ed-positive);
+  opacity: 0.3;
+  animation: ed-pulse 2s ease-in-out infinite;
+}
+@keyframes ed-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Subtle entrance animation — opacity only, no transforms */
+.ed-fade-in {
+  animation: ed-fade-in 250ms ease-out backwards;
+}
+@keyframes ed-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Grain texture overlay for editorial backgrounds */
+.ed-grain {
+  position: relative;
+}
+.ed-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.65' /%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  z-index: 0;
+}
+.ed-grain > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Sparkbar (mini inline chart) */
+.ed-sparkbar {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+.ed-sparkbar-bar {
+  width: 3px;
+  background: var(--ed-text);
+  border-radius: 0.5px;
+}
+
+/* Recharts overrides for editorial look */
+.ed-chart .recharts-cartesian-axis-tick text,
+.ed-chart .recharts-legend-item-text {
+  font-family: var(--font-editorial-mono) !important;
+  font-size: 10px !important;
+  fill: var(--ed-text-tertiary) !important;
+  letter-spacing: 0.02em;
+}
+.ed-chart .recharts-cartesian-grid line {
+  stroke: var(--ed-border) !important;
+  stroke-dasharray: 0 !important;
+}
+.ed-chart .recharts-tooltip-wrapper {
+  outline: none !important;
+}
+
+/* ============================================
+   GLOBAL EDITORIAL OVERRIDES
+   Applied when <html data-design-mode="editorial">.
+   These transform Classic-styled components into Editorial look
+   without rewriting every module.
+   ============================================ */
+
+[data-design-mode='editorial'] {
+  /* Replace accent with Editorial monochrome */
+  --accent-primary: #18181b;
+  --accent-secondary: #27272a;
+  --accent-tertiary: #3f3f46;
+  --text-on-accent: #fafaf9;
+
+  /* Backgrounds: softer, paper-like */
+  --bg-primary: #fafaf9;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f5f5f4;
+  --bg-accent: #f5f5f4;
+
+  /* Text: high-contrast zinc scale */
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-tertiary: #a1a1aa;
+
+  /* Borders: thin and subtle */
+  --border-subtle: #e4e4e7;
+  --border-medium: #d4d4d8;
+  --border-strong: #18181b;
+
+  /* Status colors: muted */
+  --success: #16a34a;
+  --warning: #ca8a04;
+  --danger: #dc2626;
+  --info: #2563eb;
+
+  /* No drama shadows */
+  --shadow-sm: 0 1px 0 rgba(24, 24, 27, 0.04);
+  --shadow-md: 0 1px 2px rgba(24, 24, 27, 0.06);
+  --shadow-lg: 0 2px 6px rgba(24, 24, 27, 0.08);
+  --shadow-xl: 0 4px 12px rgba(24, 24, 27, 0.1);
+
+  /* Square-ish corners */
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+
+  /* Editorial fonts everywhere */
+  --font-display: 'Fraunces', 'Instrument Serif', Georgia, serif;
+  --font-sans: 'Geist', system-ui, sans-serif;
+}
+
+/* Body font-feature-settings */
+[data-design-mode='editorial'] body {
+  font-feature-settings: 'cv11', 'ss01';
+  letter-spacing: -0.005em;
+}
+
+/* Headings get Fraunces + tight tracking */
+[data-design-mode='editorial'] .font-display {
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+  font-variation-settings: 'opsz' 96, 'SOFT' 30, 'WONK' 0;
+  letter-spacing: -0.025em;
+  font-weight: 500;
+}
+
+/* Mesh background off (too AI-flavored) */
+[data-design-mode='editorial'] .mesh-bg {
+  background: var(--bg-primary) !important;
+}
+
+/* Cards: 1px border, no shadow */
+[data-design-mode='editorial'] .card {
+  border-radius: 4px;
+  border-color: var(--ed-border);
+  box-shadow: none;
+}
+[data-design-mode='editorial'] .card-hover:hover {
+  border-color: var(--ed-border-bold);
+  box-shadow: none;
+  transform: none;
+}
+
+/* Buttons: square, monochrome */
+[data-design-mode='editorial'] .btn-primary {
+  background: var(--ed-text);
+  color: var(--ed-bg);
+  border-radius: 4px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  box-shadow: none;
+}
+[data-design-mode='editorial'] .btn-primary:hover {
+  background: var(--ed-text-secondary);
+  transform: none;
+  box-shadow: none;
+}
+
+[data-design-mode='editorial'] .btn-secondary {
+  background: var(--ed-surface);
+  color: var(--ed-text);
+  border: 1px solid var(--ed-border);
+  border-radius: 4px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+[data-design-mode='editorial'] .btn-secondary:hover {
+  background: var(--ed-surface-hover);
+  border-color: var(--ed-border-bold);
+}
+
+[data-design-mode='editorial'] .btn-ghost {
+  border-radius: 4px;
+  font-weight: 500;
+}
+[data-design-mode='editorial'] .btn-ghost:hover {
+  background: var(--ed-surface-2);
+}
+
+/* Inputs */
+[data-design-mode='editorial'] .input-field {
+  border-radius: 4px;
+  border-color: var(--ed-border);
+  background: var(--ed-surface);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  letter-spacing: -0.005em;
+}
+[data-design-mode='editorial'] .input-field:focus {
+  border-color: var(--ed-text);
+  box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.08);
+}
+
+/* Badges: mono font, square */
+[data-design-mode='editorial'] .badge {
+  font-family: var(--font-editorial-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--ed-surface-2);
+  color: var(--ed-text-secondary);
+  border-radius: 2px;
+  padding: 0.125rem 0.4rem;
+}
+[data-design-mode='editorial'] .badge-accent {
+  background: var(--ed-text);
+  color: var(--ed-bg);
+}
+[data-design-mode='editorial'] .badge-success {
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  color: var(--success);
+}
+[data-design-mode='editorial'] .badge-warning {
+  background: color-mix(in srgb, var(--warning) 14%, transparent);
+  color: #854d0e;
+}
+[data-design-mode='editorial'] .badge-danger {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+[data-design-mode='editorial'] .badge-info {
+  background: color-mix(in srgb, var(--info) 12%, transparent);
+  color: var(--info);
+}
+
+/* Headings */
+[data-design-mode='editorial'] h1,
+[data-design-mode='editorial'] h2,
+[data-design-mode='editorial'] h3 {
+  letter-spacing: -0.025em;
+}
+
+/* Accent colors → monochrome for these utility classes */
+[data-design-mode='editorial'] .accent-bg {
+  background: var(--ed-text) !important;
+  color: var(--ed-bg);
+}
+[data-design-mode='editorial'] .accent-text {
+  color: var(--ed-text) !important;
+}
+[data-design-mode='editorial'] .accent-border {
+  border-color: var(--ed-text) !important;
+}
+[data-design-mode='editorial'] .bg-accent {
+  background: var(--ed-surface-2) !important;
+  color: var(--ed-text);
+}
+[data-design-mode='editorial'] .ai-ring {
+  animation: none;
+  box-shadow: 0 0 0 1px var(--ed-border);
+}
+[data-design-mode='editorial'] .gradient-text {
+  background: none;
+  -webkit-text-fill-color: var(--ed-text);
+  color: var(--ed-text);
+}
+
+/* Tabular numerics for numeric-heavy classes */
+[data-design-mode='editorial'] .ed-mono,
+[data-design-mode='editorial'] table,
+[data-design-mode='editorial'] [class*='text-tabular'] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Recharts in editorial: muted text, no dashes */
+[data-design-mode='editorial'] .recharts-cartesian-axis-tick text,
+[data-design-mode='editorial'] .recharts-legend-item-text {
+  font-family: var(--font-editorial-mono) !important;
+  font-size: 10px !important;
+  fill: var(--ed-text-tertiary) !important;
+}
+[data-design-mode='editorial'] .recharts-cartesian-grid line {
+  stroke: var(--ed-border) !important;
+  stroke-dasharray: 0 !important;
+}
+
+/* Soften framer-motion hover lifts */
+[data-design-mode='editorial'] .card.card-hover {
+  transition: border-color 0.15s ease-out;
+}
+
+/* ============================================
+   BRUTALIST DESIGN SYSTEM (Mode D)
+   Editorial brutalist look: oversized serif, asymmetric, grain, no shadows
+   ============================================ */
+
+:root {
+  --br-bg: #f4f1ec;
+  --br-surface: #ffffff;
+  --br-surface-2: #ebe7df;
+  --br-text: #0a0a09;
+  --br-text-secondary: #4a4843;
+  --br-text-tertiary: #8b867d;
+  --br-text-muted: #c7c2b6;
+  --br-border: #0a0a09;
+  --br-border-thin: #c7c2b6;
+  --br-accent: #d63b1f;
+  --br-positive: #15602e;
+  --br-negative: #b91c1c;
+  --br-warning: #92400e;
+  --br-info: #1e3a8a;
+}
+
+/* Global overrides when brutalist active */
+[data-design-mode='brutalist'] {
+  --accent-primary: #0a0a09;
+  --accent-secondary: #d63b1f;
+  --accent-tertiary: #4a4843;
+  --text-on-accent: #f4f1ec;
+
+  --bg-primary: #f4f1ec;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #ebe7df;
+  --bg-accent: #ebe7df;
+
+  --text-primary: #0a0a09;
+  --text-secondary: #4a4843;
+  --text-tertiary: #8b867d;
+
+  --border-subtle: #c7c2b6;
+  --border-medium: #8b867d;
+  --border-strong: #0a0a09;
+
+  --success: #15602e;
+  --warning: #92400e;
+  --danger: #b91c1c;
+  --info: #1e3a8a;
+
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Geist', system-ui, sans-serif;
+}
+
+/* Brutalist body */
+[data-design-mode='brutalist'] body {
+  background: var(--br-bg);
+  font-family: var(--font-sans);
+  letter-spacing: -0.005em;
+  font-feature-settings: 'cv11', 'ss01';
+}
+
+/* Grain texture overlay on body */
+[data-design-mode='brutalist'] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5' /%3E%3C/svg%3E");
+  opacity: 0.04;
+  mix-blend-mode: multiply;
+}
+
+/* Bold serif headings */
+[data-design-mode='brutalist'] .font-display {
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+  font-variation-settings: 'opsz' 144, 'SOFT' 0, 'WONK' 1;
+  letter-spacing: -0.04em;
+  font-weight: 500;
+  line-height: 0.92;
+}
+
+/* Mesh background completely off */
+[data-design-mode='brutalist'] .mesh-bg {
+  background: var(--br-bg) !important;
+}
+
+/* Cards: hard 1px black borders, no radius, no shadow */
+[data-design-mode='brutalist'] .card {
+  border-radius: 0;
+  border: 1px solid var(--br-border);
+  background: var(--br-surface);
+  box-shadow: none;
+}
+[data-design-mode='brutalist'] .card-hover:hover {
+  border-color: var(--br-border);
+  box-shadow: 4px 4px 0 var(--br-border);
+  transform: translate(-2px, -2px);
+  transition: all 0.12s ease-out;
+}
+
+/* Buttons: sharp, bold, no radius */
+[data-design-mode='brutalist'] .btn-primary {
+  background: var(--br-text);
+  color: var(--br-bg);
+  border: 1px solid var(--br-text);
+  border-radius: 0;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  box-shadow: none;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1.25rem;
+}
+[data-design-mode='brutalist'] .btn-primary:hover {
+  background: var(--br-accent);
+  border-color: var(--br-accent);
+  box-shadow: 3px 3px 0 var(--br-border);
+  transform: translate(-1px, -1px);
+}
+
+[data-design-mode='brutalist'] .btn-secondary {
+  background: var(--br-surface);
+  color: var(--br-text);
+  border: 1px solid var(--br-border);
+  border-radius: 0;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1.25rem;
+}
+[data-design-mode='brutalist'] .btn-secondary:hover {
+  background: var(--br-surface-2);
+  box-shadow: 3px 3px 0 var(--br-border);
+  transform: translate(-1px, -1px);
+}
+
+[data-design-mode='brutalist'] .btn-ghost {
+  border-radius: 0;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Inputs: hard border, no radius */
+[data-design-mode='brutalist'] .input-field {
+  border-radius: 0;
+  border: 1px solid var(--br-border);
+  background: var(--br-surface);
+  font-family: var(--font-sans);
+}
+[data-design-mode='brutalist'] .input-field:focus {
+  border-color: var(--br-accent);
+  box-shadow: 3px 3px 0 var(--br-border);
+  transform: translate(-1px, -1px);
+}
+
+/* Badges */
+[data-design-mode='brutalist'] .badge {
+  font-family: var(--font-editorial-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--br-surface);
+  color: var(--br-text);
+  border: 1px solid var(--br-border);
+  border-radius: 0;
+  padding: 0.125rem 0.4rem;
+}
+[data-design-mode='brutalist'] .badge-accent {
+  background: var(--br-text);
+  color: var(--br-bg);
+  border-color: var(--br-text);
+}
+[data-design-mode='brutalist'] .badge-success {
+  background: var(--br-positive);
+  color: var(--br-bg);
+  border-color: var(--br-positive);
+}
+[data-design-mode='brutalist'] .badge-warning {
+  background: var(--br-warning);
+  color: var(--br-bg);
+  border-color: var(--br-warning);
+}
+[data-design-mode='brutalist'] .badge-danger {
+  background: var(--br-negative);
+  color: var(--br-bg);
+  border-color: var(--br-negative);
+}
+[data-design-mode='brutalist'] .badge-info {
+  background: var(--br-info);
+  color: var(--br-bg);
+  border-color: var(--br-info);
+}
+
+/* Headings */
+[data-design-mode='brutalist'] h1,
+[data-design-mode='brutalist'] h2,
+[data-design-mode='brutalist'] h3 {
+  letter-spacing: -0.035em;
+  font-weight: 500;
+}
+
+/* Accent colors -> brutalist hard black or signal red */
+[data-design-mode='brutalist'] .accent-bg {
+  background: var(--br-text) !important;
+  color: var(--br-bg);
+}
+[data-design-mode='brutalist'] .accent-text {
+  color: var(--br-text) !important;
+}
+[data-design-mode='brutalist'] .accent-border {
+  border-color: var(--br-text) !important;
+}
+[data-design-mode='brutalist'] .bg-accent {
+  background: var(--br-surface-2) !important;
+  color: var(--br-text);
+}
+[data-design-mode='brutalist'] .ai-ring {
+  animation: none;
+  box-shadow: none;
+  border: 1px solid var(--br-border);
+}
+[data-design-mode='brutalist'] .gradient-text {
+  background: none;
+  -webkit-text-fill-color: var(--br-accent);
+  color: var(--br-accent);
+  font-style: italic;
+}
+
+/* Recharts overrides */
+[data-design-mode='brutalist'] .recharts-cartesian-axis-tick text,
+[data-design-mode='brutalist'] .recharts-legend-item-text {
+  font-family: var(--font-editorial-mono) !important;
+  font-size: 10px !important;
+  fill: var(--br-text-secondary) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+[data-design-mode='brutalist'] .recharts-cartesian-grid line {
+  stroke: var(--br-text-muted) !important;
+  stroke-dasharray: 0 !important;
+}
+
+/* ============================================
+   BRUTALIST UTILITIES (.br-*)
+   For dedicated Brutalist components
+   ============================================ */
+
+.br-root {
+  font-family: var(--font-sans);
+  background: var(--br-bg);
+  color: var(--br-text);
+  font-feature-settings: 'cv11', 'ss01';
+  letter-spacing: -0.005em;
+  position: relative;
+}
+
+/* Massive poster heading */
+.br-poster {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-variation-settings: 'opsz' 144, 'SOFT' 0, 'WONK' 1;
+  letter-spacing: -0.05em;
+  line-height: 0.85;
+  font-weight: 500;
+}
+
+.br-headline {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 96, 'SOFT' 0, 'WONK' 1;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  font-weight: 500;
+}
+
+.br-italic {
+  font-style: italic;
+  font-variation-settings: 'opsz' 144, 'SOFT' 30, 'WONK' 1;
+  color: var(--br-accent);
+}
+
+.br-eyebrow {
+  font-family: var(--font-editorial-mono);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  color: var(--br-text);
+}
+
+.br-mono {
+  font-family: var(--font-editorial-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+  letter-spacing: 0;
+}
+
+.br-number {
+  font-family: var(--font-editorial-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 0.85;
+}
+
+.br-divider {
+  border: none;
+  border-top: 1px solid var(--br-border);
+  margin: 0;
+}
+
+.br-divider-thin {
+  border: none;
+  border-top: 1px solid var(--br-border-thin);
+  margin: 0;
+}
+
+/* Big black box section */
+.br-block {
+  background: var(--br-text);
+  color: var(--br-bg);
+  padding: 2rem;
+}
+
+/* Red accent box (rare, signal) */
+.br-block-accent {
+  background: var(--br-accent);
+  color: var(--br-bg);
+  padding: 2rem;
+}
+
+/* Hard-shadow card */
+.br-card {
+  background: var(--br-surface);
+  border: 1px solid var(--br-border);
+  padding: 1.25rem;
+  transition: all 0.12s ease-out;
+}
+.br-card:hover {
+  box-shadow: 4px 4px 0 var(--br-border);
+  transform: translate(-2px, -2px);
+}
+
+/* Sharp button with offset hover */
+.br-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--br-surface);
+  color: var(--br-text);
+  border: 1px solid var(--br-border);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.12s ease-out;
+}
+.br-btn:hover {
+  box-shadow: 3px 3px 0 var(--br-border);
+  transform: translate(-1px, -1px);
+}
+.br-btn-primary {
+  background: var(--br-text);
+  color: var(--br-bg);
+}
+.br-btn-primary:hover {
+  background: var(--br-accent);
+  border-color: var(--br-accent);
+}
+.br-btn-accent {
+  background: var(--br-accent);
+  color: var(--br-bg);
+  border-color: var(--br-accent);
+}
+.br-btn-accent:hover {
+  background: var(--br-text);
+  border-color: var(--br-text);
+}
+
+/* Tag */
+.br-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  font-family: var(--font-editorial-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--br-text);
+  color: var(--br-bg);
+}
+.br-tag[data-tone='accent'] { background: var(--br-accent); }
+.br-tag[data-tone='outline'] {
+  background: transparent;
+  color: var(--br-text);
+  border: 1px solid var(--br-border);
+}
+
+/* Index marker ("01" / "02" big) */
+.br-index {
+  font-family: var(--font-editorial-mono);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--br-text);
+  letter-spacing: 0.05em;
+}
+
+.br-index-large {
+  font-family: var(--font-editorial-mono);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--br-accent);
+  letter-spacing: 0.05em;
+}
+
+/* Brutalist chart overrides */
+.br-chart .recharts-cartesian-axis-tick text,
+.br-chart .recharts-legend-item-text {
+  font-family: var(--font-editorial-mono) !important;
+  font-size: 9px !important;
+  fill: var(--br-text-secondary) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.br-chart .recharts-cartesian-grid line {
+  stroke: var(--br-text-muted) !important;
+  stroke-dasharray: 0 !important;
+}
+
+/* Fade in animation */
+.br-fade-in {
+  animation: br-fade-in 200ms ease-out backwards;
+}
+@keyframes br-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+

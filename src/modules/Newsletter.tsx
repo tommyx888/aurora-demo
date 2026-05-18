@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Newspaper, Plus, Heart, MessageCircle, Share2, Sparkles } from 'lucide-react';
 import { news as initialNews } from '../data/content';
 import { useLanguage } from '../hooks/useLanguage';
+import { useDesignMode } from '../hooks/useDesignMode';
 import { LeadCTA } from './Requests';
 import { formatDate, cn } from '../lib/utils';
 
@@ -12,7 +13,10 @@ interface NewsletterProps {
 
 export function Newsletter({ onLeadCapture }: NewsletterProps) {
   const { lang } = useLanguage();
+  const { mode } = useDesignMode();
   const isEn = lang === 'en';
+  const isEditorial = mode === 'editorial';
+  const isBrutalist = mode === 'brutalist';
   const [news, setNews] = useState(initialNews);
   const [filter, setFilter] = useState<string>('all');
 
@@ -40,6 +44,59 @@ export function Newsletter({ onLeadCapture }: NewsletterProps) {
 
   return (
     <div className="page-enter space-y-6">
+      {isBrutalist ? (
+        <div className="br-fade-in">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="br-tag" data-tone="accent">● NEWS</span>
+            <span className="br-eyebrow">COMMUNICATION · {news.length} POSTS</span>
+          </div>
+          <h1 className="br-poster text-5xl md:text-7xl mb-4" style={{ lineHeight: 0.9 }}>
+            {isEn ? <>What's <em className="br-italic">happening.</em></> : <>Čo je <em className="br-italic">nové.</em></>}
+          </h1>
+          <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}>
+            {isEn ? 'Internal company feed.' : 'Interný firemný feed.'}{' '}
+            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{isEn ? 'React with emojis. Be seen.' : 'Reaguj emojkami. Buď videno.'}</span>
+          </p>
+          <hr className="br-divider mt-6" />
+          <div className="flex gap-2 flex-wrap mt-4">
+            <button className="br-btn">
+              <Sparkles size={13} strokeWidth={2} />
+              {(isEn ? 'AI: Write for me' : 'AI: Napísať za mňa').toUpperCase()}
+            </button>
+            <button className="br-btn br-btn-accent">
+              <Plus size={13} strokeWidth={2} />
+              {(isEn ? 'New post' : 'Nový článok').toUpperCase()}
+            </button>
+          </div>
+        </div>
+      ) : isEditorial ? (
+        <div className="ed-fade-in">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="ed-eyebrow">Communication</span>
+            <span className="ed-tag" data-status="live">
+              <span className="ed-pulse-dot"></span>
+              {news.length} posts
+            </span>
+          </div>
+          <h1 className="ed-display text-5xl md:text-6xl mb-3" style={{ lineHeight: 0.95 }}>
+            {isEn ? <>Company <em className="ed-italic-flourish">news</em>.</> : <>Firemné <em className="ed-italic-flourish">správy</em>.</>}
+          </h1>
+          <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--ed-text-secondary)' }}>
+            {isEn ? 'Internal feed — react with emojis, teammates see it.' : 'Interný feed — reaguj emojkami, kolegovia to vidia.'}
+          </p>
+          <hr className="ed-divider mt-6" />
+          <div className="flex gap-2 flex-wrap mt-4">
+            <button className="ed-btn">
+              <Sparkles size={13} strokeWidth={1.5} />
+              {isEn ? 'AI: Write for me' : 'AI: Napísať za mňa'}
+            </button>
+            <button className="ed-btn ed-btn-primary">
+              <Plus size={13} strokeWidth={1.5} />
+              {isEn ? 'New post' : 'Nový článok'}
+            </button>
+          </div>
+        </div>
+      ) : (
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-sm text-tertiary uppercase tracking-wider mb-1">Communication</p>
@@ -61,6 +118,7 @@ export function Newsletter({ onLeadCapture }: NewsletterProps) {
           </button>
         </div>
       </div>
+      )}
 
       {/* Categories */}
       <div className="flex items-center gap-2 flex-wrap">

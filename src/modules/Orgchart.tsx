@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { useState, useMemo, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
 import {
   GitBranch, LayoutGrid, Search, Settings2, X, ChevronRight,
   Users, MapPin, Mail, Calendar as CalendarIcon, Building2, Briefcase, Plane,
@@ -71,7 +71,7 @@ export function Orgchart({ onLeadCapture }: OrgchartProps) {
   });
   const [zoom, setZoom] = useState<number>(() => {
     const saved = localStorage.getItem(ZOOM_KEY);
-    return saved ? parseFloat(saved) : 0.85;
+    return saved ? parseFloat(saved) : 0.7;
   });
 
   // Persist all state
@@ -109,7 +109,13 @@ export function Orgchart({ onLeadCapture }: OrgchartProps) {
   useEffect(() => {
     if (!ceo) return;
     const saved = localStorage.getItem(COLLAPSED_KEY);
-    if (saved) return; // Don't overwrite user preference
+    if (saved) {
+      // Migration: if saved state is empty array but tree has been updated, regenerate default
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return; // user has a real preference
+      } catch (e) { /* ignore, regenerate */ }
+    }
     // Collapse all managers below CEO who have reports
     const initialCollapsed = new Set<string>();
     directReportsOf(ceo.id).forEach((manager) => {
@@ -144,7 +150,7 @@ export function Orgchart({ onLeadCapture }: OrgchartProps) {
 
   const zoomIn = () => setZoom((z) => Math.min(1.2, z + 0.1));
   const zoomOut = () => setZoom((z) => Math.max(0.4, z - 0.1));
-  const resetZoom = () => setZoom(0.85);
+  const resetZoom = () => setZoom(0.7);
 
   if (!ceo) return null;
 
@@ -517,7 +523,7 @@ function TreeView({
       {/* Pan/zoom viewport */}
       <div
         ref={containerRef}
-        className="relative overflow-hidden select-none touch-none"
+        className="relative overflow-auto select-none touch-none"
         style={{
           height: 'calc(100vh - 300px)',
           minHeight: 360,
@@ -533,27 +539,33 @@ function TreeView({
         onClickCapture={handleClickCapture}
       >
         <div
-          ref={contentRef}
           style={{
-            position: 'absolute',
-            top: 32,
-            left: '50%',
-            transform: `translate(calc(-50% + ${pan.x}px), ${pan.y}px) scale(${zoom})`,
-            transformOrigin: 'top center',
-            transition: isDragging ? 'none' : 'transform 0.15s ease-out',
-            willChange: 'transform',
+            minWidth: 'max-content',
+            display: 'flex',
+            justifyContent: 'center',
+            padding: '32px 60px 60px 60px',
           }}
         >
-          <TreeNode
-            emp={ceo}
-            directReportsOf={directReportsOf}
-            settings={settings}
-            getReportCount={getReportCount}
-            onSelectEmp={onSelectEmp}
-            collapsed={collapsed}
-            onToggleNode={onToggleNode}
-            depth={0}
-          />
+          <div
+            ref={contentRef}
+            style={{
+              transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+              transformOrigin: 'top center',
+              transition: isDragging ? 'none' : 'transform 0.15s ease-out',
+              willChange: 'transform',
+            }}
+          >
+            <TreeNode
+              emp={ceo}
+              directReportsOf={directReportsOf}
+              settings={settings}
+              getReportCount={getReportCount}
+              onSelectEmp={onSelectEmp}
+              collapsed={collapsed}
+              onToggleNode={onToggleNode}
+              depth={0}
+            />
+          </div>
         </div>
       </div>
 
@@ -627,39 +639,71 @@ function TreeNode({
 
       {/* Children */}
       {showChildren && (
-        <div className="relative pt-12 mt-2">
-          {/* Vertical line from parent down */}
+        <div className="relative mt-2">
+          {/* Vertical line from parent card down to horizontal bus (24px) */}
           <div
-            className="absolute left-1/2 -top-1 w-0.5 h-12"
-            style={{ background: 'var(--border-medium)', transform: 'translateX(-50%)' }}
+            className="absolute left-1/2 -top-1 w-0.5 pointer-events-none z-0"
+            style={{
+              background: 'var(--border-medium)',
+              transform: 'translateX(-50%)',
+              height: 24,
+            }}
           />
 
-          {/* Horizontal connector spanning all children */}
-          {reports.length > 1 && (
-            <ChildrenConnector childCount={reports.length} />
-          )}
-
-          {/* Children row */}
-          <div className="flex gap-5 justify-center items-start">
-            {reports.map((child) => (
-              <div key={child.id} className="relative flex flex-col items-center">
-                {/* Vertical line down to child */}
+          {/* Children flex row — each child wrapper contains its own L-shaped connector */}
+          <div
+            className="flex items-start justify-center"
+            style={{
+              columnGap: 24,
+              position: 'relative',
+              paddingTop: 48,
+            }}
+          >
+            {reports.map((child, idx) => {
+              const isFirst = idx === 0;
+              const isLast = idx === reports.length - 1;
+              const isOnly = reports.length === 1;
+              return (
                 <div
-                  className="absolute left-1/2 -top-12 w-0.5 h-12"
-                  style={{ background: 'var(--border-medium)', transform: 'translateX(-50%)' }}
-                />
-                <TreeNode
-                  emp={child}
-                  directReportsOf={directReportsOf}
-                  settings={settings}
-                  getReportCount={getReportCount}
-                  onSelectEmp={onSelectEmp}
-                  collapsed={collapsed}
-                  onToggleNode={onToggleNode}
-                  depth={depth + 1}
-                />
-              </div>
-            ))}
+                  key={child.id}
+                  className="relative flex flex-col items-center"
+                >
+                  {/* Vertical segment from horizontal bus down to this card's top */}
+                  <div
+                    className="absolute left-1/2 w-0.5 pointer-events-none z-0"
+                    style={{
+                      background: 'var(--border-medium)',
+                      transform: 'translateX(-50%)',
+                      top: -24,
+                      height: 24,
+                    }}
+                  />
+                  {/* Horizontal segment going from this card's center toward the parent's vertical line.
+                      First child: extends right; Last child: extends left; Middle children: extend both ways. */}
+                  {!isOnly && (
+                    <div
+                      className="absolute h-0.5 pointer-events-none z-0"
+                      style={{
+                        background: 'var(--border-medium)',
+                        top: -24,
+                        left: isFirst ? '50%' : '-12px',
+                        right: isLast ? '50%' : '-12px',
+                      }}
+                    />
+                  )}
+                  <TreeNode
+                    emp={child}
+                    directReportsOf={directReportsOf}
+                    settings={settings}
+                    getReportCount={getReportCount}
+                    onSelectEmp={onSelectEmp}
+                    collapsed={collapsed}
+                    onToggleNode={onToggleNode}
+                    depth={depth + 1}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -668,24 +712,10 @@ function TreeNode({
 }
 
 /**
- * Renders the horizontal line between siblings.
- * Uses a div whose width is the natural width of the children row.
+ * (Unused, replaced by inline grid-based connector that handles asymmetric subtree widths.)
  */
-function ChildrenConnector({ childCount }: { childCount: number }) {
-  // The line spans from first child's center to last child's center.
-  // First child is at left edge + (cardWidth/2). Last child is at right - (cardWidth/2).
-  // So we offset the line by half a card from each side.
-  return (
-    <div
-      className="absolute h-0.5 pointer-events-none"
-      style={{
-        background: 'var(--border-medium)',
-        top: 0,
-        left: 100,  // half of card width (200 / 2)
-        right: 100,
-      }}
-    />
-  );
+function ChildrenConnector(_: { childCount: number }) {
+  return null;
 }
 
 // ============================================

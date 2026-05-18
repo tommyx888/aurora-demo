@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { performanceReviews } from '../data/hrData';
 import { getEmployeeById } from '../data/employees';
+import { useDesignMode } from '../hooks/useDesignMode';
 import { LeadCTA } from './Requests';
 import { cn, formatDate } from '../lib/utils';
 import type { PerformanceReview, PerformanceGoal } from '../types';
@@ -28,6 +29,9 @@ const goalStatusConfig = {
 };
 
 export function Performance({ onLeadCapture }: PerformanceProps) {
+  const { mode } = useDesignMode();
+  const isEditorial = mode === 'editorial';
+  const isBrutalist = mode === 'brutalist';
   const [selectedReview, setSelectedReview] = useState<PerformanceReview | null>(null);
   const [filter, setFilter] = useState<'all' | 'scheduled' | 'in-progress' | 'completed'>('all');
 
@@ -46,6 +50,52 @@ export function Performance({ onLeadCapture }: PerformanceProps) {
 
   return (
     <div className="page-enter space-y-6">
+      {isBrutalist ? (
+        <div className="br-fade-in">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="br-tag" data-tone="accent">● PERFORMANCE</span>
+            <span className="br-eyebrow">PEOPLE DEVELOPMENT · Q2 26</span>
+          </div>
+          <h1 className="br-poster text-5xl md:text-7xl mb-4" style={{ lineHeight: 0.9 }}>
+            Reviews. <em className="br-italic">Score: {stats.avgScore.toFixed(1)}.</em>
+          </h1>
+          <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}>
+            <span style={{ color: 'var(--br-text)', fontWeight: 600 }}>{stats.completed}/{stats.total} done</span>{' · '}
+            <span style={{ color: 'var(--br-text)', fontWeight: 600 }}>{stats.inProgress} in progress</span>{' · '}
+            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{stats.scheduled} scheduled.</span>
+          </p>
+          <hr className="br-divider mt-6" />
+          <div className="flex flex-wrap mt-4">
+            <button className="br-btn br-btn-accent">
+              <Sparkles size={13} strokeWidth={2} />
+              SPUSTIŤ Q3 CYKLUS
+            </button>
+          </div>
+        </div>
+      ) : isEditorial ? (
+        <div className="ed-fade-in">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="ed-eyebrow">People Development</span>
+            <span className="ed-tag" data-status="live">
+              <span className="ed-pulse-dot"></span>
+              Q2 cycle
+            </span>
+          </div>
+          <h1 className="ed-display text-5xl md:text-6xl mb-3" style={{ lineHeight: 0.95 }}>
+            Performance <em className="ed-italic-flourish">reviews</em>.
+          </h1>
+          <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--ed-text-secondary)' }}>
+            Q2 2026 cycle · {stats.completed}/{stats.total} completed · average score {stats.avgScore.toFixed(1)}
+          </p>
+          <hr className="ed-divider mt-6" />
+          <div className="flex flex-wrap mt-4">
+            <button className="ed-btn ed-btn-primary">
+              <Sparkles size={13} strokeWidth={1.5} />
+              Spustiť Q3 cyklus
+            </button>
+          </div>
+        </div>
+      ) : (
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-sm text-tertiary uppercase tracking-wider mb-1">People Development</p>
@@ -59,6 +109,7 @@ export function Performance({ onLeadCapture }: PerformanceProps) {
           Spustit Q3 cyklus
         </button>
       </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -4,6 +4,7 @@ import { Bot, X, Send, Sparkles, Stethoscope, Loader2, CheckCircle2, XCircle } f
 import { sendChatMessage, isAILive } from '../lib/ai';
 import { runAIDiagnostics } from '../lib/aiDiagnostics';
 import { useLanguage } from '../hooks/useLanguage';
+import { useDesignMode } from '../hooks/useDesignMode';
 import type { ChatMessage } from '../types';
 
 interface AIChatbotProps {
@@ -13,6 +14,10 @@ interface AIChatbotProps {
 
 export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
   const { lang, t } = useLanguage();
+  const { mode } = useDesignMode();
+  const isEditorial = mode === 'editorial';
+  const isBrutalist = mode === 'brutalist';
+  const isMonochrome = isEditorial || isBrutalist;
   const copy = {
     welcomeLive:
       lang === 'en'
@@ -138,14 +143,47 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
         onClick={() => onClose()}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-4 left-4 md:bottom-6 md:left-6 w-12 h-12 md:w-14 md:h-14 rounded-full accent-bg shadow-xl-themed flex items-center justify-center text-white z-40 ai-ring"
+        className={
+          isMonochrome
+            ? 'fixed bottom-4 left-4 md:bottom-6 md:left-6 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center z-40 transition-all'
+            : 'fixed bottom-4 left-4 md:bottom-6 md:left-6 w-12 h-12 md:w-14 md:h-14 rounded-full accent-bg shadow-xl-themed flex items-center justify-center text-white z-40 ai-ring'
+        }
+        style={isBrutalist
+          ? {
+              background: 'var(--br-text)',
+              color: 'var(--br-bg)',
+              borderRadius: 0,
+              border: '1px solid var(--br-border)',
+              boxShadow: '3px 3px 0 var(--br-border)',
+            }
+          : isEditorial
+          ? {
+              background: 'var(--ed-text)',
+              color: 'var(--ed-bg)',
+              borderRadius: 4,
+              boxShadow: '0 4px 12px rgba(24, 24, 27, 0.15)',
+            }
+          : undefined
+        }
         title={t('chatbot.title')}
       >
-        {isOpen ? <X size={20} /> : <Bot size={20} />}
-        {!isOpen && (
+        {isOpen ? <X size={20} strokeWidth={isMonochrome ? (isBrutalist ? 2 : 1.5) : 2} /> : <Bot size={20} strokeWidth={isMonochrome ? (isBrutalist ? 2 : 1.5) : 2} />}
+        {!isOpen && !isMonochrome && (
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white text-[9px] flex items-center justify-center text-white font-bold">
             1
           </span>
+        )}
+        {!isOpen && isEditorial && (
+          <span
+            className="absolute -top-1 -right-1 w-2 h-2 rounded-full"
+            style={{ background: 'var(--ed-positive)' }}
+          />
+        )}
+        {!isOpen && isBrutalist && (
+          <span
+            className="absolute -top-1 -right-1 w-2 h-2"
+            style={{ background: 'var(--br-accent)' }}
+          />
         )}
       </motion.button>
 
@@ -161,23 +199,56 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
           >
             {/* Header */}
             <div className="p-4 border-b border-subtle flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full accent-bg flex items-center justify-center text-white text-xl ai-ring">
-                🤖
+              <div
+                className={isMonochrome
+                  ? 'w-10 h-10 flex items-center justify-center text-sm'
+                  : 'w-10 h-10 rounded-full accent-bg flex items-center justify-center text-white text-xl ai-ring'
+                }
+                style={isBrutalist
+                  ? {
+                      background: 'var(--br-accent)',
+                      color: 'var(--br-bg)',
+                      border: '1px solid var(--br-border)',
+                      fontFamily: 'var(--font-editorial-mono)',
+                      fontWeight: 700,
+                      letterSpacing: '0.05em',
+                    }
+                  : isEditorial
+                  ? {
+                      background: 'var(--ed-text)',
+                      color: 'var(--ed-bg)',
+                      borderRadius: 3,
+                      fontFamily: 'var(--font-editorial-mono)',
+                      fontWeight: 600,
+                      letterSpacing: '0.05em',
+                    }
+                  : undefined
+                }
+              >
+                {isMonochrome ? 'EV' : '🤖'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium">Eva</p>
+                <p className={isBrutalist ? 'br-headline' : isEditorial ? 'ed-headline' : 'font-medium'} style={isMonochrome ? { fontSize: '1rem', fontWeight: 500 } : undefined}>
+                  Eva
+                </p>
                 <p className="text-xs flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                  <span className="text-tertiary">
-                    AI Buddy {isAILive ? '· Live mode 🔥' : '· Demo mode'}
+                  {isBrutalist ? (
+                    <span className="inline-block w-1.5 h-1.5" style={{ background: 'var(--br-accent)' }} />
+                  ) : isEditorial ? (
+                    <span className="ed-pulse-dot" />
+                  ) : (
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                  )}
+                  <span className={isBrutalist ? 'br-eyebrow' : isEditorial ? 'ed-eyebrow' : 'text-tertiary'} style={isMonochrome ? { fontSize: '0.5625rem' } : undefined}>
+                    AI Buddy {isAILive ? (isMonochrome ? '· Live' : '· Live mode 🔥') : '· Demo mode'}
                   </span>
                 </p>
               </div>
               <button onClick={runDiag} className="btn-ghost" title={t('chatbot.diagnostics')}>
-                <Stethoscope size={14} />
+                <Stethoscope size={14} strokeWidth={isMonochrome ? (isBrutalist ? 2 : 1.5) : 2} />
               </button>
               <button onClick={onClose} className="btn-ghost">
-                <X size={16} />
+                <X size={16} strokeWidth={isMonochrome ? (isBrutalist ? 2 : 1.5) : 2} />
               </button>
             </div>
 
@@ -191,11 +262,21 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm leading-relaxed ${
-                      msg.role === 'user'
-                        ? 'accent-bg text-white rounded-tr-sm'
-                        : 'bg-tertiary text-primary rounded-tl-sm'
+                    className={`max-w-[80%] px-3 py-2 text-sm leading-relaxed ${
+                      isEditorial
+                        ? msg.role === 'user'
+                          ? 'rounded text-white'
+                          : 'rounded'
+                        : msg.role === 'user'
+                          ? 'accent-bg text-white rounded-2xl rounded-tr-sm'
+                          : 'bg-tertiary text-primary rounded-2xl rounded-tl-sm'
                     }`}
+                    style={isEditorial
+                      ? msg.role === 'user'
+                        ? { background: 'var(--ed-text)', color: 'var(--ed-bg)', borderRadius: 4, letterSpacing: '-0.005em' }
+                        : { background: 'var(--ed-surface-2)', color: 'var(--ed-text)', borderRadius: 4, letterSpacing: '-0.005em' }
+                      : undefined
+                    }
                   >
                     {msg.content}
                   </div>

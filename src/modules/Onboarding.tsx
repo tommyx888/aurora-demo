@@ -10,6 +10,7 @@ import { employees } from '../data/employees';
 import { fireConfetti, sleep } from '../lib/utils';
 import { sendChatMessage, isAILive } from '../lib/ai';
 import { useLanguage } from '../hooks/useLanguage';
+import { useDesignMode } from '../hooks/useDesignMode';
 import type { OnboardingStep, ChatMessage } from '../types';
 
 const stepIcons = {
@@ -45,7 +46,11 @@ const HELP_CONTENT_EN: Record<string, string> = {
 
 export function Onboarding({ onComplete }: OnboardingProps) {
   const { lang } = useLanguage();
+  const { mode } = useDesignMode();
   const isEn = lang === 'en';
+  const isEditorial = mode === 'editorial';
+  const isBrutalist = mode === 'brutalist';
+  const isMonochrome = isEditorial || isBrutalist;
   const [currentStep, setCurrentStep] = useState(0);
   const [steps, setSteps] = useState<OnboardingStep[]>(initialSteps);
   const [evaMessage, setEvaMessage] = useState('');
@@ -319,20 +324,66 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         <div className="md:col-span-1">
           <div className="card sticky top-6 flex flex-col" style={{ minHeight: 420 }}>
             <div className="flex items-center gap-3 mb-4 flex-shrink-0">
-              <motion.div
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="relative"
-              >
-                <div className="w-12 h-12 rounded-full overflow-hidden ai-ring accent-bg flex items-center justify-center text-white text-xl">
-                  🤖
+              {isBrutalist ? (
+                <div
+                  className="w-12 h-12 flex items-center justify-center text-sm flex-shrink-0"
+                  style={{
+                    background: 'var(--br-accent)',
+                    color: 'var(--br-bg)',
+                    border: '1px solid var(--br-border)',
+                    fontFamily: 'var(--font-editorial-mono)',
+                    fontWeight: 700,
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  EV
                 </div>
-              </motion.div>
+              ) : isEditorial ? (
+                <div
+                  className="w-12 h-12 flex items-center justify-center text-sm flex-shrink-0"
+                  style={{
+                    background: 'var(--ed-text)',
+                    color: 'var(--ed-bg)',
+                    borderRadius: 3,
+                    fontFamily: 'var(--font-editorial-mono)',
+                    fontWeight: 600,
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  EV
+                </div>
+              ) : (
+                <motion.div
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="relative"
+                >
+                  <div className="w-12 h-12 rounded-full overflow-hidden ai-ring accent-bg flex items-center justify-center text-white text-xl">
+                    🤖
+                  </div>
+                </motion.div>
+              )}
               <div className="flex-1 min-w-0">
-                <p className="font-medium">Eva</p>
-                <p className="text-xs text-tertiary flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                  AI Buddy {isAILive ? '· Live mode 🔥' : '· Demo mode'}
+                <p
+                  className={isBrutalist ? 'br-headline' : isEditorial ? 'ed-headline' : 'font-medium'}
+                  style={isMonochrome ? { fontSize: '1rem', fontWeight: 500 } : undefined}
+                >
+                  Eva
+                </p>
+                <p className="text-xs flex items-center gap-1">
+                  {isBrutalist ? (
+                    <span className="inline-block w-1.5 h-1.5" style={{ background: 'var(--br-accent)' }} />
+                  ) : isEditorial ? (
+                    <span className="ed-pulse-dot" />
+                  ) : (
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                  )}
+                  <span
+                    className={isBrutalist ? 'br-eyebrow' : isEditorial ? 'ed-eyebrow' : 'text-tertiary'}
+                    style={isMonochrome ? { fontSize: '0.5625rem' } : undefined}
+                  >
+                    AI Buddy {isAILive ? (isMonochrome ? '· Live' : '· Live mode 🔥') : '· Demo mode'}
+                  </span>
                 </p>
               </div>
               {chatMode !== 'idle' && (
@@ -341,7 +392,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                   className="btn-ghost p-1"
                   title={ui.back}
                 >
-                  <X size={14} />
+                  <X size={14} strokeWidth={isMonochrome ? (isBrutalist ? 2 : 1.5) : 2} />
                 </button>
               )}
             </div>

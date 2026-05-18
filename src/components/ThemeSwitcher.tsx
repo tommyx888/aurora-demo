@@ -1,9 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Palette, Check, Wand2, Sparkles } from 'lucide-react';
+import { Palette, Check, Wand2, Sparkles, Layout, Feather, Type } from 'lucide-react';
 import { useState } from 'react';
 import { useTheme } from '../hooks/useTheme';
 import { useBranding } from '../hooks/useBranding';
 import { useLanguage } from '../hooks/useLanguage';
+import { useDesignMode } from '../hooks/useDesignMode';
 import type { Theme } from '../types';
 
 const themes: { id: Theme; name: string; emoji: string; description: string; color: string }[] = [
@@ -20,6 +21,7 @@ export function ThemeSwitcher({ onOpenBranding }: ThemeSwitcherProps) {
   const { theme, setTheme } = useTheme();
   const { branding } = useBranding();
   const { t } = useLanguage();
+  const { mode, setMode } = useDesignMode();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -33,6 +35,53 @@ export function ThemeSwitcher({ onOpenBranding }: ThemeSwitcherProps) {
             transition={{ duration: 0.2 }}
             className="absolute bottom-14 md:bottom-16 right-0 card shadow-xl-themed w-[min(20rem,calc(100vw-1.5rem))] md:w-80 p-2"
           >
+            {/* Design mode toggle — Classic vs Editorial vs Brutalist */}
+            <div className="px-3 py-2 mb-1">
+              <p className="text-xs uppercase tracking-wider text-tertiary font-medium">Design mode</p>
+            </div>
+            <div className="grid grid-cols-3 gap-1 px-2 mb-2">
+              <button
+                onClick={() => setMode('classic')}
+                className={
+                  'flex flex-col items-center gap-1 p-2 rounded-md transition-all border ' +
+                  (mode === 'classic'
+                    ? 'accent-border bg-accent'
+                    : 'border-subtle hover:bg-tertiary')
+                }
+              >
+                <Layout size={14} className={mode === 'classic' ? 'accent-text' : 'text-tertiary'} />
+                <span className="text-xs font-medium">Classic</span>
+                <span className="text-[9px] text-tertiary text-center leading-tight">Vibrant</span>
+              </button>
+              <button
+                onClick={() => setMode('editorial')}
+                className={
+                  'flex flex-col items-center gap-1 p-2 rounded-md transition-all border ' +
+                  (mode === 'editorial'
+                    ? 'accent-border bg-accent'
+                    : 'border-subtle hover:bg-tertiary')
+                }
+              >
+                <Feather size={14} className={mode === 'editorial' ? 'accent-text' : 'text-tertiary'} />
+                <span className="text-xs font-medium">Editorial</span>
+                <span className="text-[9px] text-tertiary text-center leading-tight">Refined</span>
+              </button>
+              <button
+                onClick={() => setMode('brutalist')}
+                className={
+                  'flex flex-col items-center gap-1 p-2 rounded-md transition-all border ' +
+                  (mode === 'brutalist'
+                    ? 'accent-border bg-accent'
+                    : 'border-subtle hover:bg-tertiary')
+                }
+              >
+                <Type size={14} className={mode === 'brutalist' ? 'accent-text' : 'text-tertiary'} />
+                <span className="text-xs font-medium">Brutalist</span>
+                <span className="text-[9px] text-tertiary text-center leading-tight">Bold serif</span>
+              </button>
+            </div>
+            <div className="border-t border-subtle my-2" />
+
             <div className="px-3 py-2 mb-1">
               <p className="text-xs uppercase tracking-wider text-tertiary font-medium">{t('theme.visualStyle')}</p>
             </div>
