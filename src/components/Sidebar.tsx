@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import {
   Home, Users, BarChart3, BriefcaseBusiness, GitBranch, MessageSquare,
   Newspaper, Calendar, FileText, Brain, Crown, UserCircle, ChevronRight, Sparkles,
-  Plane, Target, FileSearch, Wand2
+  Plane, Target, FileSearch, Wand2, Tag
 } from 'lucide-react';
 import type { Page, UserRole } from '../types';
 import { cn } from '../lib/utils';
@@ -31,6 +31,7 @@ const employeeNav: { page: Page; labelKey: string; icon: any; badge?: string }[]
   { page: 'performance', labelKey: 'nav.performance', icon: Target, badge: 'NEW' },
   { page: 'orgchart', labelKey: 'nav.orgChart', icon: GitBranch },
   { page: 'surveys', labelKey: 'nav.surveys', icon: MessageSquare },
+  { page: 'pricing', labelKey: 'nav.pricing', icon: Tag, badge: 'NEW' },
 ];
 
 const adminNav: { page: Page; labelKey: string; icon: any; badge?: string }[] = [
@@ -46,6 +47,7 @@ const adminNav: { page: Page; labelKey: string; icon: any; badge?: string }[] = 
   { page: 'newsletter', labelKey: 'nav.newsAdmin', icon: Newspaper },
   { page: 'events', labelKey: 'nav.eventsAdmin', icon: Calendar },
   { page: 'surveys', labelKey: 'nav.surveysAdmin', icon: MessageSquare },
+  { page: 'pricing', labelKey: 'nav.pricing', icon: Tag, badge: 'NEW' },
 ];
 
 export function Sidebar(props: SidebarProps) {
@@ -311,7 +313,7 @@ function SidebarEditorial({
       {/* Section eyebrow */}
       <div className="px-5 pt-4 pb-2">
         <p className="ed-eyebrow" style={{ fontSize: '0.5625rem' }}>
-          {isAdmin ? '01 — Workspace' : '01 — My space'}
+          {isAdmin ? t('sidebarDesign.workspaceAdmin') : t('sidebarDesign.workspaceEmployee')}
         </p>
       </div>
 
@@ -544,7 +546,7 @@ function SidebarBrutalist({
       {/* Section eyebrow */}
       <div className="px-5 pt-4 pb-2">
         <p className="br-eyebrow" style={{ fontSize: '0.5625rem' }}>
-          / 01 — {isAdmin ? 'WORKSPACE' : 'MY SPACE'}
+          / 01 — {isAdmin ? t('sidebarDesign.workspaceAdminUpper') : t('sidebarDesign.workspaceEmployeeUpper')}
         </p>
       </div>
 

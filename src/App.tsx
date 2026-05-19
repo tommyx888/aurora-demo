@@ -16,6 +16,7 @@ import { CVScreener } from './modules/CVScreener';
 import { TimeOff } from './modules/TimeOff';
 import { AIOffice } from './modules/AIOffice';
 import { Performance } from './modules/Performance';
+import { Pricing } from './pages/Pricing';
 import { Sidebar } from './components/Sidebar';
 import { ThemeSwitcher } from './components/ThemeSwitcher';
 import { AIChatbot } from './components/AIChatbot';
@@ -36,7 +37,8 @@ function App() {
   // initialize theme + branding on mount
   useTheme();
   useBranding();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const isEn = lang === 'en';
 
   const [page, setPage] = useState<Page>('landing');
   const [role, setRole] = useState<UserRole>('both');
@@ -88,6 +90,7 @@ function App() {
     surveys: role === 'admin' ? t('nav.surveysAdmin') : t('nav.surveys'),
     newsletter: role === 'admin' ? t('nav.newsAdmin') : t('nav.news'),
     events: role === 'admin' ? t('nav.eventsAdmin') : t('nav.events'),
+    pricing: isEn ? 'Pricing' : 'Cenník',
   };
 
   const globalOverlays = (
@@ -205,6 +208,7 @@ function App() {
           {page === 'surveys' && <Surveys onLeadCapture={handleLeadCapture} />}
           {page === 'newsletter' && <Newsletter onLeadCapture={handleLeadCapture} />}
           {page === 'events' && <Events onLeadCapture={handleLeadCapture} />}
+          {page === 'pricing' && <Pricing onLeadCapture={handleLeadCapture} />}
         </div>
       </main>
 

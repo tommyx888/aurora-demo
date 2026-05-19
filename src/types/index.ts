@@ -30,7 +30,8 @@ export type Page =
   | 'time-off'
   | 'performance'
   | 'ai-office'
-  | 'cv-screener';
+  | 'cv-screener'
+  | 'pricing';
 
 export interface Employee {
   id: string;

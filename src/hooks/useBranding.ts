@@ -41,6 +41,23 @@ export function useBranding() {
     }
   }, []);
 
+  // Re-apply palette when design mode changes (so Editorial/Brutalist style overrides re-inject)
+  useEffect(() => {
+    if (!branding.isActive || branding.rawColors.length === 0) return;
+
+    const observer = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.type === 'attributes' && m.attributeName === 'data-design-mode') {
+          const palette = generatePalette(branding.rawColors);
+          applyPalette(palette);
+          break;
+        }
+      }
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-design-mode'] });
+    return () => observer.disconnect();
+  }, [branding.isActive, branding.rawColors]);
+
   const updateBranding = (updates: Partial<BrandingState>) => {
     setBranding((prev) => {
       const next = { ...prev, ...updates };

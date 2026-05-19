@@ -73,7 +73,7 @@ const AI_SOURCE_POOL: Omit<Candidate, 'id' | 'appliedDate' | 'stage' | 'activity
 ];
 
 export function Recruiting() {
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const { mode } = useDesignMode();
   const isEn = lang === 'en';
   const isEditorial = mode === 'editorial';
@@ -297,64 +297,62 @@ export function Recruiting() {
         <div className="br-fade-in mb-2">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
             <span className="br-tag" data-tone="accent">● RECRUITING</span>
-            <span className="br-eyebrow">TALENT ACQUISITION · Q2 26</span>
+            <span className="br-eyebrow">{t('recruiting.eyebrowBrutalist').toUpperCase()}</span>
           </div>
           <h1 className="br-poster text-5xl md:text-7xl mb-4" style={{ lineHeight: 0.9 }}>
-            Pipeline. <em className="br-italic">Move fast.</em>
+            {t('recruiting.headlineBrutalist')} <em className="br-italic">{t('recruiting.headlineEmBrutalist')}</em>
           </h1>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}>
-            <span style={{ color: 'var(--br-text)', fontWeight: 600 }}>{candidates.length} {isEn ? 'candidates' : 'kandidátov'}</span> across {openPositions.length} {isEn ? 'open positions' : 'otvorených pozícií'}.{' '}
-            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>AI scoring enabled.</span>
+            <span style={{ color: 'var(--br-text)', fontWeight: 600 }}>{candidates.length} {t('recruiting.candidates')}</span> {t('recruiting.bodyBrutalist')} {openPositions.length} {t('recruiting.openPositions')}.{' '}
+            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{t('recruiting.aiScoringEnabled')}.</span>
           </p>
           <hr className="br-divider mt-6" />
           <div className="flex gap-2 flex-wrap mt-4">
             <button onClick={() => setAiSourceOpen(true)} className="br-btn">
               <Sparkles size={13} strokeWidth={2} />
-              AI SOURCE
+              {t('recruiting.aiSource').toUpperCase()}
             </button>
             <button onClick={() => setAddCandidateOpen(true)} className="br-btn br-btn-accent">
               <Plus size={13} strokeWidth={2} />
-              {(isEn ? 'Add candidate' : 'Pridať kandidáta').toUpperCase()}
+              {t('recruiting.addCandidate').toUpperCase()}
             </button>
           </div>
         </div>
       ) : isEditorial ? (
         <div className="ed-fade-in mb-2">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <span className="ed-eyebrow">Admin · Talent Acquisition</span>
+            <span className="ed-eyebrow">{t('recruiting.eyebrowEditorial')}</span>
             <span className="ed-tag" data-status="live">
               <span className="ed-pulse-dot"></span>
-              AI scoring
+              {t('recruiting.aiScoringEnabled')}
             </span>
           </div>
           <h1 className="ed-display text-5xl md:text-6xl mb-3" style={{ lineHeight: 0.95 }}>
-            Recruiting <em className="ed-italic-flourish">pipeline</em>.
+            {t('recruiting.headlineEditorial')} <em className="ed-italic-flourish">{t('recruiting.headlineEmEditorial')}</em>.
           </h1>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--ed-text-secondary)' }}>
-            {candidates.length} {isEn ? 'candidates' : 'kandidátov'} · {openPositions.length} {isEn ? 'open positions' : 'otvorených pozícií'}
+            {candidates.length} {t('recruiting.candidates')} · {openPositions.length} {t('recruiting.openPositions')}
           </p>
           <hr className="ed-divider mt-6" />
           <div className="flex gap-2 flex-wrap mt-4">
             <button onClick={() => setAiSourceOpen(true)} className="ed-btn">
               <Sparkles size={13} strokeWidth={1.5} />
-              AI Source
+              {t('recruiting.aiSource')}
             </button>
             <button onClick={() => setAddCandidateOpen(true)} className="ed-btn ed-btn-primary">
               <Plus size={13} strokeWidth={1.5} />
-              {isEn ? 'Add candidate' : 'Pridať kandidáta'}
+              {t('recruiting.addCandidate')}
             </button>
           </div>
         </div>
       ) : (
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-sm text-tertiary uppercase tracking-wider mb-1">Admin · Talent Acquisition</p>
-            <h1 className="font-display text-3xl">Recruiting Pipeline</h1>
+          <p className="text-sm text-tertiary uppercase tracking-wider mb-1">{t('recruiting.eyebrowEditorial')}</p>
+            <h1 className="font-display text-3xl">{t('recruiting.headlineClassic')}</h1>
           <p className="text-secondary text-sm mt-1">
-            {isEn
-              ? `${candidates.length} candidates · ${openPositions.length} open positions ·`
-              : `${candidates.length} kandidátov · ${openPositions.length} otvorených pozícií ·`}
-            <span className="accent-text font-medium">{isEn ? ' AI scoring enabled' : ' AI scoring zapnutý'}</span>
+            {candidates.length} {t('recruiting.candidates')} · {openPositions.length} {t('recruiting.openPositions')} ·{' '}
+            <span className="accent-text font-medium">{t('recruiting.aiScoringEnabled')}</span>
           </p>
         </div>
 
@@ -364,14 +362,14 @@ export function Recruiting() {
             className="btn-secondary text-sm flex-1 sm:flex-none"
           >
             <Sparkles size={14} />
-            AI Source
+            {t('recruiting.aiSource')}
           </button>
           <button
             onClick={() => setAddCandidateOpen(true)}
             className="btn-primary text-sm flex-1 sm:flex-none"
           >
             <Plus size={14} />
-            {isEn ? 'Add candidate' : 'Pridať kandidáta'}
+            {t('recruiting.addCandidate')}
           </button>
         </div>
       </div>

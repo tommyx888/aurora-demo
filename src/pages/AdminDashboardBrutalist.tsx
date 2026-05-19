@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import { candidates } from '../data/candidates';
 import { requests } from '../data/content';
+import { useLanguage } from '../hooks/useLanguage';
 
 type Period = 'week' | 'month' | 'quarter';
 
@@ -71,8 +72,72 @@ const CHART_DATA = {
 };
 
 export function AdminDashboardBrutalist() {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [period, setPeriod] = useState<Period>('month');
   const data = CHART_DATA[period];
+  const copy = {
+    live: isEn ? '● LIVE' : '● NAŽIVO',
+    report: isEn ? 'TALENT REPORT' : 'TALENT REPORT',
+    hello: isEn ? 'Good morning,' : 'Dobré ráno,',
+    subtitleLead: isEn ? `Three metrics moved this ${period}.` : `Tri metriky sa pohli za ${period === 'week' ? 'týždeň' : period === 'month' ? 'mesiac' : 'kvartál'}.`,
+    subtitleTail: isEn ? 'One needs your attention. Recruiting funnel improved.' : 'Jedna potrebuje tvoju pozornosť. Náborový funnel sa zlepšil.',
+    period: isEn ? 'PERIOD' : 'OBDOBIE',
+    week: isEn ? 'Week' : 'Týždeň',
+    month: isEn ? 'Month' : 'Mesiac',
+    quarter: isEn ? 'Quarter' : 'Kvartál',
+    export: isEn ? 'Export' : 'Export',
+    keyMetrics: isEn ? 'KEY METRICS' : 'KĽÚČOVÉ METRIKY',
+    labelWindow: period === 'week' ? (isEn ? '7 DAYS' : '7 DNÍ') : period === 'month' ? (isEn ? '6 MONTHS' : '6 MESIACOV') : (isEn ? '6 QUARTERS' : '6 KVARTÁLOV'),
+    headcount: isEn ? 'Headcount' : 'Počet ľudí',
+    employeeNps: isEn ? 'Employee NPS' : 'Employee NPS',
+    activePipeline: isEn ? 'Active pipeline' : 'Aktívny pipeline',
+    pendingRequests: isEn ? 'Pending requests' : 'Nevybavené žiadanky',
+    awaiting: isEn ? 'Awaiting' : 'Čaká',
+    headcountSection: isEn ? 'HEADCOUNT' : 'POČET ĽUDÍ',
+    growthTag: isEn ? '01 / Growth' : '01 / Rast',
+    growthHeadline: isEn ? 'Steady.' : 'Stabilný.',
+    growthHeadlineEm: isEn ? 'Healthy.' : 'Zdravý.',
+    growthBody: isEn ? 'Team grew from 11 to 15. No churn surprises. No over-hiring. Within plan.' : 'Tím narástol z 11 na 15. Žiadne prekvapenia vo fluktuácii. Žiadny over-hiring. V rámci plánu.',
+    over: isEn ? 'OVER' : 'ZA',
+    enpsSection: isEn ? 'EMPLOYEE NPS' : 'EMPLOYEE NPS',
+    score: isEn ? 'SCORE' : 'SKÓRE',
+    enpsBody: isEn ? 'Trending up since Q1. Tatra Bank deal energized the team.' : 'Trend rastie od Q1. Tatra Bank deal nakopol tím.',
+    enpsBodyEm: isEn ? 'Watch engineering' : 'Sleduj engineering',
+    enpsBodyTail: isEn ? 'mid-summer.' : 'v polovici leta.',
+    funnelSection: isEn ? 'RECRUITING FUNNEL' : 'NÁBOROVÝ FUNNEL',
+    conv: isEn ? 'CONV.' : 'KONV.',
+    attention: isEn ? 'NEEDS YOUR ATTENTION' : 'TREBA RIEŠIŤ',
+    items: isEn ? '03 ITEMS' : '03 POLOŽKY',
+    footer: isEn ? 'DIGITAL EVOLUTION · HR PLATFORM' : 'DIGITAL EVOLUTION · HR PLATFORM',
+    updated: isEn ? 'UPDATED' : 'AKTUALIZOVANÉ',
+    insight1Headline: isEn ? 'Engineering vacation cluster' : 'Engineering dovolenkový zhluk',
+    insight1Italic: isEn ? 'mid-July' : 'polovica júla',
+    insight1Body: isEn
+      ? "Filip and Tomáš both submitted vacation for July 14–25. Combined with Adam's prior leave, the eng team drops to 3 people for two weeks."
+      : 'Filip a Tomáš obaja podali dovolenku na 14.–25. júla. Spolu s Adamovou už schválenou dovolenkou klesne eng tím na 3 ľudí na dva týždne.',
+    insight1Action: isEn ? 'Open Time-off' : 'Otvoriť Dovolenky',
+    insight2Headline: isEn ? 'Vue.js coverage is' : 'Vue.js pokrytie je',
+    insight2Italic: isEn ? 'one deep' : 'iba jeden človek',
+    insight2Body: isEn
+      ? 'Only Martin holds Vue.js (level 2). If Martin leaves, you have zero coverage. Consider sending Filip or Adam to a Vue intensive.'
+      : 'Iba Martin má Vue.js skills (level 2). Ak Martin odíde, máš nulové pokrytie. Zváž poslať Filipa alebo Adama na Vue intenzív.',
+    insight2Action: isEn ? 'Schedule training' : 'Naplánovať školenie',
+    insight3Headline: isEn ? 'Two strong AI-sourced candidates' : 'Dvaja silní AI-sourced kandidáti',
+    insight3Italic: isEn ? 'in pipeline' : 'v pipeline',
+    insight3Body: isEn
+      ? 'Patrik Sůra (92% match, Senior React) and Tomáš Fischer (89%, DevOps). Both likely getting offers from competitors. Move fast.'
+      : 'Patrik Sůra (92% match, Senior React) a Tomáš Fischer (89%, DevOps). Obaja pravdepodobne dostávajú ponuky od konkurencie. Konaj rýchlo.',
+    insight3Action: isEn ? 'View candidates' : 'Pozrieť kandidátov',
+  };
+  const funnelLabels: Record<string, string> = {
+    Applied: isEn ? 'Applied' : 'Aplikoval/a',
+    Screened: isEn ? 'Screening' : 'Po screeningu',
+    Interviewed: isEn ? 'Interviewed' : 'Po pohovore',
+    Offered: isEn ? 'Offered' : 'S ponukou',
+    Hired: isEn ? 'Hired' : 'Prijatý/á',
+  };
+  const funnelData = data.funnel.map((item) => ({ ...item, stageLabel: funnelLabels[item.stage] || item.stage }));
 
   const pendingRequests = requests.filter((r) => r.status === 'pending').length;
   const activeRecruits = candidates.filter((c) => !['hired', 'rejected'].includes(c.stage)).length;
@@ -86,7 +151,7 @@ export function AdminDashboardBrutalist() {
     : 0;
 
   const today = new Date();
-  const dateStr = today.toLocaleDateString('en-GB', {
+  const dateStr = today.toLocaleDateString(isEn ? 'en-GB' : 'sk-SK', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -100,8 +165,8 @@ export function AdminDashboardBrutalist() {
       <header className="br-fade-in mb-12" style={{ animationDelay: '0ms' }}>
         <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
           <div className="flex items-center gap-3">
-            <span className="br-tag" data-tone="accent">● LIVE</span>
-            <span className="br-eyebrow">TALENT REPORT</span>
+            <span className="br-tag" data-tone="accent">{copy.live}</span>
+            <span className="br-eyebrow">{copy.report}</span>
           </div>
           <span className="br-mono" style={{ color: 'var(--br-text-secondary)' }}>
             {dateStr} · Q2·26
@@ -109,7 +174,7 @@ export function AdminDashboardBrutalist() {
         </div>
 
         <h1 className="br-poster text-6xl md:text-8xl mb-6 max-w-5xl">
-          Good morning,<br />
+          {copy.hello}<br />
           <em className="br-italic">Janka.</em>
         </h1>
 
@@ -117,8 +182,8 @@ export function AdminDashboardBrutalist() {
           className="text-base md:text-lg leading-relaxed max-w-2xl mb-2"
           style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}
         >
-          <span style={{ color: 'var(--br-text)', fontWeight: 600 }}>Three metrics moved this {period}.</span>{' '}
-          One needs your attention. Recruiting funnel improved.
+          <span style={{ color: 'var(--br-text)', fontWeight: 600 }}>{copy.subtitleLead}</span>{' '}
+          {copy.subtitleTail}
         </p>
 
         <hr className="br-divider mt-8" />
@@ -131,7 +196,7 @@ export function AdminDashboardBrutalist() {
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-6">
             <span className="br-index-large">/ 01</span>
-            <span className="br-eyebrow">PERIOD</span>
+            <span className="br-eyebrow">{copy.period}</span>
             <div className="flex">
               {(['week', 'month', 'quarter'] as const).map((p, i) => (
                 <button
@@ -144,14 +209,14 @@ export function AdminDashboardBrutalist() {
                     borderLeft: i === 0 ? '1px solid var(--br-border)' : 'none',
                   }}
                 >
-                  {p === 'week' ? 'Week' : p === 'month' ? 'Month' : 'Quarter'}
+                  {p === 'week' ? copy.week : p === 'month' ? copy.month : copy.quarter}
                 </button>
               ))}
             </div>
           </div>
 
           <button className="br-btn">
-            Export <ArrowUpRight size={13} strokeWidth={2} />
+            {copy.export} <ArrowUpRight size={13} strokeWidth={2} />
           </button>
         </div>
       </section>
@@ -163,10 +228,10 @@ export function AdminDashboardBrutalist() {
         <div className="flex items-baseline justify-between mb-8">
           <div className="flex items-baseline gap-6">
             <span className="br-index-large">/ 02</span>
-            <span className="br-eyebrow">KEY METRICS</span>
+            <span className="br-eyebrow">{copy.keyMetrics}</span>
           </div>
           <span className="br-mono" style={{ color: 'var(--br-text-tertiary)' }}>
-            — {data.label}
+            — {copy.labelWindow}
           </span>
         </div>
 
@@ -174,10 +239,10 @@ export function AdminDashboardBrutalist() {
           className="grid grid-cols-2 md:grid-cols-4 gap-px"
           style={{ background: 'var(--br-border)', border: '1px solid var(--br-border)' }}
         >
-          <BrKpi index="01" num={15} label="Headcount" delta={`+${data.growthValue}`} deltaTone="positive" />
-          <BrKpi index="02" num={`+${enpsCurrent}`} label="Employee NPS" delta={`${enpsDelta >= 0 ? '+' : ''}${enpsDelta}`} deltaTone={enpsDelta >= 0 ? 'positive' : 'negative'} />
-          <BrKpi index="03" num={activeRecruits} label="Active pipeline" delta={`${conversion}% conv.`} deltaTone="neutral" />
-          <BrKpi index="04" num={pendingRequests} label="Pending requests" delta="Awaiting" deltaTone="warning" />
+          <BrKpi index="01" num={15} label={copy.headcount} delta={`+${data.growthValue}`} deltaTone="positive" />
+          <BrKpi index="02" num={`+${enpsCurrent}`} label={copy.employeeNps} delta={`${enpsDelta >= 0 ? '+' : ''}${enpsDelta}`} deltaTone={enpsDelta >= 0 ? 'positive' : 'negative'} />
+          <BrKpi index="03" num={activeRecruits} label={copy.activePipeline} delta={`${conversion}% ${copy.conv}`} deltaTone="neutral" />
+          <BrKpi index="04" num={pendingRequests} label={copy.pendingRequests} delta={copy.awaiting} deltaTone="warning" />
         </div>
       </section>
 
@@ -188,9 +253,9 @@ export function AdminDashboardBrutalist() {
         <div className="flex items-baseline justify-between mb-8 flex-wrap gap-3">
           <div className="flex items-baseline gap-6">
             <span className="br-index-large">/ 03</span>
-            <span className="br-eyebrow">HEADCOUNT</span>
+            <span className="br-eyebrow">{copy.headcountSection}</span>
           </div>
-          <span className="br-mono" style={{ color: 'var(--br-text-tertiary)' }}>— {data.label}</span>
+          <span className="br-mono" style={{ color: 'var(--br-text-tertiary)' }}>— {copy.labelWindow}</span>
         </div>
 
         <div className="grid md:grid-cols-5 gap-0">
@@ -201,20 +266,19 @@ export function AdminDashboardBrutalist() {
           >
             <div>
               <p className="br-eyebrow mb-4" style={{ color: 'rgba(244, 241, 236, 0.6)' }}>
-                01 / Growth
+                {copy.growthTag}
               </p>
               <h3 className="br-headline text-3xl md:text-4xl mb-4">
-                Steady. <em className="br-italic" style={{ color: '#ff6347' }}>Healthy.</em>
+                {copy.growthHeadline} <em className="br-italic" style={{ color: '#ff6347' }}>{copy.growthHeadlineEm}</em>
               </h3>
               <p className="text-sm leading-relaxed" style={{ color: 'rgba(244, 241, 236, 0.85)' }}>
-                Team grew from 11 to 15. No churn surprises.
-                No over-hiring. Within plan.
+                {copy.growthBody}
               </p>
             </div>
 
             <div className="pt-4" style={{ borderTop: '1px solid rgba(244, 241, 236, 0.2)' }}>
               <div className="flex items-baseline justify-between">
-                <span className="br-mono" style={{ color: 'rgba(244, 241, 236, 0.6)' }}>OVER {period.toUpperCase()}</span>
+                <span className="br-mono" style={{ color: 'rgba(244, 241, 236, 0.6)' }}>{copy.over} {(isEn ? period.toUpperCase() : (period === 'week' ? 'TÝŽDEŇ' : period === 'month' ? 'MESIAC' : 'KVARTÁL'))}</span>
                 <span className="br-number text-3xl" style={{ color: '#ff6347' }}>
                   +{Math.round((data.headcount[data.headcount.length - 1].count / data.headcount[0].count - 1) * 100)}%
                 </span>
@@ -281,7 +345,7 @@ export function AdminDashboardBrutalist() {
             <div className="flex items-baseline justify-between mb-6 flex-wrap gap-2">
               <div className="flex items-baseline gap-3">
                 <span className="br-index-large">/ 04</span>
-                <span className="br-eyebrow">EMPLOYEE NPS</span>
+                <span className="br-eyebrow">{copy.enpsSection}</span>
               </div>
               <span
                 className="br-mono flex items-center gap-1"
@@ -294,12 +358,12 @@ export function AdminDashboardBrutalist() {
 
             <div className="flex items-baseline gap-4 mb-6">
               <span className="br-number text-7xl md:text-8xl">+{enpsCurrent}</span>
-              <span className="br-eyebrow">SCORE</span>
+              <span className="br-eyebrow">{copy.score}</span>
             </div>
 
             <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--br-text-secondary)' }}>
-              Trending up since Q1. Tatra Bank deal energized the team.{' '}
-              <em className="br-italic">Watch engineering</em> mid-summer.
+              {copy.enpsBody}{' '}
+              <em className="br-italic">{copy.enpsBodyEm}</em> {copy.enpsBodyTail}
             </p>
 
             <div className="br-chart">
@@ -334,16 +398,16 @@ export function AdminDashboardBrutalist() {
             <div className="flex items-baseline justify-between mb-6 flex-wrap gap-2">
               <div className="flex items-baseline gap-3">
                 <span className="br-index-large">/ 05</span>
-                <span className="br-eyebrow">RECRUITING FUNNEL</span>
+                <span className="br-eyebrow">{copy.funnelSection}</span>
               </div>
               <span className="br-mono" style={{ color: 'var(--br-text-tertiary)' }}>
-                {conversion}% CONV.
+                {conversion}% {copy.conv}
               </span>
             </div>
 
             <div className="space-y-4">
-              {data.funnel.map((s, i) => {
-                const max = data.funnel[0].count;
+              {funnelData.map((s, i) => {
+                const max = funnelData[0].count;
                 const pct = max > 0 ? (s.count / max) * 100 : 0;
                 return (
                   <div key={s.stage}>
@@ -352,7 +416,7 @@ export function AdminDashboardBrutalist() {
                         <span className="br-mono" style={{ color: 'var(--br-text-tertiary)' }}>
                           {String(i + 1).padStart(2, '0')}
                         </span>
-                        <span className="text-sm" style={{ color: 'var(--br-text)' }}>{s.stage}</span>
+                        <span className="text-sm" style={{ color: 'var(--br-text)' }}>{s.stageLabel}</span>
                       </div>
                       <span className="br-mono">{s.count}</span>
                     </div>
@@ -369,7 +433,7 @@ export function AdminDashboardBrutalist() {
                         transition={{ duration: 0.5, delay: 0.15 + i * 0.06, ease: 'easeOut' }}
                         style={{
                           height: '100%',
-                          background: i === data.funnel.length - 1 ? 'var(--br-accent)' : 'var(--br-text)',
+                          background: i === funnelData.length - 1 ? 'var(--br-accent)' : 'var(--br-text)',
                         }}
                       />
                     </div>
@@ -388,35 +452,35 @@ export function AdminDashboardBrutalist() {
         <div className="flex items-baseline justify-between mb-8 flex-wrap gap-3">
           <div className="flex items-baseline gap-6">
             <span className="br-index-large">/ 06</span>
-            <span className="br-eyebrow">NEEDS YOUR ATTENTION</span>
+            <span className="br-eyebrow">{copy.attention}</span>
           </div>
-          <span className="br-tag" data-tone="outline">03 ITEMS</span>
+          <span className="br-tag" data-tone="outline">{copy.items}</span>
         </div>
 
         <div className="space-y-0" style={{ border: '1px solid var(--br-border)' }}>
           <BrInsight
             num="01"
             severity="warn"
-            headline="Engineering vacation cluster"
-            italic="mid-July"
-            body="Filip and Tomáš both submitted vacation for July 14–25. Combined with Adam's prior leave, the eng team drops to 3 people for two weeks."
-            action="Open Time-off"
+            headline={copy.insight1Headline}
+            italic={copy.insight1Italic}
+            body={copy.insight1Body}
+            action={copy.insight1Action}
           />
           <BrInsight
             num="02"
             severity="info"
-            headline="Vue.js coverage is"
-            italic="one deep"
-            body="Only Martin holds Vue.js (level 2). If Martin leaves, you have zero coverage. Consider sending Filip or Adam to a Vue intensive."
-            action="Schedule training"
+            headline={copy.insight2Headline}
+            italic={copy.insight2Italic}
+            body={copy.insight2Body}
+            action={copy.insight2Action}
           />
           <BrInsight
             num="03"
             severity="positive"
-            headline="Two strong AI-sourced candidates"
-            italic="in pipeline"
-            body="Patrik Sůra (92% match, Senior React) and Tomáš Fischer (89%, DevOps). Both likely getting offers from competitors. Move fast."
-            action="View candidates"
+            headline={copy.insight3Headline}
+            italic={copy.insight3Italic}
+            body={copy.insight3Body}
+            action={copy.insight3Action}
             isLast
           />
         </div>
@@ -426,9 +490,9 @@ export function AdminDashboardBrutalist() {
       <footer className="br-fade-in pt-8 pb-4" style={{ animationDelay: '240ms' }}>
         <hr className="br-divider mb-4" />
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <span className="br-eyebrow">DIGITAL EVOLUTION · HR PLATFORM</span>
+          <span className="br-eyebrow">{copy.footer}</span>
           <span className="br-mono" style={{ color: 'var(--br-text-tertiary)' }}>
-            UPDATED {today.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+            {copy.updated} {today.toLocaleTimeString(isEn ? 'en-GB' : 'sk-SK', { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
       </footer>

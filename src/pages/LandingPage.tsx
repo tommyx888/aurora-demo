@@ -16,16 +16,16 @@ interface LandingPageProps {
 }
 
 const features = [
-  { icon: Sparkles, label: 'AI Onboarding', color: '#8b5cf6' },
-  { icon: Brain, label: 'Skill Heatmap', color: '#ec4899' },
-  { icon: BarChart3, label: 'Live Dashboard', color: '#3b82f6' },
-  { icon: BriefcaseBusiness, label: 'Recruiting', color: '#10b981' },
-  { icon: FileText, label: 'Requests', color: '#f59e0b' },
-  { icon: GitBranch, label: 'Org Chart', color: '#06b6d4' },
-  { icon: MessageSquare, label: 'Pulse Surveys', color: '#f97316' },
-  { icon: Newspaper, label: 'Newsletter', color: '#8b5cf6' },
-  { icon: Calendar, label: 'Events', color: '#ef4444' },
-  { icon: Bot, label: 'AI Chatbot', color: '#10b981' },
+  { icon: Sparkles, labelKey: 'nav.onboarding', color: '#8b5cf6' },
+  { icon: Brain, labelKey: 'nav.skillMatrix', color: '#ec4899' },
+  { icon: BarChart3, labelKey: 'nav.adminDashboard', color: '#3b82f6' },
+  { icon: BriefcaseBusiness, labelKey: 'nav.recruiting', color: '#10b981' },
+  { icon: FileText, labelKey: 'nav.requests', color: '#f59e0b' },
+  { icon: GitBranch, labelKey: 'nav.orgChart', color: '#06b6d4' },
+  { icon: MessageSquare, labelKey: 'nav.surveys', color: '#f97316' },
+  { icon: Newspaper, labelKey: 'nav.news', color: '#8b5cf6' },
+  { icon: Calendar, labelKey: 'nav.events', color: '#ef4444' },
+  { icon: Bot, labelKey: 'chatbot.title', color: '#10b981' },
 ];
 
 export function LandingPage(props: LandingPageProps) {
@@ -161,7 +161,7 @@ function LandingPageClassic({ onStart, onOpenBranding, onOpenDemoInfo }: Landing
             const Icon = f.icon;
             return (
               <motion.div
-                key={f.label}
+                key={f.labelKey}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 + i * 0.05 }}
@@ -174,7 +174,7 @@ function LandingPageClassic({ onStart, onOpenBranding, onOpenDemoInfo }: Landing
                 >
                   <Icon size={18} />
                 </div>
-                <p className="text-xs font-medium text-secondary">{f.label}</p>
+                <p className="text-xs font-medium text-secondary">{t(f.labelKey)}</p>
               </motion.div>
             );
           })}
@@ -340,9 +340,9 @@ function LandingPageEditorial({ onStart, onOpenBranding, onOpenDemoInfo }: Landi
         {/* Feature inventory */}
         <section className="mb-24">
           <div className="flex items-baseline justify-between mb-8 flex-wrap gap-2">
-            <h2 className="ed-eyebrow">01 — Modules</h2>
+            <h2 className="ed-eyebrow">{t('landingDesign.modulesSection')}</h2>
             <span className="ed-mono" style={{ color: 'var(--ed-text-tertiary)' }}>
-              {features.length} included
+              {t('landingDesign.includedCount', { count: features.length })}
             </span>
           </div>
 
@@ -351,7 +351,7 @@ function LandingPageEditorial({ onStart, onOpenBranding, onOpenDemoInfo }: Landi
               const Icon = f.icon;
               return (
                 <motion.div
-                  key={f.label}
+                  key={f.labelKey}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.05 + i * 0.03 }}
@@ -370,7 +370,7 @@ function LandingPageEditorial({ onStart, onOpenBranding, onOpenDemoInfo }: Landi
                     className="text-xs font-medium"
                     style={{ color: 'var(--ed-text)', letterSpacing: '-0.01em' }}
                   >
-                    {f.label}
+                    {t(f.labelKey)}
                   </p>
                 </motion.div>
               );
@@ -382,7 +382,7 @@ function LandingPageEditorial({ onStart, onOpenBranding, onOpenDemoInfo }: Landi
 
         {/* Why it's different */}
         <section className="mb-24">
-          <h2 className="ed-eyebrow mb-10">02 — Why it works</h2>
+          <h2 className="ed-eyebrow mb-10">{t('landingDesign.whySection')}</h2>
 
           <div className="grid md:grid-cols-3 gap-x-10 gap-y-12">
             <article>
@@ -397,7 +397,7 @@ function LandingPageEditorial({ onStart, onOpenBranding, onOpenDemoInfo }: Landi
             <article>
               <span className="ed-section-num mb-4 block">02</span>
               <h3 className="ed-headline text-2xl mb-3">
-                <em className="ed-italic-flourish">AI</em> from day one
+                <em className="ed-italic-flourish">AI</em> {t('landingDesign.aiFromDayOne').replace(/^AI\s+/i, '')}
               </h3>
               <p className="text-sm leading-relaxed" style={{ color: 'var(--ed-text-secondary)' }}>
                 {t('landing.why2Body')}
@@ -487,7 +487,7 @@ function LandingPageBrutalist({ onStart, onOpenBranding, onOpenDemoInfo }: Landi
             transition={{ delay: 0.1 }}
           >
             <div className="flex items-center gap-3 mb-8 flex-wrap">
-              <span className="br-tag" data-tone="accent">● LIVE</span>
+              <span className="br-tag" data-tone="accent">{t('landingDesign.liveDot')}</span>
               <span className="br-eyebrow">{t('landing.badge')}</span>
             </div>
 
@@ -540,10 +540,10 @@ function LandingPageBrutalist({ onStart, onOpenBranding, onOpenDemoInfo }: Landi
           <div className="flex items-baseline justify-between mb-8 flex-wrap gap-2">
             <div className="flex items-baseline gap-6">
               <span className="br-index-large">/ 01</span>
-              <span className="br-eyebrow">MODULES</span>
+              <span className="br-eyebrow">{t('landingDesign.modulesUpper')}</span>
             </div>
             <span className="br-mono" style={{ color: 'var(--br-text-tertiary)' }}>
-              {String(features.length).padStart(2, '0')} INCLUDED
+              {t('landingDesign.includedUpper', { count: String(features.length).padStart(2, '0') })}
             </span>
           </div>
 
@@ -555,7 +555,7 @@ function LandingPageBrutalist({ onStart, onOpenBranding, onOpenDemoInfo }: Landi
               const Icon = f.icon;
               return (
                 <motion.div
-                  key={f.label}
+                  key={f.labelKey}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.05 + i * 0.03 }}
@@ -576,7 +576,7 @@ function LandingPageBrutalist({ onStart, onOpenBranding, onOpenDemoInfo }: Landi
                     className="text-sm"
                     style={{ color: 'var(--br-text)', fontWeight: 600, letterSpacing: '-0.01em' }}
                   >
-                    {f.label}
+                    {t(f.labelKey)}
                   </p>
                 </motion.div>
               );
@@ -590,7 +590,7 @@ function LandingPageBrutalist({ onStart, onOpenBranding, onOpenDemoInfo }: Landi
         <section className="mb-24">
           <div className="flex items-baseline gap-6 mb-12">
             <span className="br-index-large">/ 02</span>
-            <span className="br-eyebrow">WHY IT WORKS</span>
+            <span className="br-eyebrow">{t('landingDesign.whyUpper')}</span>
           </div>
 
           <div className="grid md:grid-cols-3 gap-0" style={{ border: '1px solid var(--br-border)' }}>
@@ -612,7 +612,7 @@ function LandingPageBrutalist({ onStart, onOpenBranding, onOpenDemoInfo }: Landi
             >
               <span className="br-index-large mb-6 block">02</span>
               <h3 className="br-headline text-3xl mb-4">
-                <em className="br-italic">AI</em> from day one
+                <em className="br-italic">AI</em> {t('landingDesign.aiFromDayOne').replace(/^AI\s+/i, '')}
               </h3>
               <p className="text-sm leading-relaxed" style={{ color: 'var(--br-text-secondary)' }}>
                 {t('landing.why2Body')}

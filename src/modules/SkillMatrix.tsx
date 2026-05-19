@@ -37,7 +37,7 @@ const heatColor = (level: number) => {
 // MAIN COMPONENT
 // ============================================
 export function SkillMatrix() {
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const { mode } = useDesignMode();
   const isEn = lang === 'en';
   const isEditorial = mode === 'editorial';
@@ -182,15 +182,15 @@ export function SkillMatrix() {
         <div className="br-fade-in mb-2">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
             <span className="br-tag" data-tone="accent">● SKILLS</span>
-            <span className="br-eyebrow">ADMIN · TALENT · HEATMAP</span>
+            <span className="br-eyebrow">{t('skillMatrix.eyebrowBrutalist').toUpperCase()}</span>
           </div>
           <h1 className="br-poster text-5xl md:text-7xl mb-4" style={{ lineHeight: 0.9 }}>
-            Who knows <em className="br-italic">what.</em>
+            {t('skillMatrix.headlineBrutalist')} <em className="br-italic">{t('skillMatrix.headlineEmBrutalist')}</em>
           </h1>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}>
-            <span style={{ color: 'var(--br-text)', fontWeight: 600 }}>{employees.length} {isEn ? 'people' : 'ľudí'}</span>{' · '}
-            <span style={{ color: 'var(--br-text)', fontWeight: 600 }}>{allSkills.length} skills</span>{' mapped. '}
-            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{isEn ? 'Click a cell to edit.' : 'Klik na bunku pre úpravu.'}</span>
+            <span style={{ color: 'var(--br-text)', fontWeight: 600 }}>{employees.length} {t('skillMatrix.people')}</span>{' · '}
+            <span style={{ color: 'var(--br-text)', fontWeight: 600 }}>{allSkills.length} {t('skillMatrix.skillsMapped')}</span>.{' '}
+            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{t('skillMatrix.clickCell')}.</span>
           </p>
           <hr className="br-divider mt-6" />
           <div className="flex items-center gap-2 flex-wrap mt-4">
@@ -210,16 +210,16 @@ export function SkillMatrix() {
                     textTransform: 'uppercase',
                   }}
                 >
-                  {dept === 'all' ? (isEn ? 'ALL' : 'VŠETKY') : dept.toUpperCase()}
+                  {dept === 'all' ? t('common.all').toUpperCase() : dept.toUpperCase()}
                 </button>
               ))}
             </div>
             <button onClick={() => setTrainingModal({ open: true })} className="br-btn br-btn-accent">
               <GraduationCap size={13} strokeWidth={2} />
-              {(isEn ? 'Plan training' : 'Naplánovať školenie').toUpperCase()}
+              {t('skillMatrix.planTraining').toUpperCase()}
             </button>
             {hasEdits && (
-              <button onClick={resetAllChanges} className="br-btn" title="Reset">
+              <button onClick={resetAllChanges} className="br-btn" title={t('common.reset')}>
                 <RotateCcw size={13} strokeWidth={2} />
               </button>
             )}
@@ -228,19 +228,17 @@ export function SkillMatrix() {
       ) : isEditorial ? (
         <div className="ed-fade-in mb-2">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <span className="ed-eyebrow">Admin · Talent</span>
+            <span className="ed-eyebrow">{t('skillMatrix.eyebrowEditorial')}</span>
             <span className="ed-tag" data-status="live">
               <span className="ed-pulse-dot"></span>
-              {employees.length} {isEn ? 'people' : 'ľudí'}
+              {employees.length} {t('skillMatrix.people')}
             </span>
           </div>
           <h1 className="ed-display text-5xl md:text-6xl mb-3" style={{ lineHeight: 0.95 }}>
-            Skill <em className="ed-italic-flourish">heatmap</em>.
+            {t('skillMatrix.headlineEditorial')} <em className="ed-italic-flourish">{t('skillMatrix.headlineEmEditorial')}</em>.
           </h1>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--ed-text-secondary)' }}>
-            {isEn
-              ? `${allSkills.length} skills mapped across the team — click any cell to edit.`
-              : `${allSkills.length} skillov namačovaných na tíme — klik na ktorúkoľvek bunku pre úpravu.`}
+            {allSkills.length} {t('skillMatrix.skillsMapped')} — {t('skillMatrix.clickCell')}.
           </p>
           <hr className="ed-divider mt-6" />
           <div className="flex items-center gap-2 flex-wrap mt-4">
@@ -255,16 +253,16 @@ export function SkillMatrix() {
                     filterDept === dept ? 'bg-secondary shadow-sm-themed text-primary' : 'text-secondary hover:text-primary'
                   )}
                 >
-                  {dept === 'all' ? (isEn ? 'All' : 'Všetky') : dept}
+                  {dept === 'all' ? t('common.all') : dept}
                 </button>
               ))}
             </div>
             <button onClick={() => setTrainingModal({ open: true })} className="ed-btn ed-btn-primary">
               <GraduationCap size={13} strokeWidth={1.5} />
-              {isEn ? 'Plan training' : 'Naplánovať školenie'}
+              {t('skillMatrix.planTraining')}
             </button>
             {hasEdits && (
-              <button onClick={resetAllChanges} className="ed-btn" title="Reset">
+              <button onClick={resetAllChanges} className="ed-btn" title={t('common.reset')}>
                 <RotateCcw size={13} strokeWidth={1.5} />
               </button>
             )}
@@ -273,13 +271,11 @@ export function SkillMatrix() {
       ) : (
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-sm text-tertiary uppercase tracking-wider mb-1">Admin · Talent</p>
-          <h1 className="font-display text-3xl">Skill Heatmap</h1>
+          <p className="text-sm text-tertiary uppercase tracking-wider mb-1">{t('skillMatrix.eyebrowEditorial')}</p>
+          <h1 className="font-display text-3xl">{t('skillMatrix.headlineClassic')}</h1>
           <p className="text-secondary text-sm mt-1">
-            {isEn
-              ? `Team competency visualization · ${employees.length} employees · ${allSkills.length} skills · `
-              : `Vizualizácia kompetencií tímu · ${employees.length} zamestnancov · ${allSkills.length} skillov · `}
-            <strong className="accent-text">{isEn ? 'Click a cell to edit' : 'Klik na bunku pre úpravu'}</strong>
+            {employees.length} {t('skillMatrix.people')} · {allSkills.length} {t('skillMatrix.skillsMapped')} ·{' '}
+            <strong className="accent-text">{t('skillMatrix.clickCell')}</strong>
           </p>
         </div>
 
@@ -295,7 +291,7 @@ export function SkillMatrix() {
                   filterDept === dept ? 'bg-secondary shadow-sm-themed text-primary' : 'text-secondary hover:text-primary'
                 )}
               >
-                {dept === 'all' ? (isEn ? 'All' : 'Všetky') : dept}
+                {dept === 'all' ? t('common.all') : dept}
               </button>
             ))}
           </div>
@@ -304,10 +300,10 @@ export function SkillMatrix() {
             className="btn-primary text-sm flex-1 sm:flex-none"
           >
             <GraduationCap size={14} />
-            {isEn ? 'Plan training' : 'Naplánovať školenie'}
+            {t('skillMatrix.planTraining')}
           </button>
           {hasEdits && (
-            <button onClick={resetAllChanges} className="btn-secondary text-sm" title="Reset">
+            <button onClick={resetAllChanges} className="btn-secondary text-sm" title={t('common.reset')}>
               <RotateCcw size={14} />
             </button>
           )}

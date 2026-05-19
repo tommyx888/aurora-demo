@@ -13,6 +13,7 @@ import { candidates, openPositions } from '../data/candidates';
 import { requests } from '../data/content';
 import { cn } from '../lib/utils';
 import { useDesignMode } from '../hooks/useDesignMode';
+import { useLanguage } from '../hooks/useLanguage';
 import { AdminDashboardEditorial } from './AdminDashboardEditorial';
 import { AdminDashboardBrutalist } from './AdminDashboardBrutalist';
 
@@ -99,8 +100,56 @@ export function AdminDashboard() {
 }
 
 function AdminDashboardClassic() {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const [period, setPeriod] = useState<Period>('month');
   const data = CHART_DATA[period];
+  const copy = {
+    title: isEn ? 'HR Dashboard' : 'HR Dashboard',
+    hello: isEn ? 'Good day, Janka 👋' : 'Dobrý deň, Janka 👋',
+    overview: isEn ? 'Here is your company overview' : 'Tu je tvoj prehľad firmy',
+    week: isEn ? 'Week' : 'Týždeň',
+    month: isEn ? 'Month' : 'Mesiac',
+    quarter: isEn ? 'Quarter' : 'Kvartál',
+    employees: isEn ? 'Employees' : 'Zamestnanci',
+    activeCandidates: isEn ? 'Active candidates' : 'Aktívni kandidáti',
+    pendingRequests: isEn ? 'Pending requests' : 'Žiadanky',
+    waitingApproval: isEn ? 'Awaiting approval' : 'Čakajú na schválenie',
+    conversion: isEn ? 'conversion' : 'konverzia',
+    headcountGrowth: isEn ? 'Headcount Growth' : 'Rast počtu ľudí',
+    growth: isEn ? 'growth' : 'rast',
+    enpsScore: isEn ? 'eNPS Score' : 'eNPS skóre',
+    workerSatisfaction: isEn ? 'Employee satisfaction' : 'Spokojnosť zamestnancov',
+    recruitingFunnel: isEn ? 'Recruiting Funnel' : 'Náborový funnel',
+    turnoverByDept: isEn ? 'Turnover by Department' : 'Fluktuácia podľa oddelenia',
+    last12Months: isEn ? 'Last 12 months' : 'Posledných 12 mesiacov',
+    voluntary: isEn ? 'Voluntary' : 'Dobrovoľný',
+    involuntary: isEn ? 'Involuntary' : 'Nedobrovoľný',
+    aiInsightTitle: isEn ? '⚠️ AI Insight: vacation cluster in July' : '⚠️ AI Insight: vacation cluster v júli',
+    aiInsightBody: isEn
+      ? 'Filip and Tomáš requested vacation for July 14-25. Together with Adam\'s approved leave, the IT team drops to 3 people for 2 weeks. Consider discussing with Peter (Head of Engineering).'
+      : 'Filip a Tomáš požiadali o dovolenku 14.-25. júla. Spolu s Adamovou už schválenou dovolenkou klesne IT tím na 3 ľudí počas 2 týždňov. Zvážte vyriešiť s Petrom (Head of Engineering).',
+    openTimeOff: isEn ? '📅 Open Time-off' : '📅 Otvoriť Time-off',
+    skip: isEn ? 'Skip' : 'Preskočiť',
+  };
+  const funnelLabels: Record<string, string> = {
+    Applied: isEn ? 'Applied' : 'Aplikoval/a',
+    Screened: isEn ? 'Screening' : 'Po screeningu',
+    Interviewed: isEn ? 'Interviewed' : 'Po pohovore',
+    Offered: isEn ? 'Offered' : 'S ponukou',
+    Hired: isEn ? 'Hired' : 'Prijatý/á',
+  };
+  const growthLabel = period === 'week'
+    ? (isEn ? '+0 weekly' : '+0 týždenne')
+    : period === 'month'
+      ? (isEn ? '+4 new hires' : '+4 novenástupy')
+      : (isEn ? '+7 quarterly' : '+7 kvartálne');
+  const periodLabel = period === 'week'
+    ? (isEn ? 'This week' : 'Tento týždeň')
+    : period === 'month'
+      ? (isEn ? 'Last 6 months' : 'Posledných 6 mesiacov')
+      : (isEn ? 'Last 6 quarters' : 'Posledných 6 kvartálov');
+  const funnelData = data.funnel.map((item) => ({ ...item, stageLabel: funnelLabels[item.stage] || item.stage }));
 
   const pendingRequests = requests.filter((r) => r.status === 'pending').length;
   const activeRecruits = candidates.filter((c) => !['hired', 'rejected'].includes(c.stage)).length;
@@ -117,18 +166,18 @@ function AdminDashboardClassic() {
     <div className="page-enter space-y-6">
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-sm text-tertiary uppercase tracking-wider mb-1">HR Dashboard</p>
-          <h1 className="font-display text-3xl">Dobrý deň, Janka 👋</h1>
+          <p className="text-sm text-tertiary uppercase tracking-wider mb-1">{copy.title}</p>
+          <h1 className="font-display text-3xl">{copy.hello}</h1>
           <p className="text-secondary text-sm mt-1">
-            Tu je tvoj prehľad firmy · {new Date().toLocaleDateString('sk-SK', { weekday: 'long', day: 'numeric', month: 'long' })}
+            {copy.overview} · {new Date().toLocaleDateString(isEn ? 'en-US' : 'sk-SK', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
         </div>
 
         <div className="flex items-center gap-1 p-1 bg-tertiary rounded-lg">
           {([
-            { id: 'week' as const, label: 'Týždeň' },
-            { id: 'month' as const, label: 'Mesiac' },
-            { id: 'quarter' as const, label: 'Kvartál' },
+            { id: 'week' as const, label: copy.week },
+            { id: 'month' as const, label: copy.month },
+            { id: 'quarter' as const, label: copy.quarter },
           ]).map((p) => (
             <button
               key={p.id}
@@ -150,9 +199,9 @@ function AdminDashboardClassic() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KpiCard
           icon={Users}
-          label="Zamestnanci"
+          label={copy.employees}
           value={employees.length}
-          change="+1 tento mesiac"
+          change={isEn ? '+1 this month' : '+1 tento mesiac'}
           trend="up"
           color="#3b82f6"
         />
@@ -166,17 +215,17 @@ function AdminDashboardClassic() {
         />
         <KpiCard
           icon={UserPlus}
-          label="Aktívni kandidáti"
+          label={copy.activeCandidates}
           value={activeRecruits}
-          change={`${conversion}% conversion`}
+          change={`${conversion}% ${copy.conversion}`}
           trend="up"
           color="#10b981"
         />
         <KpiCard
           icon={AlertCircle}
-          label="Žiadanky"
+          label={copy.pendingRequests}
           value={pendingRequests}
-          change="Čakajú na schválenie"
+          change={copy.waitingApproval}
           trend="neutral"
           color="#f59e0b"
         />
@@ -188,12 +237,12 @@ function AdminDashboardClassic() {
         <div className="card lg:col-span-2">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h2 className="font-medium">Headcount Growth</h2>
-              <p className="text-xs text-tertiary mt-0.5">{data.label} · +36% rast</p>
+              <h2 className="font-medium">{copy.headcountGrowth}</h2>
+              <p className="text-xs text-tertiary mt-0.5">{periodLabel} · +36% {copy.growth}</p>
             </div>
             <span className="badge badge-success">
               <TrendingUp size={12} />
-              {data.growthLabel}
+              {growthLabel}
             </span>
           </div>
           <ResponsiveContainer width="100%" height={240}>
@@ -216,8 +265,8 @@ function AdminDashboardClassic() {
         {/* eNPS */}
         <div className="card">
           <div className="mb-4">
-            <h2 className="font-medium">eNPS Score</h2>
-            <p className="text-xs text-tertiary mt-0.5">Worker satisfaction</p>
+            <h2 className="font-medium">{copy.enpsScore}</h2>
+            <p className="text-xs text-tertiary mt-0.5">{copy.workerSatisfaction}</p>
           </div>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={data.enps}>
@@ -234,15 +283,15 @@ function AdminDashboardClassic() {
         <div className="card">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h2 className="font-medium">Recruiting Funnel</h2>
-              <p className="text-xs text-tertiary mt-0.5">{data.label} · {conversion}% conversion</p>
+              <h2 className="font-medium">{copy.recruitingFunnel}</h2>
+              <p className="text-xs text-tertiary mt-0.5">{periodLabel} · {conversion}% {copy.conversion}</p>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={data.funnel} layout="vertical">
+            <BarChart data={funnelData} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
               <XAxis type="number" stroke="var(--text-tertiary)" style={{ fontSize: 10 }} />
-              <YAxis dataKey="stage" type="category" stroke="var(--text-tertiary)" style={{ fontSize: 10 }} width={70} />
+              <YAxis dataKey="stageLabel" type="category" stroke="var(--text-tertiary)" style={{ fontSize: 10 }} width={90} />
               <Tooltip contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', borderRadius: 8 }} />
               <Bar dataKey="count" fill="var(--accent-primary)" radius={[0, 4, 4, 0]} />
             </BarChart>
@@ -252,8 +301,8 @@ function AdminDashboardClassic() {
         {/* Turnover by department */}
         <div className="card lg:col-span-2">
           <div className="mb-4">
-            <h2 className="font-medium">Turnover by Department</h2>
-            <p className="text-xs text-tertiary mt-0.5">Posledných 12 mesiacov</p>
+            <h2 className="font-medium">{copy.turnoverByDept}</h2>
+            <p className="text-xs text-tertiary mt-0.5">{copy.last12Months}</p>
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={turnoverByDept}>
@@ -261,8 +310,8 @@ function AdminDashboardClassic() {
               <XAxis dataKey="dept" stroke="var(--text-tertiary)" style={{ fontSize: 11 }} />
               <YAxis stroke="var(--text-tertiary)" style={{ fontSize: 11 }} />
               <Tooltip contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', borderRadius: 8 }} />
-              <Bar dataKey="voluntary" fill="#10b981" name="Dobrovoľný" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="involuntary" fill="#ef4444" name="Nedobrovoľný" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="voluntary" fill="#10b981" name={copy.voluntary} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="involuntary" fill="#ef4444" name={copy.involuntary} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -275,14 +324,13 @@ function AdminDashboardClassic() {
             <Zap size={16} className="accent-text" />
           </div>
           <div className="flex-1">
-            <p className="font-medium text-sm mb-2">⚠️ AI Insight: vacation cluster v júli</p>
+            <p className="font-medium text-sm mb-2">{copy.aiInsightTitle}</p>
             <p className="text-sm text-secondary leading-relaxed">
-              Filip a Tomáš požiadali o dovolenku 14.-25. júla. Spolu s Adamovou už schválenou dovolenkou klesne IT tím na 3 ľudí počas 2 týždňov.
-              Zvážte vyriešiť s Petrom (Head of Engineering).
+              {copy.aiInsightBody}
             </p>
             <div className="flex gap-2 mt-3 flex-wrap">
-              <button className="badge badge-accent hover:opacity-80">📅 Otvoriť Time-off</button>
-              <button className="badge hover:opacity-80">Skip</button>
+              <button className="badge badge-accent hover:opacity-80">{copy.openTimeOff}</button>
+              <button className="badge hover:opacity-80">{copy.skip}</button>
             </div>
           </div>
         </div>

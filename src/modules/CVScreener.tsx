@@ -8,6 +8,7 @@ import {
 import { analyzeCv, isAILive } from '../lib/aiHelpers';
 import { sampleCVs } from '../data/hrData';
 import { LeadCTA } from './Requests';
+import { useLanguage } from '../hooks/useLanguage';
 import { useDesignMode } from '../hooks/useDesignMode';
 import { cn } from '../lib/utils';
 import type { CVAnalysis } from '../types';
@@ -34,6 +35,8 @@ const recommendationConfig = {
 };
 
 export function CVScreener({ onLeadCapture }: CVScreenerProps) {
+  const { lang, t } = useLanguage();
+  const isEn = lang === 'en';
   const { mode } = useDesignMode();
   const isEditorial = mode === 'editorial';
   const isBrutalist = mode === 'brutalist';
@@ -108,40 +111,40 @@ export function CVScreener({ onLeadCapture }: CVScreenerProps) {
         <div className="br-fade-in">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
             <span className="br-tag" data-tone="accent">● CV SCREENER</span>
-            <span className="br-eyebrow">AI RECRUITER · {isAILive ? 'LIVE' : 'DEMO MODE'}</span>
+            <span className="br-eyebrow">{t('cvScreener.eyebrowBrutalist').toUpperCase()} · {isAILive ? 'LIVE' : 'DEMO MODE'}</span>
           </div>
           <h1 className="br-poster text-5xl md:text-7xl mb-4" style={{ lineHeight: 0.9 }}>
-            CV in. <em className="br-italic">Verdict out.</em>
+            {t('cvScreener.headlineBrutalist')} <em className="br-italic">{t('cvScreener.headlineEmBrutalist')}</em>
           </h1>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}>
-            Drop a CV (or paste text), AI analyzes in seconds.{' '}
-            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>Match score, strengths, red flags.</span>
+            {t('cvScreener.bodyBrutalist')}{' '}
+            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{t('cvScreener.bodyBrutalistAccent')}</span>
           </p>
           <hr className="br-divider mt-6" />
         </div>
       ) : isEditorial ? (
         <div className="ed-fade-in">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <span className="ed-eyebrow">AI Recruiter</span>
+            <span className="ed-eyebrow">{t('cvScreener.eyebrowEditorial')}</span>
             <span className="ed-tag" data-status="live">
               <span className="ed-pulse-dot"></span>
               {isAILive ? 'Live' : 'Demo mode'}
             </span>
           </div>
           <h1 className="ed-display text-5xl md:text-6xl mb-3" style={{ lineHeight: 0.95 }}>
-            CV <em className="ed-italic-flourish">screener</em>.
+            {t('cvScreener.headlineEditorial')} <em className="ed-italic-flourish">{t('cvScreener.headlineEmEditorial')}</em>.
           </h1>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--ed-text-secondary)' }}>
-            Drop a CV or paste text — AI delivers a match score, strengths and risks within seconds.
+            {t('cvScreener.bodyEditorial')}
           </p>
           <hr className="ed-divider mt-6" />
         </div>
       ) : (
       <div>
-        <p className="text-sm text-tertiary uppercase tracking-wider mb-1">AI Recruiter</p>
-        <h1 className="font-display text-3xl">CV Screener</h1>
+        <p className="text-sm text-tertiary uppercase tracking-wider mb-1">{t('cvScreener.eyebrowEditorial')}</p>
+        <h1 className="font-display text-3xl">{t('cvScreener.headlineClassic')}</h1>
         <p className="text-secondary text-sm mt-1">
-          Pretiahni CV (alebo skopiruj text), AI ho analyzuje za sekundu · {isAILive ? 'Live AI mode 🔥' : 'Demo mode'}
+          {t('cvScreener.bodyClassic')} · {isAILive ? (isEn ? 'Live AI mode 🔥' : 'Live AI mode 🔥') : (isEn ? 'Demo mode' : 'Demo mode')}
         </p>
       </div>
       )}

@@ -34,7 +34,7 @@ function isDateInRange(date: Date, start: string, end: string): boolean {
 }
 
 export function TimeOff({ onLeadCapture }: TimeOffProps) {
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const { mode } = useDesignMode();
   const isEn = lang === 'en';
   const isEditorial = mode === 'editorial';
@@ -125,45 +125,41 @@ export function TimeOff({ onLeadCapture }: TimeOffProps) {
         <div className="br-fade-in">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
             <span className="br-tag" data-tone="accent">● TIME OFF</span>
-            <span className="br-eyebrow">PEOPLE OPS · CAPACITY MAP</span>
+            <span className="br-eyebrow">{t('timeOff.eyebrowBrutalist').toUpperCase()}</span>
           </div>
           <h1 className="br-poster text-5xl md:text-7xl mb-4" style={{ lineHeight: 0.9 }}>
-            Who's <em className="br-italic">out.</em>
+            {t('timeOff.headlineBrutalist')} <em className="br-italic">{t('timeOff.headlineEmBrutalist')}</em>
           </h1>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}>
-            {isEn ? 'Planning tool for HR.' : 'Plánovací nástroj pre HR.'}{' '}
-            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{isEn ? 'See where coverage breaks.' : 'Vidíš kde sa lámá vykrytie.'}</span>
+            {t('timeOff.bodyBrutalist')}{' '}
+            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{t('timeOff.bodyBrutalistAccent')}</span>
           </p>
           <hr className="br-divider mt-6" />
         </div>
       ) : isEditorial ? (
         <div className="ed-fade-in">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <span className="ed-eyebrow">People Operations</span>
+            <span className="ed-eyebrow">{t('timeOff.eyebrowEditorial')}</span>
             <span className="ed-tag" data-status="live">
               <span className="ed-pulse-dot"></span>
-              Capacity map
+              {t('timeOff.capacityMap')}
             </span>
           </div>
           <h1 className="ed-display text-5xl md:text-6xl mb-3" style={{ lineHeight: 0.95 }}>
-            Time off &amp; team <em className="ed-italic-flourish">capacity</em>.
+            {t('timeOff.headlineEditorial')} <em className="ed-italic-flourish">{t('timeOff.headlineEmEditorial')}</em>.
           </h1>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--ed-text-secondary)' }}>
-            {isEn
-              ? 'Planning tool for HR — see who is away and where coverage is critical.'
-              : 'Plánovací nástroj pre HR — vidíš kto je preč a kde sú kritické vykrytia.'}
+            {t('timeOff.bodyEditorial')}
           </p>
           <hr className="ed-divider mt-6" />
         </div>
       ) : (
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-sm text-tertiary uppercase tracking-wider mb-1">People Operations</p>
-            <h1 className="font-display text-3xl">{isEn ? 'Time Off & Team Capacity' : 'Dovolenky & Kapacita timu'}</h1>
+          <p className="text-sm text-tertiary uppercase tracking-wider mb-1">{t('timeOff.eyebrowEditorial')}</p>
+            <h1 className="font-display text-3xl">{t('timeOff.headlineClassic')}</h1>
           <p className="text-secondary text-sm mt-1">
-            {isEn
-              ? 'Planning tool for HR · see who is away and where coverage is critical'
-              : 'Planovacie nastroj pre HR · vidis kedy je kazdy prec a kde su kriticke vykryty'}
+            {t('timeOff.bodyClassic')}
           </p>
         </div>
       </div>

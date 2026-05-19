@@ -12,7 +12,7 @@ interface NewsletterProps {
 }
 
 export function Newsletter({ onLeadCapture }: NewsletterProps) {
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const { mode } = useDesignMode();
   const isEn = lang === 'en';
   const isEditorial = mode === 'editorial';
@@ -20,8 +20,32 @@ export function Newsletter({ onLeadCapture }: NewsletterProps) {
   const [news, setNews] = useState(initialNews);
   const [filter, setFilter] = useState<string>('all');
 
-  const categories = ['all', ...Array.from(new Set(news.map((n) => n.category)))];
-  const filtered = filter === 'all' ? news : news.filter((n) => n.category === filter);
+  const localizedNews = news.map((item) => {
+    if (lang === 'en') return item;
+    const categoryMap: Record<string, string> = {
+      Milestones: t('newsletterContent.milestone'),
+      'Office Life': t('newsletterContent.officeLife'),
+      Events: t('newsletterContent.events'),
+      Benefits: t('newsletterContent.benefits'),
+      Business: t('newsletterContent.business'),
+    };
+    const byId: Record<string, { title: string; excerpt: string }> = {
+      'n-1': { title: t('newsletterContent.n1Title'), excerpt: t('newsletterContent.n1Excerpt') },
+      'n-2': { title: t('newsletterContent.n2Title'), excerpt: t('newsletterContent.n2Excerpt') },
+      'n-3': { title: t('newsletterContent.n3Title'), excerpt: t('newsletterContent.n3Excerpt') },
+      'n-4': { title: t('newsletterContent.n4Title'), excerpt: t('newsletterContent.n4Excerpt') },
+      'n-5': { title: t('newsletterContent.n5Title'), excerpt: t('newsletterContent.n5Excerpt') },
+    };
+    return {
+      ...item,
+      title: byId[item.id]?.title ?? item.title,
+      excerpt: byId[item.id]?.excerpt ?? item.excerpt,
+      category: categoryMap[item.category] ?? item.category,
+    };
+  });
+
+  const categories = ['all', ...Array.from(new Set(localizedNews.map((n) => n.category)))];
+  const filtered = filter === 'all' ? localizedNews : localizedNews.filter((n) => n.category === filter);
 
   const addReaction = (newsId: string, emoji: string) => {
     setNews((prev) =>
@@ -48,73 +72,71 @@ export function Newsletter({ onLeadCapture }: NewsletterProps) {
         <div className="br-fade-in">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
             <span className="br-tag" data-tone="accent">● NEWS</span>
-            <span className="br-eyebrow">COMMUNICATION · {news.length} POSTS</span>
+            <span className="br-eyebrow">{t('newsletter.eyebrowBrutalist').toUpperCase()} · {news.length} {t('newsletter.posts').toUpperCase()}</span>
           </div>
           <h1 className="br-poster text-5xl md:text-7xl mb-4" style={{ lineHeight: 0.9 }}>
-            {isEn ? <>What's <em className="br-italic">happening.</em></> : <>Čo je <em className="br-italic">nové.</em></>}
+            {t('newsletter.headlineBrutalist')} <em className="br-italic">{t('newsletter.headlineEmBrutalist')}</em>
           </h1>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}>
-            {isEn ? 'Internal company feed.' : 'Interný firemný feed.'}{' '}
-            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{isEn ? 'React with emojis. Be seen.' : 'Reaguj emojkami. Buď videno.'}</span>
+            {t('newsletter.bodyBrutalist')}{' '}
+            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{t('newsletter.bodyBrutalistAccent')}</span>
           </p>
           <hr className="br-divider mt-6" />
           <div className="flex gap-2 flex-wrap mt-4">
             <button className="br-btn">
               <Sparkles size={13} strokeWidth={2} />
-              {(isEn ? 'AI: Write for me' : 'AI: Napísať za mňa').toUpperCase()}
+              {t('newsletter.aiWrite').toUpperCase()}
             </button>
             <button className="br-btn br-btn-accent">
               <Plus size={13} strokeWidth={2} />
-              {(isEn ? 'New post' : 'Nový článok').toUpperCase()}
+              {t('newsletter.newPost').toUpperCase()}
             </button>
           </div>
         </div>
       ) : isEditorial ? (
         <div className="ed-fade-in">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <span className="ed-eyebrow">Communication</span>
+            <span className="ed-eyebrow">{t('newsletter.eyebrowEditorial')}</span>
             <span className="ed-tag" data-status="live">
               <span className="ed-pulse-dot"></span>
-              {news.length} posts
+              {news.length} {t('newsletter.posts')}
             </span>
           </div>
           <h1 className="ed-display text-5xl md:text-6xl mb-3" style={{ lineHeight: 0.95 }}>
-            {isEn ? <>Company <em className="ed-italic-flourish">news</em>.</> : <>Firemné <em className="ed-italic-flourish">správy</em>.</>}
+            {t('newsletter.headlineEditorial')} <em className="ed-italic-flourish">{t('newsletter.headlineEmEditorial')}</em>.
           </h1>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--ed-text-secondary)' }}>
-            {isEn ? 'Internal feed — react with emojis, teammates see it.' : 'Interný feed — reaguj emojkami, kolegovia to vidia.'}
+            {t('newsletter.bodyEditorial')}
           </p>
           <hr className="ed-divider mt-6" />
           <div className="flex gap-2 flex-wrap mt-4">
             <button className="ed-btn">
               <Sparkles size={13} strokeWidth={1.5} />
-              {isEn ? 'AI: Write for me' : 'AI: Napísať za mňa'}
+              {t('newsletter.aiWrite')}
             </button>
             <button className="ed-btn ed-btn-primary">
               <Plus size={13} strokeWidth={1.5} />
-              {isEn ? 'New post' : 'Nový článok'}
+              {t('newsletter.newPost')}
             </button>
           </div>
         </div>
       ) : (
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-sm text-tertiary uppercase tracking-wider mb-1">Communication</p>
-          <h1 className="font-display text-3xl">{isEn ? 'Company News' : 'Firemné správy'}</h1>
+          <p className="text-sm text-tertiary uppercase tracking-wider mb-1">{t('newsletter.eyebrowEditorial')}</p>
+          <h1 className="font-display text-3xl">{t('newsletter.headlineClassic')}</h1>
           <p className="text-secondary text-sm mt-1">
-            {isEn
-              ? `${news.length} posts · Tip: react with emojis, teammates can see it 👀`
-              : `${news.length} článkov · Tip: Reaguj emojkami, kolegovia to vidia 👀`}
+            {news.length} {t('newsletter.bodyClassic')}
           </p>
         </div>
         <div className="flex gap-2">
           <button className="btn-secondary text-sm">
             <Sparkles size={14} />
-            {isEn ? 'AI: Write for me' : 'AI: Napísať za mňa'}
+            {t('newsletter.aiWrite')}
           </button>
           <button className="btn-primary text-sm">
             <Plus size={14} />
-            {isEn ? 'New post' : 'Nový článok'}
+            {t('newsletter.newPost')}
           </button>
         </div>
       </div>
@@ -128,7 +150,7 @@ export function Newsletter({ onLeadCapture }: NewsletterProps) {
             onClick={() => setFilter(cat)}
             className={cn('badge', filter === cat && 'badge-accent')}
           >
-            {cat === 'all' ? (isEn ? 'All' : 'Všetky') : cat}
+            {cat === 'all' ? t('newsletter.allCategory') : cat}
           </button>
         ))}
       </div>

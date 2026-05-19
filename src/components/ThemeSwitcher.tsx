@@ -37,7 +37,7 @@ export function ThemeSwitcher({ onOpenBranding }: ThemeSwitcherProps) {
           >
             {/* Design mode toggle — Classic vs Editorial vs Brutalist */}
             <div className="px-3 py-2 mb-1">
-              <p className="text-xs uppercase tracking-wider text-tertiary font-medium">Design mode</p>
+              <p className="text-xs uppercase tracking-wider text-tertiary font-medium">{t('theme.designMode')}</p>
             </div>
             <div className="grid grid-cols-3 gap-1 px-2 mb-2">
               <button
@@ -50,8 +50,8 @@ export function ThemeSwitcher({ onOpenBranding }: ThemeSwitcherProps) {
                 }
               >
                 <Layout size={14} className={mode === 'classic' ? 'accent-text' : 'text-tertiary'} />
-                <span className="text-xs font-medium">Classic</span>
-                <span className="text-[9px] text-tertiary text-center leading-tight">Vibrant</span>
+                <span className="text-xs font-medium">{t('theme.modeClassic')}</span>
+                <span className="text-[9px] text-tertiary text-center leading-tight">{t('theme.modeClassicDesc')}</span>
               </button>
               <button
                 onClick={() => setMode('editorial')}
@@ -63,8 +63,8 @@ export function ThemeSwitcher({ onOpenBranding }: ThemeSwitcherProps) {
                 }
               >
                 <Feather size={14} className={mode === 'editorial' ? 'accent-text' : 'text-tertiary'} />
-                <span className="text-xs font-medium">Editorial</span>
-                <span className="text-[9px] text-tertiary text-center leading-tight">Refined</span>
+                <span className="text-xs font-medium">{t('theme.modeEditorial')}</span>
+                <span className="text-[9px] text-tertiary text-center leading-tight">{t('theme.modeEditorialDesc')}</span>
               </button>
               <button
                 onClick={() => setMode('brutalist')}
@@ -76,8 +76,8 @@ export function ThemeSwitcher({ onOpenBranding }: ThemeSwitcherProps) {
                 }
               >
                 <Type size={14} className={mode === 'brutalist' ? 'accent-text' : 'text-tertiary'} />
-                <span className="text-xs font-medium">Brutalist</span>
-                <span className="text-[9px] text-tertiary text-center leading-tight">Bold serif</span>
+                <span className="text-xs font-medium">{t('theme.modeBrutalist')}</span>
+                <span className="text-[9px] text-tertiary text-center leading-tight">{t('theme.modeBrutalistDesc')}</span>
               </button>
             </div>
             <div className="border-t border-subtle my-2" />

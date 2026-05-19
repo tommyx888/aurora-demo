@@ -9,6 +9,7 @@ import {
 } from 'recharts';
 import { candidates } from '../data/candidates';
 import { requests } from '../data/content';
+import { useLanguage } from '../hooks/useLanguage';
 
 type Period = 'week' | 'month' | 'quarter';
 
@@ -73,6 +74,8 @@ const CHART_DATA = {
 };
 
 export function AdminDashboardEditorial() {
+  const { t, lang } = useLanguage();
+  const isEn = lang === 'en';
   const [period, setPeriod] = useState<Period>('month');
   const data = CHART_DATA[period];
 
@@ -90,12 +93,33 @@ export function AdminDashboardEditorial() {
 
   // Today's date in editorial format
   const today = new Date();
-  const dateStr = today.toLocaleDateString('en-GB', {
+  const dateStr = today.toLocaleDateString(isEn ? 'en-GB' : 'sk-SK', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
+
+  // Localized period label + story
+  const periodLabel = period === 'week' ? t('adminEditorial.labelWeek')
+    : period === 'month' ? t('adminEditorial.labelMonth')
+    : t('adminEditorial.labelQuarter');
+  const subtitleText = period === 'week' ? t('adminEditorial.subtitleWeek')
+    : period === 'month' ? t('adminEditorial.subtitleMonth')
+    : t('adminEditorial.subtitleQuarter');
+  const headcountStory = period === 'week' ? t('adminEditorial.headcountStoryWeek')
+    : period === 'month' ? t('adminEditorial.headcountStoryMonth')
+    : t('adminEditorial.headcountStoryQuarter');
+  const overLabel = period === 'week' ? t('adminEditorial.overWeek')
+    : period === 'month' ? t('adminEditorial.overMonth')
+    : t('adminEditorial.overQuarter');
+  const funnelLabel: Record<string, string> = {
+    Applied: t('adminEditorial.funnelApplied'),
+    Screened: t('adminEditorial.funnelScreened'),
+    Interviewed: t('adminEditorial.funnelInterviewed'),
+    Offered: t('adminEditorial.funnelOffered'),
+    Hired: t('adminEditorial.funnelHired'),
+  };
 
   return (
     <div className="ed-root min-h-full -m-6 sm:-m-8 p-6 sm:p-10">
@@ -105,20 +129,20 @@ export function AdminDashboardEditorial() {
       <header className="ed-fade-in" style={{ animationDelay: '0ms' }}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <span className="ed-eyebrow">Talent · Q2 2026</span>
+            <span className="ed-eyebrow">{t('adminEditorial.eyebrow')}</span>
             <span className="ed-tag" data-status="live">
               <span className="ed-pulse-dot"></span>
-              Live
+              {t('adminEditorial.live')}
             </span>
           </div>
           <span className="ed-mono" style={{ color: 'var(--ed-text-tertiary)' }}>{dateStr}</span>
         </div>
 
         <h1 className="ed-display text-5xl md:text-6xl mb-2">
-          Good morning, <em className="ed-italic-flourish">Janka</em>.
+          {t('adminEditorial.helloMorning')} <em className="ed-italic-flourish">{t('adminEditorial.helloName')}</em>.
         </h1>
         <p className="text-base mb-6" style={{ color: 'var(--ed-text-secondary)', maxWidth: '38rem' }}>
-          Here's where the company stands this {period}. Three metrics moved, one needs attention.
+          {subtitleText}
         </p>
 
         <hr className="ed-divider-bold mt-4" />
@@ -126,7 +150,7 @@ export function AdminDashboardEditorial() {
         {/* Period switcher row */}
         <div className="flex items-center justify-between gap-4 py-4 flex-wrap">
           <nav className="flex items-center gap-1" aria-label="Period">
-            <span className="ed-section-num mr-4">01 — Period</span>
+            <span className="ed-section-num mr-4">{t('adminEditorial.secPeriod')}</span>
             <div className="ed-segment">
               {(['week', 'month', 'quarter'] as const).map((p) => (
                 <button
@@ -135,7 +159,9 @@ export function AdminDashboardEditorial() {
                   className="ed-segment-item"
                   data-active={period === p}
                 >
-                  {p === 'week' ? 'Week' : p === 'month' ? 'Month' : 'Quarter'}
+                  {p === 'week' ? t('adminEditorial.periodWeek')
+                    : p === 'month' ? t('adminEditorial.periodMonth')
+                    : t('adminEditorial.periodQuarter')}
                 </button>
               ))}
             </div>
@@ -144,7 +170,7 @@ export function AdminDashboardEditorial() {
           <div className="flex items-center gap-2">
             <button className="ed-btn">
               <Activity size={13} strokeWidth={1.5} />
-              Export
+              {t('adminEditorial.export')}
             </button>
           </div>
         </div>
@@ -157,33 +183,33 @@ export function AdminDashboardEditorial() {
           ============================================ */}
       <section className="ed-fade-in py-10" style={{ animationDelay: '60ms' }}>
         <div className="flex items-baseline justify-between mb-6">
-          <h2 className="ed-eyebrow">02 — Key metrics</h2>
-          <span className="ed-mono" style={{ color: 'var(--ed-text-tertiary)' }}>{data.label}</span>
+          <h2 className="ed-eyebrow">{t('adminEditorial.secMetrics')}</h2>
+          <span className="ed-mono" style={{ color: 'var(--ed-text-tertiary)' }}>{periodLabel}</span>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-8">
           <Kpi
             num={15}
-            label="Headcount"
-            delta={`+${data.growthValue} new`}
+            label={t('adminEditorial.kpiHeadcount')}
+            delta={`+${data.growthValue} ${t('adminEditorial.kpiHeadcountDelta')}`}
             deltaSign="positive"
           />
           <Kpi
             num={`+${enpsCurrent}`}
-            label="Employee NPS"
-            delta={`${enpsDelta >= 0 ? '+' : ''}${enpsDelta} vs. prev.`}
+            label={t('adminEditorial.kpiEnps')}
+            delta={`${enpsDelta >= 0 ? '+' : ''}${enpsDelta} ${t('adminEditorial.kpiEnpsDelta')}`}
             deltaSign={enpsDelta >= 0 ? 'positive' : 'negative'}
           />
           <Kpi
             num={activeRecruits}
-            label="Active pipeline"
-            delta={`${conversion}% conversion`}
+            label={t('adminEditorial.kpiPipeline')}
+            delta={`${conversion}% ${t('adminEditorial.kpiPipelineDelta')}`}
             deltaSign="neutral"
           />
           <Kpi
             num={pendingRequests}
-            label="Pending requests"
-            delta="Awaiting review"
+            label={t('adminEditorial.kpiPending')}
+            delta={t('adminEditorial.kpiPendingDelta')}
             deltaSign="warning"
           />
         </div>
@@ -196,22 +222,22 @@ export function AdminDashboardEditorial() {
           ============================================ */}
       <section className="ed-fade-in py-10" style={{ animationDelay: '120ms' }}>
         <div className="flex items-baseline justify-between mb-6">
-          <h2 className="ed-eyebrow">03 — Headcount</h2>
-          <span className="ed-mono" style={{ color: 'var(--ed-text-tertiary)' }}>{data.label}</span>
+          <h2 className="ed-eyebrow">{t('adminEditorial.secHeadcount')}</h2>
+          <span className="ed-mono" style={{ color: 'var(--ed-text-tertiary)' }}>{periodLabel}</span>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 items-start">
           <div className="md:col-span-1">
             <h3 className="ed-headline text-3xl mb-3">
-              Steady <em className="ed-italic-flourish">growth</em>
+              {t('adminEditorial.headcountTitle')} <em className="ed-italic-flourish">{t('adminEditorial.headcountTitleEm')}</em>
             </h3>
             <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--ed-text-secondary)' }}>
-              The team grew from 11 to 15 over the {period}. Hiring rate stayed within plan — no over-hiring, no churn surprises.
+              {headcountStory}
             </p>
             <div className="flex items-center gap-2 ed-mono">
               <TrendingUp size={13} strokeWidth={1.5} style={{ color: 'var(--ed-positive)' }} />
               <span style={{ color: 'var(--ed-positive)' }}>+{Math.round((data.headcount[data.headcount.length - 1].count / data.headcount[0].count - 1) * 100)}%</span>
-              <span style={{ color: 'var(--ed-text-tertiary)' }}>over {period}</span>
+              <span style={{ color: 'var(--ed-text-tertiary)' }}>{overLabel}</span>
             </div>
           </div>
 
@@ -262,7 +288,7 @@ export function AdminDashboardEditorial() {
           {/* eNPS */}
           <div>
             <div className="flex items-baseline justify-between mb-6">
-              <h2 className="ed-eyebrow">04 — Employee NPS</h2>
+              <h2 className="ed-eyebrow">{t('adminEditorial.secEnps')}</h2>
               <span className={`ed-mono flex items-center gap-1`} style={{ color: enpsDelta >= 0 ? 'var(--ed-positive)' : 'var(--ed-negative)' }}>
                 {enpsDelta >= 0 ? <TrendingUp size={11} strokeWidth={1.5} /> : <TrendingDown size={11} strokeWidth={1.5} />}
                 {enpsDelta >= 0 ? '+' : ''}{enpsDelta}
@@ -271,11 +297,11 @@ export function AdminDashboardEditorial() {
 
             <div className="flex items-baseline gap-4 mb-4">
               <span className="ed-number text-7xl">+{enpsCurrent}</span>
-              <span className="ed-eyebrow">Score</span>
+              <span className="ed-eyebrow">{t('adminEditorial.enpsScore')}</span>
             </div>
 
             <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--ed-text-secondary)' }}>
-              Trending up since Q1. The Tatra Bank deal energized the team. Watch for engineering team mid-summer when capacity tightens.
+              {t('adminEditorial.enpsStory')}
             </p>
 
             <div className="ed-chart">
@@ -308,9 +334,9 @@ export function AdminDashboardEditorial() {
           {/* Recruiting Funnel */}
           <div>
             <div className="flex items-baseline justify-between mb-6">
-              <h2 className="ed-eyebrow">05 — Recruiting funnel</h2>
+              <h2 className="ed-eyebrow">{t('adminEditorial.secFunnel')}</h2>
               <span className="ed-mono" style={{ color: 'var(--ed-text-tertiary)' }}>
-                {conversion}% conversion
+                {conversion}% {t('adminEditorial.funnelConversion')}
               </span>
             </div>
 
@@ -321,7 +347,7 @@ export function AdminDashboardEditorial() {
                 return (
                   <div key={s.stage} className="flex items-center gap-4">
                     <span className="ed-section-num w-6">{String(i + 1).padStart(2, '0')}</span>
-                    <span className="text-sm flex-1" style={{ color: 'var(--ed-text-secondary)' }}>{s.stage}</span>
+                    <span className="text-sm flex-1" style={{ color: 'var(--ed-text-secondary)' }}>{funnelLabel[s.stage] || s.stage}</span>
                     <div className="relative flex-1 max-w-xs">
                       <div className="h-px" style={{ background: 'var(--ed-border)' }} />
                       <motion.div
@@ -348,31 +374,31 @@ export function AdminDashboardEditorial() {
           ============================================ */}
       <section className="ed-fade-in py-10" style={{ animationDelay: '240ms' }}>
         <div className="flex items-baseline justify-between mb-6">
-          <h2 className="ed-eyebrow">06 — Worth your attention</h2>
-          <span className="ed-tag">3 items</span>
+          <h2 className="ed-eyebrow">{t('adminEditorial.secAttention')}</h2>
+          <span className="ed-tag">3 {t('adminEditorial.attentionItems')}</span>
         </div>
 
         <div className="space-y-8">
           <Insight
             num="01"
             severity="warn"
-            headline={<>Engineering vacation cluster, <em className="ed-italic-flourish">mid-July</em></>}
-            body="Filip and Tomáš both submitted vacation for July 14–25. Combined with Adam's previously approved leave, the eng team drops to 3 people for two weeks. Worth flagging to Peter."
-            action="Open in Time-off"
+            headline={<>{t('adminEditorial.insight1Headline')} <em className="ed-italic-flourish">{t('adminEditorial.insight1HeadlineEm')}</em></>}
+            body={t('adminEditorial.insight1Body')}
+            action={t('adminEditorial.insight1Action')}
           />
           <Insight
             num="02"
             severity="info"
-            headline={<>Vue.js coverage is <em className="ed-italic-flourish">one deep</em></>}
-            body="Only Martin holds Vue.js skills (level 2). If a Vue project lands or Martin leaves, you have zero coverage. Consider sending Filip or Adam to a 2-week Vue intensive."
-            action="Schedule training"
+            headline={<>{t('adminEditorial.insight2Headline')} <em className="ed-italic-flourish">{t('adminEditorial.insight2HeadlineEm')}</em></>}
+            body={t('adminEditorial.insight2Body')}
+            action={t('adminEditorial.insight2Action')}
           />
           <Insight
             num="03"
             severity="positive"
-            headline={<>Two strong AI-sourced candidates <em className="ed-italic-flourish">in pipeline</em></>}
-            body="Patrik Sůra (92% match, Senior React) and Tomáš Fischer (89%, DevOps) are both at screening. Both are likely getting offers from competitors. Move fast."
-            action="View candidates"
+            headline={<>{t('adminEditorial.insight3Headline')} <em className="ed-italic-flourish">{t('adminEditorial.insight3HeadlineEm')}</em></>}
+            body={t('adminEditorial.insight3Body')}
+            action={t('adminEditorial.insight3Action')}
           />
         </div>
       </section>
@@ -381,9 +407,9 @@ export function AdminDashboardEditorial() {
       <footer className="ed-fade-in pt-12 pb-4" style={{ animationDelay: '300ms' }}>
         <hr className="ed-divider mb-4" />
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <span className="ed-eyebrow">Digital Evolution · HR Platform</span>
+          <span className="ed-eyebrow">{t('adminEditorial.footerLabel')}</span>
           <span className="ed-mono" style={{ color: 'var(--ed-text-tertiary)' }}>
-            Updated {today.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+            {t('adminEditorial.footerUpdated')} {today.toLocaleTimeString(isEn ? 'en-GB' : 'sk-SK', { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
       </footer>

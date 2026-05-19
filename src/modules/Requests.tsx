@@ -31,7 +31,7 @@ const typeLabels = {
 };
 
 export function Requests({ onLeadCapture }: RequestsProps) {
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const { mode } = useDesignMode();
   const isEn = lang === 'en';
   const isEditorial = mode === 'editorial';
@@ -51,59 +51,59 @@ export function Requests({ onLeadCapture }: RequestsProps) {
         <div className="br-fade-in">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
             <span className="br-tag" data-tone="accent">● REQUESTS</span>
-            <span className="br-eyebrow">WORKFLOW · {requests.filter((r) => r.status === 'pending').length} PENDING</span>
+            <span className="br-eyebrow">{t('requests.eyebrowBrutalist').toUpperCase()} · {requests.filter((r) => r.status === 'pending').length} {t('requests.pending').toUpperCase()}</span>
           </div>
           <h1 className="br-poster text-5xl md:text-7xl mb-4" style={{ lineHeight: 0.9 }}>
-            {isEn ? <>Ask. <em className="br-italic">Approve.</em></> : <>Požiadaj. <em className="br-italic">Schváľ.</em></>}
+            {t('requests.headlineBrutalist')} <em className="br-italic">{t('requests.headlineEmBrutalist')}</em>
           </h1>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}>
-            {isEn ? 'Central place for vacation, equipment, training.' : 'Centrálne miesto pre dovolenky, equipment, školenia.'}{' '}
-            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{isEn ? 'No more email chains.' : 'Žiadne email chaíny.'}</span>
+            {t('requests.bodyBrutalist')}{' '}
+            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{t('requests.bodyBrutalistAccent')}</span>
           </p>
           <hr className="br-divider mt-6" />
           <div className="flex gap-2 flex-wrap mt-4">
             <button className="br-btn br-btn-accent">
               <Plus size={13} strokeWidth={2} />
-              {(isEn ? 'New request' : 'Nová žiadanka').toUpperCase()}
+              {t('requests.newRequest').toUpperCase()}
             </button>
           </div>
         </div>
       ) : isEditorial ? (
         <div className="ed-fade-in">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <span className="ed-eyebrow">Workflow</span>
+            <span className="ed-eyebrow">{t('requests.eyebrowEditorial')}</span>
             <span className="ed-tag" data-status="live">
               <span className="ed-pulse-dot"></span>
-              {requests.filter((r) => r.status === 'pending').length} pending
+              {requests.filter((r) => r.status === 'pending').length} {t('requests.pending').toLowerCase()}
             </span>
           </div>
           <h1 className="ed-display text-5xl md:text-6xl mb-3" style={{ lineHeight: 0.95 }}>
-            {isEn ? <>Requests &amp; <em className="ed-italic-flourish">approvals</em>.</> : <>Žiadanky &amp; <em className="ed-italic-flourish">schvaľovanie</em>.</>}
+            {t('requests.headlineEditorial')} <em className="ed-italic-flourish">{t('requests.headlineEmEditorial')}</em>.
           </h1>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--ed-text-secondary)' }}>
-            {isEn ? 'Central place for vacation, equipment, training and more.' : 'Centrálne miesto pre dovolenky, equipment, školenia a viac.'}
+            {t('requests.bodyEditorial')}
           </p>
           <hr className="ed-divider mt-6" />
           <div className="flex gap-2 flex-wrap mt-4">
             <button className="ed-btn ed-btn-primary">
               <Plus size={13} strokeWidth={1.5} />
-              {isEn ? 'New request' : 'Nová žiadanka'}
+              {t('requests.newRequest')}
             </button>
           </div>
         </div>
       ) : (
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-sm text-tertiary uppercase tracking-wider mb-1">Workflow</p>
-          <h1 className="font-display text-3xl">{isEn ? 'Requests & Approvals' : 'Žiadanky & Schvaľovanie'}</h1>
+          <p className="text-sm text-tertiary uppercase tracking-wider mb-1">{t('requests.eyebrowEditorial')}</p>
+          <h1 className="font-display text-3xl">{t('requests.headlineClassic')}</h1>
           <p className="text-secondary text-sm mt-1">
-            {isEn ? 'Central place for vacation, equipment, training and more' : 'Centrálne miesto pre dovolenky, equipment, školenia a viac'}
+            {t('requests.bodyClassic')}
           </p>
         </div>
         <div className="flex gap-2">
           <button className="btn-primary text-sm">
             <Plus size={14} />
-            {isEn ? 'New request' : 'Nová žiadanka'}
+            {t('requests.newRequest')}
           </button>
         </div>
       </div>

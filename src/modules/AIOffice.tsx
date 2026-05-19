@@ -113,7 +113,7 @@ const TEMPLATES: TemplateConfig[] = [
 ];
 
 export function AIOffice({ onLeadCapture }: AIOfficeProps) {
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const { mode } = useDesignMode();
   const isEn = lang === 'en';
   const isEditorial = mode === 'editorial';
@@ -174,42 +174,40 @@ export function AIOffice({ onLeadCapture }: AIOfficeProps) {
         <div className="br-fade-in">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
             <span className="br-tag" data-tone="accent">● AI OFFICE</span>
-            <span className="br-eyebrow">DOCS · {isAILive ? 'LIVE' : 'DEMO MODE'}</span>
+            <span className="br-eyebrow">{t('aiOffice.eyebrowBrutalist').toUpperCase()} · {isAILive ? 'LIVE' : 'DEMO MODE'}</span>
           </div>
           <h1 className="br-poster text-5xl md:text-7xl mb-4" style={{ lineHeight: 0.9 }}>
-            Docs in <em className="br-italic">seconds.</em>
+            {t('aiOffice.headlineBrutalist')} <em className="br-italic">{t('aiOffice.headlineEmBrutalist')}</em>
           </h1>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--br-text-secondary)', letterSpacing: '-0.005em' }}>
-            {isEn ? 'Contracts, job ads, exit interviews and more.' : 'Zmluvy, inzeráty, exit interviews a viac.'}{' '}
-            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{TEMPLATES.length} {isEn ? 'templates ready' : 'šablón pripravených'}.</span>
+            {t('aiOffice.bodyBrutalist')}{' '}
+            <span style={{ color: 'var(--br-accent)', fontWeight: 600 }}>{t('aiOffice.bodyBrutalistAccent').replace('{count}', String(TEMPLATES.length))}</span>
           </p>
           <hr className="br-divider mt-6" />
         </div>
       ) : isEditorial ? (
         <div className="ed-fade-in">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <span className="ed-eyebrow">AI Office</span>
+            <span className="ed-eyebrow">{t('aiOffice.eyebrowEditorial')}</span>
             <span className="ed-tag" data-status="live">
               <span className="ed-pulse-dot"></span>
               {isAILive ? 'Live' : 'Demo mode'}
             </span>
           </div>
           <h1 className="ed-display text-5xl md:text-6xl mb-3" style={{ lineHeight: 0.95 }}>
-            AI document <em className="ed-italic-flourish">generator</em>.
+            {t('aiOffice.headlineEditorial')} <em className="ed-italic-flourish">{t('aiOffice.headlineEmEditorial')}</em>.
           </h1>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--ed-text-secondary)' }}>
-            {isEn
-              ? `${TEMPLATES.length} ready-made templates — contracts, job ads, exit interviews and more.`
-              : `${TEMPLATES.length} pripravených šablón — zmluvy, inzeráty, exit interviews a viac.`}
+            {t('aiOffice.bodyEditorial').replace('{count}', String(TEMPLATES.length))}
           </p>
           <hr className="ed-divider mt-6" />
         </div>
       ) : (
       <div>
-        <p className="text-sm text-tertiary uppercase tracking-wider mb-1">AI Office</p>
-        <h1 className="font-display text-3xl">{isEn ? 'AI Document Generator' : 'AI Generator dokumentov'}</h1>
+        <p className="text-sm text-tertiary uppercase tracking-wider mb-1">{t('aiOffice.eyebrowEditorial')}</p>
+        <h1 className="font-display text-3xl">{t('aiOffice.headlineClassic')}</h1>
         <p className="text-secondary text-sm mt-1">
-          {isEn ? 'Contracts, job ads, exit interviews and more' : 'Zmluvy, inzeraty, exit interviews a viac'} · {isAILive ? 'Live AI mode 🔥' : 'Demo mode'}
+          {t('aiOffice.bodyClassic')} · {isAILive ? 'Live AI mode 🔥' : 'Demo mode'}
         </p>
       </div>
       )}

@@ -303,10 +303,18 @@ export function applyPalette(palette: ExtractedPalette) {
   if (!styleEl) {
     styleEl = document.createElement('style');
     styleEl.id = 'custom-theme-style';
-    document.head.appendChild(styleEl);
   }
+  // ALWAYS re-append so this <style> is LAST in <head> — guarantees it wins cascade
+  // over Vite-bundled index.css (which is appended earlier).
+  document.head.appendChild(styleEl);
+
+  // Derived shades for Editorial + Brutalist accent treatments
+  const accentDark = adjustLightness(palette.primary, 25);
+  const accentVivid = adjustSaturation(palette.primary, 85);
+  const bgTinted = mixColors('#f4f1ec', palette.primary, 0.04);
 
   styleEl.textContent = `
+    /* ====== CLASSIC mode (default) ====== */
     [data-theme='custom'] {
       --bg-primary: ${palette.bgPrimary};
       --bg-secondary: ${palette.bgSecondary};
@@ -325,6 +333,125 @@ export function applyPalette(palette: ExtractedPalette) {
       --border-subtle: ${palette.borderSubtle};
       --border-medium: ${palette.borderMedium};
       --border-strong: ${palette.textPrimary};
+    }
+
+    /* ====== EDITORIAL mode: keep paper bg but apply user color as accent + headline tint ====== */
+    /* HIGH-SPECIFICITY selectors so we win against [data-design-mode='editorial'] alone */
+    html[data-theme='custom'][data-design-mode='editorial'],
+    html[data-design-mode='editorial'][data-theme='custom'] {
+      /* Accent colors get user palette — !important to defeat any later cascade rules */
+      --accent-primary: ${palette.primary} !important;
+      --accent-secondary: ${palette.secondary} !important;
+      --accent-tertiary: ${palette.tertiary} !important;
+      --text-on-accent: #ffffff !important;
+
+      /* Subtle tint in backgrounds */
+      --bg-accent: ${mixColors('#f5f5f4', palette.primary, 0.15)} !important;
+
+      /* Editorial-specific tokens */
+      --ed-accent: ${palette.primary} !important;
+      --ed-accent-hover: ${palette.secondary} !important;
+      --ed-positive: ${palette.primary} !important;
+    }
+
+    /* Editorial: pulse-dot uses custom color */
+    [data-theme='custom'][data-design-mode='editorial'] .ed-pulse-dot,
+    [data-design-mode='editorial'][data-theme='custom'] .ed-pulse-dot {
+      background: ${palette.primary};
+    }
+    [data-theme='custom'][data-design-mode='editorial'] .ed-pulse-dot::after,
+    [data-design-mode='editorial'][data-theme='custom'] .ed-pulse-dot::after {
+      background: ${palette.primary};
+    }
+
+    /* Editorial: tags use custom color */
+    [data-theme='custom'][data-design-mode='editorial'] .ed-tag[data-status='live'],
+    [data-design-mode='editorial'][data-theme='custom'] .ed-tag[data-status='live'] {
+      background: color-mix(in srgb, ${palette.primary} 12%, transparent);
+      color: ${accentDark};
+    }
+
+    /* Editorial: italic-flourish in headlines gets user accent */
+    [data-theme='custom'][data-design-mode='editorial'] .ed-italic-flourish,
+    [data-design-mode='editorial'][data-theme='custom'] .ed-italic-flourish {
+      color: ${palette.primary};
+    }
+
+    /* Editorial: primary button gets user color */
+    [data-theme='custom'][data-design-mode='editorial'] .ed-btn-primary,
+    [data-design-mode='editorial'][data-theme='custom'] .ed-btn-primary {
+      background: ${palette.primary};
+      color: #ffffff;
+      border-color: ${palette.primary};
+    }
+    [data-theme='custom'][data-design-mode='editorial'] .ed-btn-primary:hover,
+    [data-design-mode='editorial'][data-theme='custom'] .ed-btn-primary:hover {
+      background: ${palette.secondary};
+      border-color: ${palette.secondary};
+    }
+
+    /* Editorial: accent utility classes */
+    [data-theme='custom'][data-design-mode='editorial'] .accent-text,
+    [data-design-mode='editorial'][data-theme='custom'] .accent-text {
+      color: ${palette.primary} !important;
+    }
+    [data-theme='custom'][data-design-mode='editorial'] .accent-bg,
+    [data-design-mode='editorial'][data-theme='custom'] .accent-bg {
+      background: ${palette.primary} !important;
+      color: #ffffff;
+    }
+    [data-theme='custom'][data-design-mode='editorial'] .accent-border,
+    [data-design-mode='editorial'][data-theme='custom'] .accent-border {
+      border-color: ${palette.primary} !important;
+    }
+    [data-theme='custom'][data-design-mode='editorial'] .gradient-text,
+    [data-design-mode='editorial'][data-theme='custom'] .gradient-text {
+      background: linear-gradient(135deg, ${palette.primary}, ${palette.secondary});
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ====== BRUTALIST mode: accent gets user vivid color, keep paper bg ====== */
+    html[data-theme='custom'][data-design-mode='brutalist'],
+    html[data-design-mode='brutalist'][data-theme='custom'] {
+      /* Replace signal-red with vivid user color */
+      --br-accent: ${accentVivid} !important;
+      --accent-secondary: ${accentVivid} !important;
+
+      /* Slightly tint paper bg with user color */
+      --br-bg: ${bgTinted} !important;
+      --bg-primary: ${bgTinted} !important;
+    }
+
+    /* Brutalist: italic flourish gets user color */
+    [data-theme='custom'][data-design-mode='brutalist'] .br-italic,
+    [data-design-mode='brutalist'][data-theme='custom'] .br-italic {
+      color: ${accentVivid};
+    }
+
+    /* Brutalist: accent tag uses user color */
+    [data-theme='custom'][data-design-mode='brutalist'] .br-tag[data-tone='accent'],
+    [data-design-mode='brutalist'][data-theme='custom'] .br-tag[data-tone='accent'] {
+      background: ${accentVivid};
+      color: ${palette.bgSecondary};
+    }
+
+    /* Brutalist: accent button */
+    [data-theme='custom'][data-design-mode='brutalist'] .br-btn-accent,
+    [data-design-mode='brutalist'][data-theme='custom'] .br-btn-accent {
+      background: ${accentVivid};
+      color: ${palette.bgSecondary};
+      border-color: ${accentVivid};
+    }
+
+    /* Brutalist: gradient-text gets user color (italic) */
+    [data-theme='custom'][data-design-mode='brutalist'] .gradient-text,
+    [data-design-mode='brutalist'][data-theme='custom'] .gradient-text {
+      background: none;
+      -webkit-text-fill-color: ${accentVivid};
+      color: ${accentVivid};
+      font-style: italic;
     }
   `;
 

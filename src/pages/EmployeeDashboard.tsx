@@ -15,7 +15,7 @@ interface EmployeeDashboardProps {
 }
 
 export function EmployeeDashboard({ onNavigate, onOpenChat }: EmployeeDashboardProps) {
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const isEn = lang === 'en';
   const upcomingBirthdays = employees
     .map((e) => {
@@ -34,7 +34,31 @@ export function EmployeeDashboard({ onNavigate, onOpenChat }: EmployeeDashboardP
     .sort((a, b) => a.days - b.days)
     .slice(0, 5);
 
-  const latestNews = news.slice(0, 3);
+  const localizedNews = news.map((item) => {
+    if (lang === 'en') return item;
+    const categoryMap: Record<string, string> = {
+      Milestones: t('newsletterContent.milestone'),
+      'Office Life': t('newsletterContent.officeLife'),
+      Events: t('newsletterContent.events'),
+      Benefits: t('newsletterContent.benefits'),
+      Business: t('newsletterContent.business'),
+    };
+    const byId: Record<string, { title: string; excerpt: string }> = {
+      'n-1': { title: t('newsletterContent.n1Title'), excerpt: t('newsletterContent.n1Excerpt') },
+      'n-2': { title: t('newsletterContent.n2Title'), excerpt: t('newsletterContent.n2Excerpt') },
+      'n-3': { title: t('newsletterContent.n3Title'), excerpt: t('newsletterContent.n3Excerpt') },
+      'n-4': { title: t('newsletterContent.n4Title'), excerpt: t('newsletterContent.n4Excerpt') },
+      'n-5': { title: t('newsletterContent.n5Title'), excerpt: t('newsletterContent.n5Excerpt') },
+    };
+    return {
+      ...item,
+      title: byId[item.id]?.title ?? item.title,
+      excerpt: byId[item.id]?.excerpt ?? item.excerpt,
+      category: categoryMap[item.category] ?? item.category,
+    };
+  });
+
+  const latestNews = localizedNews.slice(0, 3);
 
   return (
     <div className="page-enter space-y-6">
